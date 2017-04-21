@@ -30,7 +30,7 @@
 #define SPI_TX_LSB_FIRST							1
 
 
-#define SPI_REG_CR1_SPE								((uint32) 1 << 6)			// SPI Enable
+#define SPI_REG_CR1_SPE								((uint32_t) 1 << 6)			// SPI Enable
 
 
 #define SPI_REG_CR1_BR_PCLK_DIV_2			((uint32_t) 0 << 3)		// Baud rate control
@@ -72,6 +72,20 @@
 #define SPI_DATA_SIZE_14							((uint32_t) 13 << 8)
 #define SPI_DATA_SIZE_15						  ((uint32_t) 14 << 8)
 #define SPI_DATA_SIZE_16							((uint32_t) 15 << 8)
+
+#define SPI_DATASIZE_4								4
+#define SPI_DATASIZE_5								5
+#define SPI_DATASIZE_6								6
+#define SPI_DATASIZE_7								7
+#define SPI_DATASIZE_8								8
+#define SPI_DATASIZE_9								9
+#define SPI_DATASIZE_10								10
+#define SPI_DATASIZE_11								11
+#define SPI_DATASIZE_12								12
+#define SPI_DATASIZE_13								13
+#define SPI_DATASIZE_14								14
+#define SPI_DATASIZE_15								15
+#define SPI_DATASIZE_16								16
 
 
 #define SPI_REG_CR2_TXEIE_ENABLE			((uint32_t) 1 << 7)		// TX buffer empty int. enable
@@ -235,7 +249,7 @@ void hal_spi_slave_tx(spi_handle_t *spi_handle, uint8_t *buffer, uint32_t len);
 * @param	*buffer : pointer to the rx buffer
 * @param	len : len of rx data
 */
-void hal_spi_master_rx(spi_handle_t *spi_handle, uint8_t *rcv_buffer, uint32_t len);
+void hal_spi_master_rx(spi_handle_t *spi_handle, uint8_t *rx_buffer, uint32_t len);
 
 
 /**
@@ -244,7 +258,7 @@ void hal_spi_master_rx(spi_handle_t *spi_handle, uint8_t *rcv_buffer, uint32_t l
 * @param	*buffer : pointer to the rx buffer
 * @param	len : len of rx data
 */
-void hal_spi_slave_rx(spi_handle_t *spi_handle, uint8_t *rcv_buffer, uint32_t len);
+void hal_spi_slave_rx(spi_handle_t *spi_handle, uint8_t *rx_buffer, uint32_t len);
 
 /**
 * @brief	This function handles SPI interrupt request.
@@ -253,6 +267,37 @@ void hal_spi_slave_rx(spi_handle_t *spi_handle, uint8_t *rcv_buffer, uint32_t le
 * @reval	None
 */
 void hal_spi_irq_handler(spi_handle_t *hspi);
+
+
+/**
+* @brief	
+* @param	*SPIx : base address of the SPI
+* @retval	None
+*/
+static void hal_spi_enable_txe_interrupt(SPI_TypeDef *SPIx);
+
+
+/**
+* @brief	
+* @param	*SPIx : base address of the SPI
+* @retval	None
+*/
+static void hal_spi_disable_txe_interrupt(SPI_TypeDef *SPIx);
+
+/**
+* @brief	
+* @param	*SPIx : base address of the SPI
+* @retval	None
+*/
+static void hal_spi_enable_rxne_interrupt(SPI_TypeDef *SPIx);
+
+
+/**
+* @brief	
+* @param	*SPIx : base address of the SPI
+* @retval	None
+*/
+static void hal_spi_disable_rxne_interrupt(SPI_TypeDef *SPIx);
 
 
 #endif

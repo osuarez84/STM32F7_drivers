@@ -441,6 +441,16 @@
               <FileType>5</FileType>
               <FilePath>.\hal_gpio_driver.h</FilePath>
             </File>
+            <File>
+              <FileName>hal_spi_driver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\hal_spi_driver.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_timer6_driver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\hal_timer6_driver.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -470,6 +480,12 @@
       </component>
     </components>
     <files>
+      <file attr="config" category="header" name="CMSIS\Driver\Config\RTE_Device.h" version="1.4.0">
+        <instance index="0" removed="1">RTE\Device\STM32F769NIHx\RTE_Device.h</instance>
+        <component Capiversion="1.0.0" Cclass="Device" Cgroup="STM32Cube Framework" Csub="Classic" Cvendor="Keil" Cversion="1.2.0" condition="STM32F7 Framework Classic"/>
+        <package name="STM32F7xx_DFP" schemaVersion="1.3" url="http://www.keil.com/pack" vendor="Keil" version="2.9.0"/>
+        <targetInfos/>
+      </file>
       <file attr="config" category="source" condition="STM32F769_ARMCC" name="Drivers\CMSIS\Device\ST\STM32F7xx\Source\Templates\arm\startup_stm32f769xx.s" version="1.2.0">
         <instance index="0">RTE\Device\STM32F769NIHx\startup_stm32f769xx.s</instance>
         <component Cclass="Device" Cgroup="Startup" Cvendor="Keil" Cversion="1.2.0" condition="STM32F7 CMSIS"/>
@@ -477,6 +493,12 @@
         <targetInfos>
           <targetInfo name="Target 1"/>
         </targetInfos>
+      </file>
+      <file attr="config" category="header" name="MDK\Templates\Inc\stm32f7xx_hal_conf.h" version="1.2.0">
+        <instance index="0" removed="1">RTE\Device\STM32F769NIHx\stm32f7xx_hal_conf.h</instance>
+        <component Capiversion="1.0.0" Cclass="Device" Cgroup="STM32Cube Framework" Csub="Classic" Cvendor="Keil" Cversion="1.2.0" condition="STM32F7 Framework Classic"/>
+        <package name="STM32F7xx_DFP" schemaVersion="1.3" url="http://www.keil.com/pack" vendor="Keil" version="2.9.0"/>
+        <targetInfos/>
       </file>
       <file attr="config" category="source" name="Drivers\CMSIS\Device\ST\STM32F7xx\Source\Templates\system_stm32f7xx.c" version="1.2.0">
         <instance index="0">RTE\Device\STM32F769NIHx\system_stm32f7xx.c</instance>
