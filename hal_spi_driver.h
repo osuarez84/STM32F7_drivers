@@ -268,6 +268,23 @@ void hal_spi_slave_rx(spi_handle_t *spi_handle, uint8_t *rx_buffer, uint32_t len
 */
 void hal_spi_irq_handler(spi_handle_t *hspi);
 
+/**
+* @brief	This function handles SPI interrupt request.
+* @param	*hspi : pointer to spi_handle_t structure that contains
+*						the configuration information or SPI module.
+* @reval	None
+*/
+void hal_spi_handle_tx_interrupt(spi_handle_t *hspi);
+
+
+/**
+* @brief	This function handles SPI interrupt request.
+* @param	*hspi : pointer to spi_handle_t structure that contains
+*						the configuration information or SPI module.
+* @reval	None
+*/
+void hal_spi_handle_rx_interrupt(spi_handle_t *hspi);
+
 
 /**
 * @brief	
@@ -297,7 +314,7 @@ static void hal_spi_enable_rxne_interrupt(SPI_TypeDef *SPIx);
 * @param	*SPIx : base address of the SPI
 * @retval	None
 */
-static void hal_spi_disable_rxne_interrupt(SPI_TypeDef *SPIx);
+
 
 
 #endif

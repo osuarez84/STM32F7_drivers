@@ -6,7 +6,15 @@
 /*                        			Helper functions											        */
 /*                                                     												*/
 /******************************************************************************/
+	/* NOTE : helper functions are all static. Static means that are	
+	encapsulated and only used inside this .c file. They are only
+	available for the API functions. */
 
+/**
+* @brief	
+* @param	
+* @retval	
+*/
 static void hal_spi_enable(SPI_TypeDef *SPIx){
 
 	// First check if peripheral is already enable
@@ -17,6 +25,11 @@ static void hal_spi_enable(SPI_TypeDef *SPIx){
 }
 
 
+/**
+* @brief	
+* @param	
+* @retval	
+*/
 static void hal_spi_disable(SPI_TypeDef *SPIx){
 
 	SPIx->CR1 &= ~SPI_REG_CR1_SPE;
@@ -24,6 +37,11 @@ static void hal_spi_disable(SPI_TypeDef *SPIx){
 
 }
 
+/**
+* @brief	
+* @param	
+* @retval	
+*/
 static void hal_spi_configure_phase_and_polarity(SPI_TypeDef *SPIx, uint32_t phase_value, uint32_t polarity){
 
 	if(phase_value){
@@ -43,7 +61,11 @@ static void hal_spi_configure_phase_and_polarity(SPI_TypeDef *SPIx, uint32_t pha
 
 }
 
-
+/**
+* @brief	
+* @param	
+* @retval	
+*/
 static void hal_spi_configure_device_mode(SPI_TypeDef *SPIx, uint32_t master){
 
 	if(master){
@@ -55,8 +77,12 @@ static void hal_spi_configure_device_mode(SPI_TypeDef *SPIx, uint32_t master){
 		
 }
 
-
-static void hal_spi_configure_datasize_direction(SPI_TypeDef *SPIx, uint32_t datasize, uint32_t lsbfirst){
+/**
+* @brief	
+* @param	
+* @retval	
+*/
+static void hal_spi_configure_datasize(SPI_TypeDef *SPIx, uint32_t datasize, uint32_t lsbfirst){
 
 	switch(datasize){
 		
@@ -99,6 +125,12 @@ static void hal_spi_configure_datasize_direction(SPI_TypeDef *SPIx, uint32_t dat
 	
 }
 
+
+/**
+* @brief	
+* @param	
+* @retval	
+*/
 static void hal_spi_configure_nss_master(SPI_TypeDef *SPIx, uint32_t ssm_enable){
 
 	if(ssm_enable){
@@ -113,7 +145,11 @@ static void hal_spi_configure_nss_master(SPI_TypeDef *SPIx, uint32_t ssm_enable)
 
 }
 
-
+/**
+* @brief	
+* @param	
+* @retval	
+*/
 static void hal_spi_configure_nss_slave(SPI_TypeDef *SPIx, uint32_t ssm_enable){
 
 		if(ssm_enable){
@@ -123,60 +159,34 @@ static void hal_spi_configure_nss_slave(SPI_TypeDef *SPIx, uint32_t ssm_enable){
 			SPIx->CR1 &= SPI_REG_CR1_SSM;
 		}
 
-
-
 }
 
-
-
-
-
-
-
 /**
-* @brief	API used to do initilize the given SPI device
-* @param	*SPIx : base adress of the SPI
-* @retval	None
+* @brief	
+* @param	
+* @retval	
 */
-void hal_spi_init(spi_handle_t *spi_handle){
+static void hal_spi_configure_direction(SPI_TypeDef *SPIx, uint32_t direction){
 	
-	/* Configure the phase and polerity */
-	
-	/* Configure the spi device mode */
-	
-	/* Configure the spi data size */
-	
-	/* configure the slave select line */
-	
-	/* Configure the SPI device speed */
-	
-	/* Configure the SPI device direction */
-
+	if(direction){
+		SPIx->CR1 |= SPI_REG_CR1_BIDIMODE;
+	}
+	else{
+		SPIx->CR1 &= ~SPI_REG_CR1_BIDIMODE;
+	}
 
 }
 
 /**
-* @brief	API used to do master data transmission
-* @param	*SPIx : base address of the SPI
-* @param	*buffer : pointer to the tx buffer
-* @param	len : len of tx data
-* @retval	None
+* @brief	
+* @param	
+* @retval	
 */
-void hal_spi_master_tx(spi_handle_t *spi_handle, uint8_t *buffer, uint32_t len){
-		
-	spi_handle->pTxBuffPtr = buffer;
-	spi_handle->TxXferCount = len;
-	spi_handle->TxXferSize = len;
-	
-	spi_handle->State = HAL_SPI_STATE_BUSY_TX;
-	
-	hal_spi_enable(spi_handle->Instance);
-	
-	hal_spi_enable_txe_interrupt(spi_handle->Instance);
+static void hal_spi_configure_baudrate(SPI_TypeDef *SPIx, uint32_t pre_scalar_value){
 
-
+	SPIx->CR1 |= pre_scalar_value;
+	
 }
-
 
 /**
 * @brief	
@@ -226,6 +236,123 @@ static void hal_spi_disable_rxne_interrupt(SPI_TypeDef *SPIx){
 }
 
 
+/**
+* @brief	close Tx transfer
+* @param	*hspi : pointer to spi_handle_t structure that contains
+*						the configuration information or SPI module.
+* @retval	None
+*/
+static void hal_spi_tx_close_interrupt(spi_handle_t *hspi){
+	
+	/* Disable TXE interrupt */
+	hal_spi_disable_txe_interrupt(hspi->Instance);
+	
+	/* if master and if driver state is not HAL_SPI_STATE_BUSY_RX then make state
+	HAL_SPI_STATE_READEY */	
+	if(hspi->Init.Mode && (hspi->State != HAL_SPI_STATE_BUSY_RX))
+		hspi->State = HAL_SPI_STATE_READY;
+}
+
+/**
+* @brief	
+* @param	
+* @retval	
+*/
+uint8_t hal_spi_is_bus_busy(SPI_TypeDef *SPIx){
+
+	if(SPIx->SR & SPI_REG_SR_BUSY_FLAG){
+		return SPI_IS_BUSY;
+	}
+	else{
+		return SPI_IS_NOT_BUSY;
+	}
+}
+
+
+/**
+* @brief	
+* @param	*hspi : pointer to spi_handle_t structure that contains
+*						the configuration information or SPI module.
+* @retval	None
+*/
+static void hal_spi_rx_close_interrupt(spi_handle_t *hspi){
+
+	while(hal_spi_is_bus_busy(hspi->Instance));
+	
+	/* Disable RXNE interrupt */
+	hal_spi_disable_rxne_interrupt(hspi->Instance);
+	hspi->State = HAL_SPI_STATE_READY;
+
+}
+
+
+
+
+
+
+/******************************************************************************/
+/*                                                                           	*/
+/*                         Driver exposed APIs										            */
+/*                                                     												*/
+/******************************************************************************/
+
+/**
+* @brief	API used to do initilize the given SPI device
+* @param	*SPIx : base adress of the SPI
+* @retval	None
+*/
+void hal_spi_init(spi_handle_t *spi_handle){
+	
+	/* Configure the phase and polerity */
+	hal_spi_configure_phase_and_polarity(spi_handle->Instance, \
+				spi_handle->Init.CLKPhase, spi_handle->Init.CLKPolarity);
+	
+	/* Configure the spi device mode */
+	hal_spi_configure_device_mode(spi_handle->Instance, spi_handle->Init.Mode);
+	
+	/* Configure the spi data size */
+	hal_spi_configure_datasize(spi_handle->Instance, spi_handle->Init.DataSize, spi_handle->Init.FirstBit);
+	
+	/* configure the slave select line */
+	if(spi_handle->Init.Mode == SPI_MASTER_MODE_SEL)
+		hal_spi_configure_nss_master(spi_handle->Instance, spi_handle->Init.NSS);
+	else
+		hal_spi_configure_nss_slave(spi_handle->Instance, spi_handle->Init.NSS);
+	
+	/* Configure the SPI device speed */
+	hal_spi_configure_baudrate(spi_handle->Instance, spi_handle->Init.BaudRatePrescaler);
+	
+	/* Configure the SPI device direction */
+	hal_spi_configure_direction(spi_handle->Instance, spi_handle->Init.Direction);
+
+
+}
+
+/**
+* @brief	API used to do master data transmission
+* @param	*SPIx : base address of the SPI
+* @param	*buffer : pointer to the tx buffer
+* @param	len : len of tx data
+* @retval	None
+*/
+void hal_spi_master_tx(spi_handle_t *spi_handle, uint8_t *buffer, uint32_t len){
+		
+	spi_handle->pTxBuffPtr = buffer;
+	spi_handle->TxXferCount = len;
+	spi_handle->TxXferSize = len;
+	
+	spi_handle->State = HAL_SPI_STATE_BUSY_TX;
+	
+	hal_spi_enable(spi_handle->Instance);
+	
+	hal_spi_enable_txe_interrupt(spi_handle->Instance);
+
+
+}
+
+
+
+
 
 
 /**
@@ -268,6 +395,7 @@ void hal_spi_slave_tx(spi_handle_t *spi_handle, uint8_t *buffer, uint32_t len){
 * @param	*SPIx : Base address of the SPI
 * @param	*buffer : pointer to the rx buffer
 * @param	len : len of rx data
+* @retval
 */
 void hal_spi_master_rx(spi_handle_t *spi_handle, uint8_t *rx_buffer, uint32_t len){
 	
@@ -312,6 +440,7 @@ void hal_spi_master_rx(spi_handle_t *spi_handle, uint8_t *rx_buffer, uint32_t le
 * @param	*SPIx : Base addres of the SPI
 * @param	*buffer : pointer to the rx buffer
 * @param	len : len of rx data
+* @retval
 */
 void hal_spi_slave_rx(spi_handle_t *spi_handle, uint8_t *rx_buffer, uint32_t len){
 
@@ -336,6 +465,94 @@ void hal_spi_slave_rx(spi_handle_t *spi_handle, uint8_t *rx_buffer, uint32_t len
 * @brief	This function handles SPI interrupt request.
 * @param	*hspi : pointer to spi_handle_t structure that contains
 *						the configuration information or SPI module.
-* @reval	None
+* @retval	None
 */
-void hal_spi_irq_handler(spi_handle_t *hspi);
+void hal_spi_irq_handler(spi_handle_t *hspi){
+
+	uint32_t tmp1 = 0, tmp2 = 0;
+	
+	/* RXNE */
+	/* check to see RXNE is set in the status register */
+	tmp1 = (hspi->Instance->SR & SPI_REG_SR_RXNE_FLAG);
+	
+	/* check whether RXNEIE bit is enabled in the control register */
+	tmp2 = (hspi->Instance->CR2 & SPI_REG_CR2_RXNEIE_ENABLE);
+	
+	if ((tmp1 != RESET) && (tmp2 != RESET) ){
+		
+		/* RXNE floag is set handle the RX of data bytes */
+		hal_spi_handle_rx_interrupt(hspi);
+		return;
+	}
+	
+	
+	/* TXE */
+	/* check to see TXE is set in the status register */
+	tmp1 = (hspi->Instance->SR & SPI_REG_SR_TXE_FLAG);
+	tmp2 = (hspi->Instance->CR2 & SPI_REG_CR2_TXEIE_ENABLE);
+	
+	if ( (tmp1 != RESET) && (tmp2 != RESET) ){
+		/* TXE flag is set handle the TX of data bytes */
+		hal_spi_handle_tx_interrupt(hspi);
+		return;
+	}
+
+};
+
+/**
+* @brief	handles TXE interrupt
+* @param	*hspi : pointer to spi_handle_t structure that contains
+*						the configuration information or SPI module.
+* @retval	None
+*/
+void hal_spi_handle_tx_interrupt(spi_handle_t *hspi){
+
+	/* Transmit data in 8 bit mode */
+	if(hspi->Init.DataSize == SPI_DATASIZE_8){
+		hspi->Instance->DR = (*hspi->pTxBuffPtr++);
+		hspi->TxXferCount--; // We sent 1 byte
+	}
+	else if (hspi->Init.DataSize == SPI_DATASIZE_16){
+		hspi->Instance->DR = *((uint16_t*)hspi->pTxBuffPtr);
+		hspi->pTxBuffPtr += 2;
+		hspi->TxXferCount -= 2;		// we sent two bytes in one go
+	}
+
+	if(hspi->TxXferCount == 0){
+		/* we reached end of transmission, so close the txe interrupt */
+		hal_spi_tx_close_interrupt(hspi);
+	
+	}
+	
+}
+
+
+
+/**
+* @brief	handles RXNE interrupt
+* @param	*hspi : pointer to spi_handle_t structure that contains
+*						the configuration information or SPI module.
+* @retval	None
+*/
+static void hal_spi_handle_rx_interrupt(spi_handle_t *hspi){
+
+	/* Receive data in 8 bit mode */
+	if(hspi->Init.DataSize == SPI_DATASIZE_8){
+		// NULL check
+		if(hspi->pRxBuffPtr++)													// Si no está vacío...
+			(*hspi->pRxBuffPtr) = hspi->Instance->DR;			// Leeme el buffer RX
+		hspi->RxXferCount--;
+	}
+	else if(hspi->Init.DataSize == SPI_DATASIZE_16){
+		*((uint16_t*)hspi->pRxBuffPtr) = hspi->Instance->DR;
+		hspi->pRxBuffPtr += 2;
+		hspi->RxXferCount -= 2;
+	}
+
+	if(hspi->RxXferCount == 0){
+		/* we are done with the Rxing of data, lets close the rxne interrupt */
+		hal_spi_rx_close_interrupt(hspi);
+	}
+}
+
+

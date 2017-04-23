@@ -8,7 +8,7 @@
   <Extensions>
     <cExt>*.c</cExt>
     <aExt>*.s*; *.src; *.a*</aExt>
-    <oExt>*.obj</oExt>
+    <oExt>*.obj; *.o</oExt>
     <lExt>*.lib</lExt>
     <tExt>*.txt; *.h; *.inc</tExt>
     <pExt>*.plm</pExt>
@@ -78,58 +78,6 @@
         <IsCurrentTarget>1</IsCurrentTarget>
       </OPTFL>
       <CpuCode>18</CpuCode>
-      <Books>
-        <Book>
-          <Number>0</Number>
-          <Title>User Manual (STM32F769I-Discovery)</Title>
-          <Path>C:\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\MDK\Boards\ST\STM32F769I_Discovery\Documentation\DM00276557.pdf</Path>
-        </Book>
-        <Book>
-          <Number>1</Number>
-          <Title>Bill of Materials (STM32F769I-Discovery)</Title>
-          <Path>C:\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\MDK\Boards\ST\STM32F769I_Discovery\Documentation\stm32f769i-disco_bom.zip</Path>
-        </Book>
-        <Book>
-          <Number>2</Number>
-          <Title>Gerber Files (STM32F769I-Discovery)</Title>
-          <Path>C:\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\MDK\Boards\ST\STM32F769I_Discovery\Documentation\stm32f769i-disco_gerber.zip</Path>
-        </Book>
-        <Book>
-          <Number>3</Number>
-          <Title>Schematics (STM32F769I-Discovery)</Title>
-          <Path>C:\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\MDK\Boards\ST\STM32F769I_Discovery\Documentation\stm32f769i-disco_sch.zip</Path>
-        </Book>
-        <Book>
-          <Number>4</Number>
-          <Title>User Manual (STM32F769I-EVAL)</Title>
-          <Path>C:\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\MDK\Boards\ST\STM32F769I_EVAL\Documentation\DM00276567.pdf</Path>
-        </Book>
-        <Book>
-          <Number>5</Number>
-          <Title>Bill of Materials (STM32F769I-EVAL)</Title>
-          <Path>C:\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\MDK\Boards\ST\STM32F769I_EVAL\Documentation\stm32f7x9i-eval_bom.zip</Path>
-        </Book>
-        <Book>
-          <Number>6</Number>
-          <Title>Gerber Files (STM32F769I-EVAL)</Title>
-          <Path>C:\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\MDK\Boards\ST\STM32F769I_EVAL\Documentation\stm32f7x9i-eval_gerber.zip</Path>
-        </Book>
-        <Book>
-          <Number>7</Number>
-          <Title>Schematics (STM32F769I-EVAL)</Title>
-          <Path>C:\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\MDK\Boards\ST\STM32F769I_EVAL\Documentation\stm32f7x9i-eval_sch.zip</Path>
-        </Book>
-        <Book>
-          <Number>8</Number>
-          <Title>STM32F769I_Discovery Web Page (STM32F769I-Discovery)</Title>
-          <Path>http://www.st.com/en/evaluation-tools/32f769idiscovery.html</Path>
-        </Book>
-        <Book>
-          <Number>9</Number>
-          <Title>STM32F769I_EVAL Evaluation Board Web Page (STM32F769I-EVAL)</Title>
-          <Path>http://www.st.com/en/evaluation-tools/stm32f769i-eval.html</Path>
-        </Book>
-      </Books>
       <DebugOpt>
         <uSim>0</uSim>
         <uTrg>1</uTrg>
@@ -152,7 +100,8 @@
         <tRSysVw>1</tRSysVw>
         <sRunDeb>0</sRunDeb>
         <sLrtime>0</sLrtime>
-        <nTsel>11</nTsel>
+        <bEvRecOn>1</bEvRecOn>
+        <nTsel>5</nTsel>
         <sDll></sDll>
         <sDllPa></sDllPa>
         <sDlgDll></sDlgDll>
@@ -264,6 +213,12 @@
       <LintExecutable></LintExecutable>
       <LintConfigFile></LintConfigFile>
       <bLintAuto>0</bLintAuto>
+      <bAutoGenD>0</bAutoGenD>
+      <LntExFlags>0</LntExFlags>
+      <pMisraName></pMisraName>
+      <pszMrule></pszMrule>
+      <pSingCmds></pSingCmds>
+      <pMultCmds></pMultCmds>
       <SystemViewers>
         <Entry>
           <Name>System Viewer\RCC</Name>
@@ -362,6 +317,18 @@
       <bDave2>0</bDave2>
       <PathWithFileName>.\hal_timer6_driver.c</PathWithFileName>
       <FilenameWithoutPath>hal_timer6_driver.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>2</GroupNumber>
+      <FileNumber>7</FileNumber>
+      <FileType>5</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>.\hal_spi_driver.h</PathWithFileName>
+      <FilenameWithoutPath>hal_spi_driver.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
