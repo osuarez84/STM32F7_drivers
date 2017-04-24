@@ -1,24 +1,31 @@
 #include <stdint.h>
 #include "hal_gpio_driver.h"
 #include "hal_spi_driver.h"
+#include "hal_usart_driver.h"
 #include "led.h"
 
 
 
 
 /* PRIVATE VARIABLES */
-/* SPI handle for our SPI device */
+/* Devices handlers */
 spi_handle_t SpiHandle;
+uart_handle_t uartHandle;
 
 
 /* master read/write buffers */
 // TEST DATA
 uint16_t master_write_data[]={ 0xAAAA, 0xBBBB, 0xCCCC, 0xDDDD };
+uint8_t message1[] = "STM32F7xx Hello world!!";
 
+/* UART buffers */
+uint8_t UART_rxBuff[39];
 
-
-
-
+/**
+	* @brief  Initialize the SPI2 pin
+	* @param  None
+	* @retval None
+	*/
 /* Configure GPIO for SPI functionality */
 void spi_gpio_init(void){
 
@@ -48,10 +55,39 @@ void spi_gpio_init(void){
 	// TODO : para la comunicación con el DAC 
 	// no vamos a necesitar la línea MISO.
 	
-	// TODO : no necesitamos el GPIO paca el CS ya que el control
+	// TODO : no necesitamos el GPIO para el CS ya que el control
 	// lo vamos a configurar por software mediante la NSS
 	
 	
+}
+
+
+/**
+	* @brief  Initialize the USART6 pin
+	* @param  None
+	* @retval None
+	*/
+void uart_gpio_init(void){
+
+	gpio_pin_conf_t uart_pin_conf;
+	
+	/* enable the clock for the GPIO port C */
+	_HAL_RCC_GPIOC_CLK_ENABLE();
+	
+	/* configure the GPIO_PORT_C_PIN_6 as TX */
+	uart_pin_conf.pin = USARTx_TX_PIN;
+	uart_pin_conf.mode = GPIO_PIN_ALT_FUN_MODE;
+	uart_pin_conf.op_type = GPIO_PIN_OP_TYPE_PUSHPULL;
+	uart_pin_conf.speed = GPIO_PIN_SPEED_HIGH;
+	uart_pin_conf.pull = GPIO_PIN_NO_PULL_PUSH;
+	hal_gpio_set_alt_function(GPIOC, USARTx_TX_PIN, USARTx_TX_AF);
+	hal_gpio_init(GPIOC, &uart_pin_conf);
+	
+	
+	/* configure the GPIO PORT_C_PIN_7 as RX */
+	uart_pin_conf.pin = USARTx_RX_PIN;
+	hal_gpio_set_alt_function(GPIOC, USARTx_RX_PIN, USARTx_RX_AF);
+	hal_gpio_init(GPIOC, &uart_pin_conf);
 }
 
 
@@ -129,6 +165,54 @@ void led_toggle(GPIO_TypeDef *GPIOx, uint16_t pin)
 }
 
 
+/**
+* @brief  This function parses the command and takes action
+* @param  *cmd :
+* @retval None
+*/
+void 	parse_cmd(uint8_t *cmd)
+{
+	/*
+	if( cmd[0] == 'L' && cmd[1] == 'E' && cmd[2] == 'D' )
+	{
+		if(cmd[3] == 'O' )
+		{
+			handle_cmd(cmd[4],LED_ORANGE);
+			
+		}else if(cmd[3] == 'B' )
+		{
+			handle_cmd(cmd[4],LED_BLUE);
+			
+		}else if(cmd[3] == 'G' )
+		{
+				handle_cmd(cmd[4],LED_GREEN);
+			
+		}else if(cmd[3] == 'R' )
+		{
+	    	handle_cmd(cmd[4],LED_RED);
+		}else if (cmd[3] == 'A' )
+		{
+			handle_cmd(cmd[4],0xff);
+		}
+		else 
+		{
+			;
+		}
+		
+		
+		
+	}else
+	{
+		error_handler();
+		
+	}
+	*/
+	
+}
+
+
+
+
 void initClock(){
 	/* Selección de HSE como reloj del sistema */
 	/* Enable HSE */
@@ -165,23 +249,26 @@ int main(void)
 
 	
 	/* SPI SECTION */
+	/* configure GPIO for SPI2 */
+	spi_gpio_init();
+	
 	/* enable the clock for the SPI2 */
 	_HAL_RCC_SPI2_CLK_ENABLE();
 	
 	/* fill up the handle structure */
-	SpiHandle.Instance													= SPI_2;
+	SpiHandle.Instance										= SPI_2;
 	SpiHandle.Init.BaudRatePrescaler						= SPI_REG_CR1_BR_PCLK_DIV_32;
-	SpiHandle.Init.Direction										= SPI_ENABLE_2_LINE_UNI_DIR;
-	SpiHandle.Init.CLKPhase											= SPI_SECOND_CLOCK_TRANS;
-	SpiHandle.Init.CLKPolarity									= SPI_CPOL_LOW;
-	SpiHandle.Init.DataSize											= SPI_DATASIZE_16;
-	SpiHandle.Init.FirstBit											= SPI_TX_MSB_FIRST;
-	SpiHandle.Init.NSS													= SPI_SSM_ENABLE;
-	SpiHandle.Init.Mode													= SPI_MASTER_MODE_SEL;
+	SpiHandle.Init.Direction								= SPI_ENABLE_2_LINE_UNI_DIR;
+	SpiHandle.Init.CLKPhase									= SPI_SECOND_CLOCK_TRANS;
+	SpiHandle.Init.CLKPolarity								= SPI_CPOL_LOW;
+	SpiHandle.Init.DataSize									= SPI_DATASIZE_16;
+	SpiHandle.Init.FirstBit									= SPI_TX_MSB_FIRST;
+	SpiHandle.Init.NSS										= SPI_SSM_ENABLE;
+	SpiHandle.Init.Mode										= SPI_MASTER_MODE_SEL;
 	
-	SpiHandle.State															= HAL_SPI_STATE_READY;
+	SpiHandle.State											= HAL_SPI_STATE_READY;
 	
-	/* Call driver API to initialize the SPI device */
+	/* Call driver API to initialize devices */
 	hal_spi_init(&SpiHandle);
 	
 	/* Enable the IRQs in the NVIC */
@@ -189,7 +276,38 @@ int main(void)
 	
 	
 	/* USART SECTION */
-	// TODO
+	/* Configure GPIO for UART6 */
+	uart_gpio_init();
+	
+	/* enable clock for USART6 */
+	_HAL_RCC_USART6_CLK_ENABLE();
+	
+	uartHandle.Instance = USART_6;
+	
+	uartHandle.Init.BaudRate 				= USART_BAUD_9600;
+	uartHandle.Init.WordLength 				= USART_WL_8;
+	uartHandle.Init.StopBits				= USART_STOP_BITS_1;
+	uartHandle.Init.Parity					= USART_PARITY_NONE;
+	uartHandle.Init.Mode 					= USART_MODE_TX_RX;
+	uartHandle.Init.OverSampling			= USART_OVER8_ENABLE;
+	
+	/* fill out the application callbacks */
+	uartHandle.tx_cmp_cb = app_tx_cmp_callback;
+	uartHandle.rx_cmp_cb = app_rx_cmp_callback;
+	
+	hal_uart_init(&uartHandle);
+	
+	/* enable the IRQ of USART peripheral */
+	NVIC_EnableIRQ(USART6_IRQn);
+	
+	
+	
+	
+	
+	/* Esperamos hasta que el UART esté listo para enviar */
+	while(uartHandle.tx_state != HAL_UART_STATE_READY);
+	
+	hal_uart_tx(&uartHandle, message1, sizeof(message1)-1);
 	
 	
 	/* TIM6 SECTION */
@@ -198,6 +316,8 @@ int main(void)
 #if 1
 	while(1)
 	{
+		
+		/*
 		led_turn_on(GPIOJ,LED_GREEN);
 		led_turn_on(GPIOJ,LED_RED);
 
@@ -207,6 +327,7 @@ int main(void)
 		led_turn_off(GPIOJ,LED_RED);
 
 		for(i=0;i<500000;i++);
+		*/
 
 	}
 
@@ -241,6 +362,39 @@ void SPI2_IRQHandler(void){
 	/* call the driver api to process this interrupt */
   hal_spi_irq_handler(&SpiHandle);
 }
+
+
+void USART6_IRQHandler(void)
+{
+  hal_uart_handle_interrupt(&uartHandle);
+}
+
+//================================================
+
+//================================================
+/* Application callbacks */
+// -----------------------------------------------
+
+/* UART Callbacks */
+/*This callback will be called by the driver when driver finishes the transmission of data */
+void app_tx_cmp_callback(void *size)
+{
+ 
+	
+}
+
+/*This callback will be called by the driver when the application receives the command */
+void app_rx_cmp_callback(void *size)
+{
+	//we got a command,  parse it 
+	//parse_cmd(rx_buffer);
+	
+}
+
+
+
+
+
 
 
 //================================================

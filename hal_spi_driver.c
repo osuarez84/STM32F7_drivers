@@ -88,30 +88,43 @@ static void hal_spi_configure_datasize(SPI_TypeDef *SPIx, uint32_t datasize, uin
 		
 		case (4) :
 			SPIx->CR2 |= SPI_DATA_SIZE_4;		
+			break;
 		case (5) :
 			SPIx->CR2 |= SPI_DATA_SIZE_5;
+			break;
 		case (6) :
 			SPIx->CR2 |= SPI_DATA_SIZE_6;
+			break;
 		case (7) :
 			SPIx->CR2 |= SPI_DATA_SIZE_7;
+			break;
 		case (8) :
-			SPIx->CR2 |= SPI_DATA_SIZE_8;
+			SPIx->CR2 |= SPI_DATA_SIZE_8;	
+			break;
 		case (9) :
-			SPIx->CR2 |= SPI_DATA_SIZE_9;
+			SPIx->CR2 |= SPI_DATA_SIZE_9;	
+			break;
 		case (10) :
 			SPIx->CR2 |= SPI_DATA_SIZE_10;
+			break;
 		case (11) : 
 			SPIx->CR2 |= SPI_DATA_SIZE_11;
+			break;
 		case (12) :
 			SPIx->CR2 |= SPI_DATA_SIZE_12;
+			break;
 		case (13) :
-			SPIx->CR2 |= SPI_DATA_SIZE_13;
+			SPIx->CR2 |= SPI_DATA_SIZE_13;	
+			break;
 		case (14) :
 			SPIx->CR2 |= SPI_DATA_SIZE_14;
+			break;
 		case (15) :
 			SPIx->CR2 |= SPI_DATA_SIZE_15;
+			break;
 		case (16) :
 			SPIx->CR2 |= SPI_DATA_SIZE_16;
+			break;
 		default :
 			SPIx->CR2 |= SPI_DATA_SIZE_8;
 	}

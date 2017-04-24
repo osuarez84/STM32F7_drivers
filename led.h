@@ -12,10 +12,6 @@
 #define LED_RED				GPIOJ_PIN_5
 
 
-/* Definition for SPIx's NVIC */
-#define SPIx_IRQn					SPI2_IRQn
-#define SPIx_IRQHandler		SPI2_IRQHandler
-
 
 
 
@@ -33,9 +29,31 @@
 /* SPI alternate functionality value */
 #define GPIO_PIN_AF5_SPI2		0x05
 
+/* Definition for SPIx's NVIC */
+#define SPIx_IRQn					SPI2_IRQn
+#define SPIx_IRQHandler				SPI2_IRQHandler
 
 
 
+
+/* Macros used for configuring gpios for UART functionality */
+#define GPIO_AF8_USART6					((uint8_t)0x08)
+
+#define GPIO_PIN_6_SEL					6
+#define GPIO_PIN_7_SEL					7
+
+
+
+#define USARTx_TX_PIN					GPIO_PIN_6_SEL
+#define USARTx_TX_GPIO_PORT				GPIOC
+#define USARTx_TX_AF					GPIO_AF8_USART6
+#define USARTx_RX_PIN					GPIO_PIN_7_SEL
+#define USARTx_RX_GPIO_PORT				GPIOC
+#define USARTx_RX_AF					GPIO_AF8_USART6
+
+/* Definition for USARTx's NVIC */
+#define USARTx_IRQn						USART6_IRQn
+#define USARTx_IRQHandler				USART6_IRQHandler
 
 
 
@@ -69,5 +87,15 @@ void led_turn_off(GPIO_TypeDef *GPIOx, uint16_t pin);
 * @retval None
 */
 void led_toggle(GPIO_TypeDef *GPIOx, uint16_t pin);
+
+
+
+
+/* USART callback function */
+void app_tx_cmp_callback(void *size);
+void app_rx_cmp_callback(void *size);
+
+
+
 
 #endif 
