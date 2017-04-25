@@ -208,6 +208,13 @@ void 	parse_cmd(uint8_t *cmd)
 	}
 	*/
 	
+	/* TESTING COMMAND RECEPTION */
+	if (cmd[0] == 'C' && cmd[1] == 'O' && cmd[2] == 'N' && \
+		cmd[3] == 'E' && cmd[4] == 'C' && cmd[5] == 'T'){
+		
+			led_turn_on(GPIOJ, LED_GREEN);
+		}
+	
 }
 
 
@@ -237,6 +244,7 @@ void initClock(){
 int main(void)
 {
 	uint32_t i;
+	int32_t c;
 	
 	/* Inicializamos el HSE como clock del sistema (25 MHz) */
 	initClock();
@@ -284,12 +292,12 @@ int main(void)
 	
 	uartHandle.Instance = USART_6;
 	
-	uartHandle.Init.BaudRate 				= USART_BAUD_9600;
+	uartHandle.Init.BaudRate 				= USART_BAUD_115200;
 	uartHandle.Init.WordLength 				= USART_WL_8;
 	uartHandle.Init.StopBits				= USART_STOP_BITS_1;
 	uartHandle.Init.Parity					= USART_PARITY_NONE;
 	uartHandle.Init.Mode 					= USART_MODE_TX_RX;
-	uartHandle.Init.OverSampling			= USART_OVER8_ENABLE;
+	uartHandle.Init.OverSampling			= USART_OVER16_ENABLE;
 	
 	/* fill out the application callbacks */
 	uartHandle.tx_cmp_cb = app_tx_cmp_callback;
@@ -303,12 +311,15 @@ int main(void)
 	
 	
 	
+	//Delay para esperar a que arranque el BT
+	for(c = 0; c < 5000000; c++){}
+		
 	
-	/* Esperamos hasta que el UART esté listo para enviar */
-	while(uartHandle.tx_state != HAL_UART_STATE_READY);
 	
-	hal_uart_tx(&uartHandle, message1, sizeof(message1)-1);
-	
+	/* TEST ENVIAR */
+	//while(uartHandle.tx_state != HAL_UART_STATE_READY);
+	//hal_uart_tx(&uartHandle, message1, sizeof(message1)-1);
+		
 	
 	/* TIM6 SECTION */
 	// TODO
@@ -316,7 +327,9 @@ int main(void)
 #if 1
 	while(1)
 	{
-		
+		/* TEST RECIBIR */
+		while(uartHandle.rx_state != HAL_UART_STATE_READY);
+		hal_uart_rx(&uartHandle, UART_rxBuff, 6);
 		/*
 		led_turn_on(GPIOJ,LED_GREEN);
 		led_turn_on(GPIOJ,LED_RED);
@@ -379,7 +392,7 @@ void USART6_IRQHandler(void)
 /*This callback will be called by the driver when driver finishes the transmission of data */
 void app_tx_cmp_callback(void *size)
 {
- 
+ led_turn_on(GPIOJ,LED_RED);
 	
 }
 
@@ -387,7 +400,7 @@ void app_tx_cmp_callback(void *size)
 void app_rx_cmp_callback(void *size)
 {
 	//we got a command,  parse it 
-	//parse_cmd(rx_buffer);
+	parse_cmd(UART_rxBuff);
 	
 }
 

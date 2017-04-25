@@ -416,7 +416,7 @@ void hal_uart_rx(uart_handle_t *handle, uint8_t *buffer, uint32_t len){
 	hal_uart_configure_error_interrupt(handle->Instance, 1);
 	
 	// Hacemos una primera lectura del buffer rx, para que no nos salte la
-	// interrupción por buffer vacío al configurarlo por primera vez
+	// interrupción por buffer no vacío al configurarlo por primera vez
 	val = handle->Instance->RDR;
 	
 	/* Enable the UART RXNE interrupt */
