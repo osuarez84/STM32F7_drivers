@@ -18,6 +18,11 @@
 #define SPI_ENABLE_2_LINE_UNI_DIR			0
 #define SPI_ENABLE_1_LINE_BIDI				1
 
+#define SPI_REG_CR1_OUTBIDIMODE				((uint32_t) 1 << 14)	// Output enable in bidimode
+#define SPI_ENABLE_RX_ONLY						0
+#define SPI_ENABLE_TX_ONLY						1
+
+
 #define SPI_REG_CR1_SSM								((uint32_t) 1 << 9)		// Software slave management
 #define SPI_SSM_ENABLE								1
 #define SPI_SSM_DISABLE								0
@@ -73,6 +78,11 @@
 #define SPI_DATA_SIZE_15						  ((uint32_t) 14 << 8)
 #define SPI_DATA_SIZE_16							((uint32_t) 15 << 8)
 
+
+/* Aunque se pueda definir el datasize desde 4 a 16,
+la API para el envío de datos solamente tiene implementado
+el envío de 1 byte o dos bytes. Solo podemos utilizar
+ahora mismo el DATASIZE_8 o el DATASIZE_16. */
 #define SPI_DATASIZE_4								4
 #define SPI_DATASIZE_5								5
 #define SPI_DATASIZE_6								6
@@ -155,7 +165,7 @@ typedef enum{
 	HAL_SPI_STATE_BUSY					= 0X02,					// SPI process is ongoing
 	HAL_SPI_STATE_BUSY_TX				= 0X12,					// Data transmission process is ongoing
 	HAL_SPI_STATE_BUSY_RX				= 0X22,					// Data reception process is ongoing
-	HAL_SPI_STATE_BUSY_TX_RX		= 0X32,					//  Data transmission and reception process is ongoing
+	HAL_SPI_STATE_BUSY_TX_RX		= 0X32,					// Data transmission and reception process is ongoing
 	HAL_SPI_STATE_ERROR					= 0X03					// SPI error state
 }hal_spi_state_t;
 
@@ -168,6 +178,8 @@ typedef struct{
 	uint32_t Mode;									// Specifies the SPI operating mode
 	
 	uint32_t Direction;							// Specifies the SPI directional mode state
+	
+	uint32_t OutputBidiMode;				// Specifies in bidimode if RX only or TX only
 	
 	uint32_t DataSize;							// Specifies the SPI data size
 	
@@ -283,7 +295,7 @@ void hal_spi_handle_tx_interrupt(spi_handle_t *hspi);
 *						the configuration information or SPI module.
 * @reval	None
 */
-void hal_spi_handle_rx_interrupt(spi_handle_t *hspi);
+static void hal_spi_handle_rx_interrupt(spi_handle_t *hspi);
 
 
 /**

@@ -179,13 +179,20 @@ static void hal_spi_configure_nss_slave(SPI_TypeDef *SPIx, uint32_t ssm_enable){
 * @param	
 * @retval	
 */
-static void hal_spi_configure_direction(SPI_TypeDef *SPIx, uint32_t direction){
+static void hal_spi_configure_direction(SPI_TypeDef *SPIx, uint32_t direction, uint32_t output){
 	
 	if(direction){
 		SPIx->CR1 |= SPI_REG_CR1_BIDIMODE;
 	}
 	else{
 		SPIx->CR1 &= ~SPI_REG_CR1_BIDIMODE;
+	}
+	
+	if(output){
+		SPIx->CR1 |= SPI_REG_CR1_OUTBIDIMODE;
+	}
+	else{
+		SPIx->CR1 &= ~SPI_REG_CR1_OUTBIDIMODE;
 	}
 
 }
@@ -336,7 +343,7 @@ void hal_spi_init(spi_handle_t *spi_handle){
 	hal_spi_configure_baudrate(spi_handle->Instance, spi_handle->Init.BaudRatePrescaler);
 	
 	/* Configure the SPI device direction */
-	hal_spi_configure_direction(spi_handle->Instance, spi_handle->Init.Direction);
+	hal_spi_configure_direction(spi_handle->Instance, spi_handle->Init.Direction, spi_handle->Init.OutputBidiMode);
 
 
 }

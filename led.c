@@ -16,6 +16,8 @@ uart_handle_t uartHandle;
 /* master read/write buffers */
 // TEST DATA
 uint16_t master_write_data[]={ 0xAAAA, 0xBBBB, 0xCCCC, 0xDDDD };
+uint8_t addrcmd[2];
+
 uint8_t message1[] = "STM32F7xx Hello world!!";
 
 /* UART buffers */
@@ -267,6 +269,7 @@ int main(void)
 	SpiHandle.Instance										= SPI_2;
 	SpiHandle.Init.BaudRatePrescaler						= SPI_REG_CR1_BR_PCLK_DIV_32;
 	SpiHandle.Init.Direction								= SPI_ENABLE_2_LINE_UNI_DIR;
+	SpiHandle.Init.OutputBidiMode						= SPI_ENABLE_RX_ONLY;
 	SpiHandle.Init.CLKPhase									= SPI_SECOND_CLOCK_TRANS;
 	SpiHandle.Init.CLKPolarity								= SPI_CPOL_LOW;
 	SpiHandle.Init.DataSize									= SPI_DATASIZE_16;
@@ -316,7 +319,7 @@ int main(void)
 		
 	
 	
-	/* TEST ENVIAR */
+	/* TEST SENDING */
 	//while(uartHandle.tx_state != HAL_UART_STATE_READY);
 	//hal_uart_tx(&uartHandle, message1, sizeof(message1)-1);
 		
@@ -327,9 +330,22 @@ int main(void)
 #if 1
 	while(1)
 	{
-		/* TEST RECIBIR */
-		while(uartHandle.rx_state != HAL_UART_STATE_READY);
-		hal_uart_rx(&uartHandle, UART_rxBuff, 6);
+		/* TEST RECEIVING */
+		//while(uartHandle.rx_state != HAL_UART_STATE_READY);
+		//hal_uart_rx(&uartHandle, UART_rxBuff, 6);
+
+		/* TEST SPI MASTER */
+		while(SpiHandle.State != HAL_SPI_STATE_READY);
+		
+		addrcmd[0] = (uint8_t) master_write_data[0];
+		addrcmd[1] = (uint8_t) (master_write_data[0] >> 8);
+		
+		/* first send the master write cmd to slave */
+		hal_spi_master_tx(&SpiHandle, addrcmd, 2);
+		
+		// Delay entre envíos
+		for(c = 0; c < 5000000; c++){}
+		
 		/*
 		led_turn_on(GPIOJ,LED_GREEN);
 		led_turn_on(GPIOJ,LED_RED);
@@ -401,6 +417,9 @@ void app_rx_cmp_callback(void *size)
 {
 	//we got a command,  parse it 
 	parse_cmd(UART_rxBuff);
+	
+	// TODO: aquí podemos volver a habilitar la interrupción RXNE, para
+	// que vuelva a estár disponible la recepcion de datos.
 	
 }
 
