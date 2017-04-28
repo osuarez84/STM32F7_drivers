@@ -19,8 +19,8 @@
 #define SPI_ENABLE_1_LINE_BIDI				1
 
 #define SPI_REG_CR1_OUTBIDIMODE				((uint32_t) 1 << 14)	// Output enable in bidimode
-#define SPI_ENABLE_RX_ONLY						0
-#define SPI_ENABLE_TX_ONLY						1
+#define SPI_ENABLE_TX_ONLY						0
+#define SPI_ENABLE_RX_ONLY						1
 
 
 #define SPI_REG_CR1_SSM								((uint32_t) 1 << 9)		// Software slave management
@@ -288,44 +288,6 @@ void hal_spi_irq_handler(spi_handle_t *hspi);
 */
 void hal_spi_handle_tx_interrupt(spi_handle_t *hspi);
 
-
-/**
-* @brief	This function handles SPI interrupt request.
-* @param	*hspi : pointer to spi_handle_t structure that contains
-*						the configuration information or SPI module.
-* @reval	None
-*/
-static void hal_spi_handle_rx_interrupt(spi_handle_t *hspi);
-
-
-/**
-* @brief	
-* @param	*SPIx : base address of the SPI
-* @retval	None
-*/
-static void hal_spi_enable_txe_interrupt(SPI_TypeDef *SPIx);
-
-
-/**
-* @brief	
-* @param	*SPIx : base address of the SPI
-* @retval	None
-*/
-static void hal_spi_disable_txe_interrupt(SPI_TypeDef *SPIx);
-
-/**
-* @brief	
-* @param	*SPIx : base address of the SPI
-* @retval	None
-*/
-static void hal_spi_enable_rxne_interrupt(SPI_TypeDef *SPIx);
-
-
-/**
-* @brief	
-* @param	*SPIx : base address of the SPI
-* @retval	None
-*/
 
 
 

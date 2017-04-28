@@ -133,7 +133,7 @@ static void hal_spi_configure_datasize(SPI_TypeDef *SPIx, uint32_t datasize, uin
 		SPIx->CR2 |= SPI_CR1_LSBFRIST;
 	}
 	else{
-		SPIx->CR2 |= SPI_CR1_LSBFRIST;
+		SPIx->CR2 &= ~SPI_CR1_LSBFRIST;
 	}
 	
 }
@@ -153,7 +153,7 @@ static void hal_spi_configure_nss_master(SPI_TypeDef *SPIx, uint32_t ssm_enable)
 		SPIx->CR1 |= SPI_REG_CR1_SSI;
 	}
 	else{
-		SPIx->CR1 |= SPI_REG_CR1_SSI;
+		SPIx->CR1 &= ~SPI_REG_CR1_SSM;
 	}
 
 }
@@ -481,6 +481,64 @@ void hal_spi_slave_rx(spi_handle_t *spi_handle, uint8_t *rx_buffer, uint32_t len
 	
 }
 
+
+/**
+* @brief	handles TXE interrupt
+* @param	*hspi : pointer to spi_handle_t structure that contains
+*						the configuration information or SPI module.
+* @retval	None
+*/
+void hal_spi_handle_tx_interrupt(spi_handle_t *hspi){
+
+	/* Transmit data in 8 bit mode */
+	if(hspi->Init.DataSize == SPI_DATASIZE_8){
+		hspi->Instance->DR = (*hspi->pTxBuffPtr++);
+		hspi->TxXferCount--; // We sent 1 byte
+	}
+	else if (hspi->Init.DataSize == SPI_DATASIZE_16){
+		hspi->Instance->DR = *((uint16_t*)hspi->pTxBuffPtr);
+		hspi->pTxBuffPtr += 2;
+		hspi->TxXferCount -= 2;		// we sent two bytes in one go
+	}
+
+	if(hspi->TxXferCount == 0){
+		/* we reached end of transmission, so close the txe interrupt */
+		hal_spi_tx_close_interrupt(hspi);
+	
+	}
+	
+}
+
+
+/**
+* @brief	handles RXNE interrupt
+* @param	*hspi : pointer to spi_handle_t structure that contains
+*						the configuration information or SPI module.
+* @retval	None
+*/
+static void hal_spi_handle_rx_interrupt(spi_handle_t *hspi){
+
+	/* Receive data in 8 bit mode */
+	if(hspi->Init.DataSize == SPI_DATASIZE_8){
+		// NULL check
+		if(hspi->pRxBuffPtr++)													// Si no está vacío...
+			(*hspi->pRxBuffPtr) = hspi->Instance->DR;			// Leeme el buffer RX
+		hspi->RxXferCount--;
+	}
+	else if(hspi->Init.DataSize == SPI_DATASIZE_16){
+		*((uint16_t*)hspi->pRxBuffPtr) = hspi->Instance->DR;
+		hspi->pRxBuffPtr += 2;
+		hspi->RxXferCount -= 2;
+	}
+
+	if(hspi->RxXferCount == 0){
+		/* we are done with the Rxing of data, lets close the rxne interrupt */
+		hal_spi_rx_close_interrupt(hspi);
+	}
+}
+
+
+
 /**
 * @brief	This function handles SPI interrupt request.
 * @param	*hspi : pointer to spi_handle_t structure that contains
@@ -518,61 +576,4 @@ void hal_spi_irq_handler(spi_handle_t *hspi){
 	}
 
 };
-
-/**
-* @brief	handles TXE interrupt
-* @param	*hspi : pointer to spi_handle_t structure that contains
-*						the configuration information or SPI module.
-* @retval	None
-*/
-void hal_spi_handle_tx_interrupt(spi_handle_t *hspi){
-
-	/* Transmit data in 8 bit mode */
-	if(hspi->Init.DataSize == SPI_DATASIZE_8){
-		hspi->Instance->DR = (*hspi->pTxBuffPtr++);
-		hspi->TxXferCount--; // We sent 1 byte
-	}
-	else if (hspi->Init.DataSize == SPI_DATASIZE_16){
-		hspi->Instance->DR = *((uint16_t*)hspi->pTxBuffPtr);
-		hspi->pTxBuffPtr += 2;
-		hspi->TxXferCount -= 2;		// we sent two bytes in one go
-	}
-
-	if(hspi->TxXferCount == 0){
-		/* we reached end of transmission, so close the txe interrupt */
-		hal_spi_tx_close_interrupt(hspi);
-	
-	}
-	
-}
-
-
-
-/**
-* @brief	handles RXNE interrupt
-* @param	*hspi : pointer to spi_handle_t structure that contains
-*						the configuration information or SPI module.
-* @retval	None
-*/
-static void hal_spi_handle_rx_interrupt(spi_handle_t *hspi){
-
-	/* Receive data in 8 bit mode */
-	if(hspi->Init.DataSize == SPI_DATASIZE_8){
-		// NULL check
-		if(hspi->pRxBuffPtr++)													// Si no está vacío...
-			(*hspi->pRxBuffPtr) = hspi->Instance->DR;			// Leeme el buffer RX
-		hspi->RxXferCount--;
-	}
-	else if(hspi->Init.DataSize == SPI_DATASIZE_16){
-		*((uint16_t*)hspi->pRxBuffPtr) = hspi->Instance->DR;
-		hspi->pRxBuffPtr += 2;
-		hspi->RxXferCount -= 2;
-	}
-
-	if(hspi->RxXferCount == 0){
-		/* we are done with the Rxing of data, lets close the rxne interrupt */
-		hal_spi_rx_close_interrupt(hspi);
-	}
-}
-
 

@@ -7,7 +7,7 @@
 
 
 
-/* PRIVATE VARIABLES */
+/* PRIVATE VARIABLES --------------------------------------------- */
 /* Devices handlers */
 spi_handle_t SpiHandle;
 uart_handle_t uartHandle;
@@ -15,14 +15,24 @@ uart_handle_t uartHandle;
 
 /* master read/write buffers */
 // TEST DATA
-uint16_t master_write_data[]={ 0xAAAA, 0xBBBB, 0xCCCC, 0xDDDD };
+uint16_t master_write_data[]={ 	0x8000,0xa78d,0xcb3c,0xe78d,0xf9bb,0xffff,0xf9bb,0xe78d,
+																0xcb3c,0xa78d,0x8000,0x5872,0x34c3,0x1872,0x644,0x0,
+																0x644,0x1872,0x34c3,0x5872,0x8000};
 uint8_t addrcmd[2];
 
-uint8_t message1[] = "STM32F7xx Hello world!!";
+// UART messages
+//uint8_t message1[] = "STM32F7xx Hello world!!";
+uint8_t message1[] = "DAT1234567891F";
+
 
 /* UART buffers */
 uint8_t UART_rxBuff[39];
 
+																
+																
+																
+																
+																
 /**
 	* @brief  Initialize the SPI2 pin
 	* @param  None
@@ -50,6 +60,7 @@ void spi_gpio_init(void){
 	/* configure GPIOB_PIN_15 for MOSI functionality */
 	spi_conf.pin = SPI_MOSI_PIN;
 	spi_conf.pull = GPIO_PIN_PULL_UP;
+	
 	hal_gpio_set_alt_function(GPIOB, SPI_MOSI_PIN, GPIO_PIN_AF5_SPI2);
 	hal_gpio_init(GPIOB, &spi_conf);
 	
@@ -57,8 +68,12 @@ void spi_gpio_init(void){
 	// TODO : para la comunicación con el DAC 
 	// no vamos a necesitar la línea MISO.
 	
-	// TODO : no necesitamos el GPIO para el CS ya que el control
-	// lo vamos a configurar por software mediante la NSS
+	/* configure GPIOx for CS functionality */
+	spi_conf.pin = SPI_CS_PIN;
+	spi_conf.mode = GPIO_PIN_OUTPUT_MODE;
+	spi_conf.pull = GPIO_PIN_NO_PULL_PUSH;
+	
+	hal_gpio_init(GPIOB, &spi_conf);
 	
 	
 }
@@ -92,6 +107,30 @@ void uart_gpio_init(void){
 	hal_gpio_init(GPIOC, &uart_pin_conf);
 }
 
+
+/**
+	* @brief  Initialize GPIO pins
+	* @param  None
+	* @retval None
+	*/
+void gpio_init(void){
+
+	// TODO: hay que definir aquí todos los
+	// pines utilizados como I/O digitales.
+	
+	/* Bluetooth */
+	gpio_pin_conf_t bt_pin_conf;
+	
+	bt_pin_conf.pin = BT_RESET_PIN;
+	bt_pin_conf.mode = GPIO_PIN_OUTPUT_MODE;
+	bt_pin_conf.op_type = GPIO_PIN_OP_TYPE_PUSHPULL;
+	bt_pin_conf.speed = GPIO_PIN_SPEED_HIGH;
+	bt_pin_conf.pull = GPIO_PIN_NO_PULL_PUSH;
+	
+	hal_gpio_init(GPIOC, &bt_pin_conf);
+	
+
+}
 
 
 /**
@@ -211,17 +250,36 @@ void 	parse_cmd(uint8_t *cmd)
 	*/
 	
 	/* TESTING COMMAND RECEPTION */
+	uint32_t c;
+	
+	
 	if (cmd[0] == 'C' && cmd[1] == 'O' && cmd[2] == 'N' && \
 		cmd[3] == 'E' && cmd[4] == 'C' && cmd[5] == 'T'){
 		
 			led_turn_on(GPIOJ, LED_GREEN);
+			
+			// delay
+			for (c = 0; c <= 2000; c++){}
+			
+			led_turn_off(GPIOJ, LED_GREEN);
+				
+
+			sendDFUART();
+
+				
 		}
+		
+	
 	
 }
 
 
 
-
+/**
+* @brief  This function initializes the SystemClock as HSE
+* @param  None
+* @retval None
+*/
 void initClock(){
 	/* Selección de HSE como reloj del sistema */
 	/* Enable HSE */
@@ -243,10 +301,69 @@ void initClock(){
 }
 
 
+
+
+
+
+/* Testing functions *************************************************************/
+
+void sendDFUART(){
+		
+	
+	while(uartHandle.tx_state != HAL_UART_STATE_READY);
+	hal_uart_tx(&uartHandle, message1, sizeof(message1)-1);
+	
+
+}
+
+
+void sendSineSPI(){
+	
+	uint32_t count, c;
+	
+	// CS = 0
+	hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 0);
+	
+	
+	for (count = 0; count <= 20; count++){
+			
+			while(SpiHandle.State != HAL_SPI_STATE_READY);
+	
+			addrcmd[0] = (uint8_t) master_write_data[count];
+			addrcmd[1] = (uint8_t) (master_write_data[count] >> 8);
+		
+			/* first send the master write cmd to slave */
+			hal_spi_master_tx(&SpiHandle, addrcmd, 2);
+			
+			
+			// Delay entre envíos
+			for(c = 0; c < 2000; c++){}
+			
+	}
+	
+		
+		
+	// CS = 1
+	hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 1);
+
+}
+
+
+void sendValueSPI(){
+
+	
+
+}
+
+/* Testing functions *************************************************************/
+
+
+
 int main(void)
 {
 	uint32_t i;
 	int32_t c;
+	uint32_t count = 0;
 	
 	/* Inicializamos el HSE como clock del sistema (25 MHz) */
 	initClock();
@@ -258,7 +375,7 @@ int main(void)
 	RCC->APB2ENR |= 0x00004000;
 
 	
-	/* SPI SECTION */
+	/* SPI SECTION ---------------------------------------- */
 	/* configure GPIO for SPI2 */
 	spi_gpio_init();
 	
@@ -267,9 +384,9 @@ int main(void)
 	
 	/* fill up the handle structure */
 	SpiHandle.Instance										= SPI_2;
-	SpiHandle.Init.BaudRatePrescaler						= SPI_REG_CR1_BR_PCLK_DIV_32;
+	SpiHandle.Init.BaudRatePrescaler						= SPI_REG_CR1_BR_PCLK_DIV_256;
 	SpiHandle.Init.Direction								= SPI_ENABLE_2_LINE_UNI_DIR;
-	SpiHandle.Init.OutputBidiMode						= SPI_ENABLE_RX_ONLY;
+	SpiHandle.Init.OutputBidiMode						= SPI_ENABLE_TX_ONLY;
 	SpiHandle.Init.CLKPhase									= SPI_SECOND_CLOCK_TRANS;
 	SpiHandle.Init.CLKPolarity								= SPI_CPOL_LOW;
 	SpiHandle.Init.DataSize									= SPI_DATASIZE_16;
@@ -282,11 +399,14 @@ int main(void)
 	/* Call driver API to initialize devices */
 	hal_spi_init(&SpiHandle);
 	
+	// Ponemos SPI2 CS a HIGH
+	hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 1);
+	
 	/* Enable the IRQs in the NVIC */
 	NVIC_EnableIRQ(SPI2_IRQn);
 	
 	
-	/* USART SECTION */
+	/* USART SECTION ---------------------------------------- */
 	/* Configure GPIO for UART6 */
 	uart_gpio_init();
 	
@@ -314,49 +434,35 @@ int main(void)
 	
 	
 	
+
+
+		
+	/* GPIOs SECTION ---------------------------------------- */
+	gpio_init();
+	
+	
 	//Delay para esperar a que arranque el BT
 	for(c = 0; c < 5000000; c++){}
 		
-	
-	
-	/* TEST SENDING */
+		
+		
+	/* TEST UART SENDING */
 	//while(uartHandle.tx_state != HAL_UART_STATE_READY);
 	//hal_uart_tx(&uartHandle, message1, sizeof(message1)-1);
 		
-	
-	/* TIM6 SECTION */
-	// TODO
+	/* TEST UART RECEIVING */
+	while(uartHandle.rx_state != HAL_UART_STATE_READY);
+	hal_uart_rx(&uartHandle, UART_rxBuff, 6);
+		
 
+	/* Test SPI Master sending */
+	//sendSineSPI();
+		
+		
 #if 1
 	while(1)
 	{
-		/* TEST RECEIVING */
-		//while(uartHandle.rx_state != HAL_UART_STATE_READY);
-		//hal_uart_rx(&uartHandle, UART_rxBuff, 6);
 
-		/* TEST SPI MASTER */
-		while(SpiHandle.State != HAL_SPI_STATE_READY);
-		
-		addrcmd[0] = (uint8_t) master_write_data[0];
-		addrcmd[1] = (uint8_t) (master_write_data[0] >> 8);
-		
-		/* first send the master write cmd to slave */
-		hal_spi_master_tx(&SpiHandle, addrcmd, 2);
-		
-		// Delay entre envíos
-		for(c = 0; c < 5000000; c++){}
-		
-		/*
-		led_turn_on(GPIOJ,LED_GREEN);
-		led_turn_on(GPIOJ,LED_RED);
-
-		for(i=0;i<500000;i++);
-
-		led_turn_off(GPIOJ,LED_GREEN);
-		led_turn_off(GPIOJ,LED_RED);
-
-		for(i=0;i<500000;i++);
-		*/
 
 	}
 
@@ -408,7 +514,10 @@ void USART6_IRQHandler(void)
 /*This callback will be called by the driver when driver finishes the transmission of data */
 void app_tx_cmp_callback(void *size)
 {
- led_turn_on(GPIOJ,LED_RED);
+	uint32_t c;
+	led_turn_on(GPIOJ,LED_RED);
+	for (c = 0; c <= 2000; c++){}
+	led_turn_off(GPIOJ, LED_RED);
 	
 }
 
@@ -420,7 +529,8 @@ void app_rx_cmp_callback(void *size)
 	
 	// TODO: aquí podemos volver a habilitar la interrupción RXNE, para
 	// que vuelva a estár disponible la recepcion de datos.
-	
+	while(uartHandle.rx_state != HAL_UART_STATE_READY);
+	hal_uart_rx(&uartHandle, UART_rxBuff, 6);
 }
 
 

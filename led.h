@@ -8,8 +8,8 @@
 #define GPIOJ_PIN_5   5	
 
 
-#define LED_GREEN     GPIOJ_PIN_13
-#define LED_RED				GPIOJ_PIN_5
+#define LED_RED			GPIOJ_PIN_13
+#define LED_GREEN		GPIOJ_PIN_5
 
 
 
@@ -18,10 +18,11 @@
 /* Macros used for configuring gpios for SPI functionality */
 #define GPIOA_PIN_12	12
 #define GPIOB_PIN_15	15
-
+#define GPIOB_PIN_9		9
 
 #define	SPI_CLK_PIN		GPIOA_PIN_12
 #define SPI_MOSI_PIN	GPIOB_PIN_15
+#define SPI_CS_PIN		GPIOB_PIN_9
 
 //#define SPI_MISO_PIN
 
@@ -54,6 +55,15 @@
 /* Definition for USARTx's NVIC */
 #define USARTx_IRQn						USART6_IRQn
 #define USARTx_IRQHandler				USART6_IRQHandler
+
+
+
+
+/* Macros used for GPIOs configuration of diferent funcionalities */
+// Bluetooth reset
+#define GPIOC_PIN_2			2
+#define BT_RESET_PIN		GPIOC_PIN_2
+
 
 
 
@@ -97,5 +107,7 @@ void app_rx_cmp_callback(void *size);
 
 
 
+
+void sendDFUART(void);
 
 #endif 
