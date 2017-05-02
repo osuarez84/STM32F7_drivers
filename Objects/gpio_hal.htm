@@ -3,11 +3,11 @@
 <title>Static Call Graph - [.\Objects\gpio_hal.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Objects\gpio_hal.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060061: Last Updated: Tue May 02 11:02:06 2017
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060061: Last Updated: Tue May 02 18:17:17 2017
 <BR><P>
-<H3>Maximum Stack Usage =         52 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
+<H3>Maximum Stack Usage =        124 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
-__rt_entry_main &rArr; main &rArr; uart_gpio_init &rArr; hal_gpio_init &rArr; hal_gpio_configure_pin_speed
+__rt_entry_main &rArr; main &rArr; gpio_init &rArr; hal_gpio_init &rArr; hal_gpio_configure_pin_speed
 <P>
 <H3>
 Functions with no stack information
@@ -138,7 +138,7 @@ Function Pointers
  <LI><a href="#[2a]">TIM4_IRQHandler</a> from startup_stm32f769xx.o(.text) referenced from startup_stm32f769xx.o(RESET)
  <LI><a href="#[3e]">TIM5_IRQHandler</a> from startup_stm32f769xx.o(.text) referenced from startup_stm32f769xx.o(RESET)
  <LI><a href="#[42]">TIM6_DAC_IRQHandler</a> from startup_stm32f769xx.o(.text) referenced from startup_stm32f769xx.o(RESET)
- <LI><a href="#[43]">TIM7_IRQHandler</a> from startup_stm32f769xx.o(.text) referenced from startup_stm32f769xx.o(RESET)
+ <LI><a href="#[43]">TIM7_IRQHandler</a> from led.o(i.TIM7_IRQHandler) referenced from startup_stm32f769xx.o(RESET)
  <LI><a href="#[37]">TIM8_BRK_TIM12_IRQHandler</a> from startup_stm32f769xx.o(.text) referenced from startup_stm32f769xx.o(RESET)
  <LI><a href="#[3a]">TIM8_CC_IRQHandler</a> from startup_stm32f769xx.o(.text) referenced from startup_stm32f769xx.o(RESET)
  <LI><a href="#[39]">TIM8_TRG_COM_TIM14_IRQHandler</a> from startup_stm32f769xx.o(.text) referenced from startup_stm32f769xx.o(RESET)
@@ -273,8 +273,8 @@ Global Symbols
 <P><STRONG><a name="[eb]"></a>__rt_entry_postsh_1</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, __rtentry2.o(.ARM.Collect$$rtentry$$00000009))
 
 <P><STRONG><a name="[8a]"></a>__rt_entry_main</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, __rtentry2.o(.ARM.Collect$$rtentry$$0000000D))
-<BR><BR>[Stack]<UL><LI>Max Depth = 52 + Unknown Stack Size
-<LI>Call Chain = __rt_entry_main &rArr; main &rArr; uart_gpio_init &rArr; hal_gpio_init &rArr; hal_gpio_configure_pin_speed
+<BR><BR>[Stack]<UL><LI>Max Depth = 124 + Unknown Stack Size
+<LI>Call Chain = __rt_entry_main &rArr; main &rArr; gpio_init &rArr; hal_gpio_init &rArr; hal_gpio_configure_pin_speed
 </UL>
 <BR>[Calls]<UL><LI><a href="#[8c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;exit
 <LI><a href="#[8b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
@@ -644,9 +644,6 @@ Global Symbols
 <P><STRONG><a name="[42]"></a>TIM6_DAC_IRQHandler</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup_stm32f769xx.o(.text))
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32f769xx.o(RESET)
 </UL>
-<P><STRONG><a name="[43]"></a>TIM7_IRQHandler</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup_stm32f769xx.o(.text))
-<BR>[Address Reference Count : 1]<UL><LI> startup_stm32f769xx.o(RESET)
-</UL>
 <P><STRONG><a name="[37]"></a>TIM8_BRK_TIM12_IRQHandler</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, startup_stm32f769xx.o(.text))
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32f769xx.o(RESET)
 </UL>
@@ -749,6 +746,9 @@ Global Symbols
 <P><STRONG><a name="[79]"></a>SystemInit</STRONG> (Thumb, 82 bytes, Stack size 0 bytes, system_stm32f7xx.o(i.SystemInit))
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32f769xx.o(.text)
 </UL>
+<P><STRONG><a name="[43]"></a>TIM7_IRQHandler</STRONG> (Thumb, 2 bytes, Stack size 0 bytes, led.o(i.TIM7_IRQHandler))
+<BR>[Address Reference Count : 1]<UL><LI> startup_stm32f769xx.o(RESET)
+</UL>
 <P><STRONG><a name="[53]"></a>USART6_IRQHandler</STRONG> (Thumb, 10 bytes, Stack size 8 bytes, led.o(i.USART6_IRQHandler))
 <BR><BR>[Stack]<UL><LI>Max Depth = 40<LI>Call Chain = USART6_IRQHandler &rArr; hal_uart_handle_interrupt &rArr; hal_uart_handle_RXNE_interrupt
 </UL>
@@ -772,8 +772,8 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> led.o(i.main)
 </UL>
-<P><STRONG><a name="[99]"></a>gpio_init</STRONG> (Thumb, 36 bytes, Stack size 32 bytes, led.o(i.gpio_init))
-<BR><BR>[Stack]<UL><LI>Max Depth = 52<LI>Call Chain = gpio_init &rArr; hal_gpio_init &rArr; hal_gpio_configure_pin_speed
+<P><STRONG><a name="[99]"></a>gpio_init</STRONG> (Thumb, 294 bytes, Stack size 104 bytes, led.o(i.gpio_init))
+<BR><BR>[Stack]<UL><LI>Max Depth = 124<LI>Call Chain = gpio_init &rArr; hal_gpio_init &rArr; hal_gpio_configure_pin_speed
 </UL>
 <BR>[Calls]<UL><LI><a href="#[9a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;hal_gpio_init
 </UL>
@@ -828,8 +828,7 @@ Global Symbols
 <P><STRONG><a name="[c5]"></a>hal_gpio_write_to_pin</STRONG> (Thumb, 28 bytes, Stack size 8 bytes, hal_gpio_driver.o(i.hal_gpio_write_to_pin))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = hal_gpio_write_to_pin
 </UL>
-<BR>[Called By]<UL><LI><a href="#[c9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;sendSineSPI
-<LI><a href="#[8b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+<BR>[Called By]<UL><LI><a href="#[8b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 <LI><a href="#[97]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;led_turn_on
 <LI><a href="#[98]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;led_turn_off
 </UL>
@@ -956,8 +955,8 @@ Global Symbols
 <LI><a href="#[7b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;app_tx_cmp_callback
 </UL>
 
-<P><STRONG><a name="[8b]"></a>main</STRONG> (Thumb, 206 bytes, Stack size 0 bytes, led.o(i.main))
-<BR><BR>[Stack]<UL><LI>Max Depth = 52<LI>Call Chain = main &rArr; uart_gpio_init &rArr; hal_gpio_init &rArr; hal_gpio_configure_pin_speed
+<P><STRONG><a name="[8b]"></a>main</STRONG> (Thumb, 214 bytes, Stack size 0 bytes, led.o(i.main))
+<BR><BR>[Stack]<UL><LI>Max Depth = 124<LI>Call Chain = main &rArr; gpio_init &rArr; hal_gpio_init &rArr; hal_gpio_configure_pin_speed
 </UL>
 <BR>[Calls]<UL><LI><a href="#[b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;hal_uart_init
 <LI><a href="#[a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;hal_spi_init
@@ -991,11 +990,10 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;parse_cmd
 </UL>
 
-<P><STRONG><a name="[c9]"></a>sendSineSPI</STRONG> (Thumb, 86 bytes, Stack size 16 bytes, led.o(i.sendSineSPI))
+<P><STRONG><a name="[c9]"></a>sendSineSPI</STRONG> (Thumb, 66 bytes, Stack size 16 bytes, led.o(i.sendSineSPI))
 <BR><BR>[Stack]<UL><LI>Max Depth = 32<LI>Call Chain = sendSineSPI &rArr; hal_spi_master_tx
 </UL>
 <BR>[Calls]<UL><LI><a href="#[ab]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;hal_spi_master_tx
-<LI><a href="#[c5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;hal_gpio_write_to_pin
 </UL>
 <BR>[Called By]<UL><LI><a href="#[8b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>

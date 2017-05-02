@@ -442,14 +442,19 @@
               <FilePath>.\hal_gpio_driver.h</FilePath>
             </File>
             <File>
-              <FileName>hal_spi_driver.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\hal_spi_driver.c</FilePath>
-            </File>
-            <File>
               <FileName>hal_timer6_driver.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\hal_timer6_driver.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_timer6_driver.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\hal_timer6_driver.h</FilePath>
+            </File>
+            <File>
+              <FileName>hal_spi_driver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\hal_spi_driver.c</FilePath>
             </File>
             <File>
               <FileName>hal_spi_driver.h</FileName>
@@ -465,6 +470,16 @@
               <FileName>hal_usart_driver.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\hal_usart_driver.h</FilePath>
+            </File>
+            <File>
+              <FileName>hal_EQ_techniques.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\hal_EQ_techniques.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_EQ_techniques.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\hal_EQ_techniques.h</FilePath>
             </File>
           </Files>
         </Group>

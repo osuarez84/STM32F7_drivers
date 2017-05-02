@@ -109,18 +109,113 @@ void uart_gpio_init(void){
 
 
 /**
-	* @brief  Initialize GPIO pins
+	* @brief  Initialize I/O pins
 	* @param  None
 	* @retval None
 	*/
 void gpio_init(void){
+	
+	/* Declaramos las estructuras para inicializar los pines */
+	gpio_pin_conf_t bt_pin_conf;
+	gpio_pin_conf_t W1_gpio_conf;
+	gpio_pin_conf_t ADCs_gpio_conf;
+	gpio_pin_conf_t ON_OFF_gpio_conf;
+	
+	
+	/* Habilitamos los relojes necesarios */
+	_HAL_RCC_GPIOB_CLK_ENABLE();
+	_HAL_RCC_GPIOH_CLK_ENABLE();
+	_HAL_RCC_GPIOI_CLK_ENABLE();
+	_HAL_RCC_GPIOF_CLK_ENABLE();
+	_HAL_RCC_GPIOJ_CLK_ENABLE();
+	
 
-	// TODO: hay que definir aquí todos los
-	// pines utilizados como I/O digitales.
+	
+	/* Working 1 Channels */
+	// CH0
+	W1_gpio_conf.pin = 		W1_CH0;
+	W1_gpio_conf.mode = 		GPIO_PIN_OUTPUT_MODE;
+	W1_gpio_conf.op_type = 	GPIO_PIN_OP_TYPE_PUSHPULL;
+	W1_gpio_conf.speed =		GPIO_PIN_SPEED_HIGH;
+	W1_gpio_conf.pull = 		GPIO_PIN_NO_PULL_PUSH;
+	
+	hal_gpio_init(GPIOB, &W1_gpio_conf);
+	
+	// CH1
+	W1_gpio_conf.pin = 		W1_CH1;
+
+	hal_gpio_init(GPIOJ, &W1_gpio_conf);
+	
+	// CH2
+	W1_gpio_conf.pin =		W1_CH2;
+	
+	hal_gpio_init(GPIOI, &W1_gpio_conf);
+	
+	// CH3
+	W1_gpio_conf.pin =		W1_CH3;
+	
+	hal_gpio_init(GPIOF, &W1_gpio_conf);
+	
+	// CH4
+	W1_gpio_conf.pin = 		W1_CH4;
+	
+	hal_gpio_init(GPIOB, &W1_gpio_conf);
+	
+	// CH5
+	W1_gpio_conf.pin = 		W1_CH5;
+	
+	hal_gpio_init(GPIOB, &W1_gpio_conf);
+	
+	
+	
+	/* ADCs : I W1 y V REF */
+	// ADC V REF
+	ADCs_gpio_conf.pin = 		V_REF_ADC_DOUT;
+	ADCs_gpio_conf.mode = 	GPIO_PIN_INPUT_MODE;
+	ADCs_gpio_conf.speed =	GPIO_PIN_SPEED_HIGH;
+	ADCs_gpio_conf.pull = 	GPIO_PIN_NO_PULL_PUSH;
+	
+	hal_gpio_init(GPIOB, &ADCs_gpio_conf);
+	
+	// ADC I W1
+	ADCs_gpio_conf.pin = 	I_W1_ADC_OUT;
+
+	hal_gpio_init(GPIOC, &ADCs_gpio_conf);
+	
+	// ADCs CS y CLK
+	ADCs_gpio_conf.pin = 		ADC_CS;
+	ADCs_gpio_conf.mode =		GPIO_PIN_OUTPUT_MODE;
+	ADCs_gpio_conf.op_type =	GPIO_PIN_OP_TYPE_PUSHPULL;
+	
+	hal_gpio_init(GPIOJ, &ADCs_gpio_conf);
+	
+	ADCs_gpio_conf.pin = ADC_CLK;
+	
+	hal_gpio_init(GPIOF, &ADCs_gpio_conf);
+	
+	
+	
+	/* ON/OFF */
+	// Filter ON/OFF
+	ON_OFF_gpio_conf.pin = 		FILT_W1_ON_OFF;
+	ON_OFF_gpio_conf.mode =		GPIO_PIN_OUTPUT_MODE;
+	ON_OFF_gpio_conf.op_type =	GPIO_PIN_OP_TYPE_PUSHPULL;
+	ON_OFF_gpio_conf.speed =	GPIO_PIN_SPEED_HIGH;
+	ON_OFF_gpio_conf.pull =		GPIO_PIN_NO_PULL_PUSH;
+	
+	hal_gpio_init(GPIOJ, &ON_OFF_gpio_conf);
+	
+	// CE ON/OFF 
+	ON_OFF_gpio_conf.pin =	AUX_ON_OFF;
+
+	hal_gpio_init(GPIOA, &ON_OFF_gpio_conf);
+	
+	// W1 ON/OFF
+	ON_OFF_gpio_conf.pin =	W1_ON_OFF;
+	
+	hal_gpio_init(GPIOA, &ON_OFF_gpio_conf);
 	
 	/* Bluetooth */
-	gpio_pin_conf_t bt_pin_conf;
-	
 	bt_pin_conf.pin = BT_RESET_PIN;
 	bt_pin_conf.mode = GPIO_PIN_OUTPUT_MODE;
 	bt_pin_conf.op_type = GPIO_PIN_OP_TYPE_PUSHPULL;
@@ -322,7 +417,7 @@ void sendSineSPI(){
 	uint32_t count, c;
 	
 	// CS = 0
-	hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 0);
+
 	
 	
 	for (count = 0; count <= 20; count++){
@@ -344,13 +439,21 @@ void sendSineSPI(){
 		
 		
 	// CS = 1
-	hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 1);
+	//hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 1);
 
 }
 
 
 void sendValueSPI(){
 
+	while(SpiHandle.State != HAL_SPI_STATE_READY);
+	
+	
+	addrcmd[0] = (uint8_t) master_write_data[0];
+	addrcmd[1] = (uint8_t) (master_write_data[0] >> 8);
+		
+	/* first send the master write cmd to slave */
+	hal_spi_master_tx(&SpiHandle, addrcmd, 2);
 	
 
 }
@@ -388,7 +491,7 @@ int main(void)
 	SpiHandle.Init.Direction								= SPI_ENABLE_2_LINE_UNI_DIR;
 	SpiHandle.Init.OutputBidiMode						= SPI_ENABLE_TX_ONLY;
 	SpiHandle.Init.CLKPhase									= SPI_SECOND_CLOCK_TRANS;
-	SpiHandle.Init.CLKPolarity								= SPI_CPOL_LOW;
+	SpiHandle.Init.CLKPolarity								= SPI_CPOL_HIGH;
 	SpiHandle.Init.DataSize									= SPI_DATASIZE_16;
 	SpiHandle.Init.FirstBit									= SPI_TX_MSB_FIRST;
 	SpiHandle.Init.NSS										= SPI_SSM_ENABLE;
@@ -431,14 +534,13 @@ int main(void)
 	/* enable the IRQ of USART peripheral */
 	NVIC_EnableIRQ(USART6_IRQn);
 	
-	
-	
-	
-
-
 		
-	/* GPIOs SECTION ---------------------------------------- */
+	/* I/Os SECTION ---------------------------------------- */
+	/* Configure GPIO for I/Os */
 	gpio_init();
+	
+	
+	
 	
 	
 	//Delay para esperar a que arranque el BT
@@ -457,12 +559,14 @@ int main(void)
 
 	/* Test SPI Master sending */
 	//sendSineSPI();
-		
+
+	hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 0);
+
 		
 #if 1
 	while(1)
 	{
-			sendSineSPI();
+		sendSineSPI();
 
 	}
 
@@ -498,11 +602,36 @@ void SPI2_IRQHandler(void){
   hal_spi_irq_handler(&SpiHandle);
 }
 
-
+/**
+  * @brief  This function handles SPI2 interrupt request.
+  * @param  None
+  * @retval None
+  */
 void USART6_IRQHandler(void)
 {
   hal_uart_handle_interrupt(&uartHandle);
 }
+
+/**
+  * @brief  This function handles TIM6 interrupt request.
+  * @param  None
+  * @retval None
+  */
+void TIM6_IRQHandler(){
+
+}
+
+/**
+  * @brief  This function handles TIM7 interrupt request.
+  * @param  None
+  * @retval None
+  */
+void TIM7_IRQHandler(){
+	
+	
+	
+}
+
 
 //================================================
 

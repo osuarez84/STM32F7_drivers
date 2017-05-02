@@ -3,17 +3,46 @@
 
 #include "hal_gpio_driver.h"
 
-/* LEDs GPIO definitions */
+/* Macros used for configuring gpios for I/O s */
+#define 	GPIOA_PIN_6			6
+#define 	GPIOA_PIN_4			4
+#define 	GPIOB_PIN_14		14
+#define 	GPIOB_PIN_8			8
+#define 	GPIOB_PIN_11		11
+#define 	GPIOC_PIN_8			8
+#define 	GPIOF_PIN_6			6
+#define 	GPIOF_PIN_7			7
+#define 	GPIOH_PIN_6			6
+#define		GPIOI_PIN_3			3
+#define 	GPIOJ_PIN_4			4
+#define 	GPIOJ_PIN_0			0
+#define 	GPIOJ_PIN_1			1
+#define 	GPIOC_PIN_2			2
+
+#define		V_REF_ADC_DOUT		GPIOB_PIN_14		
+#define 	W1_CH4						GPIOB_PIN_8		
+#define 	W1_CH5						GPIOB_PIN_11		
+#define		W1_CH1						GPIOH_PIN_6		
+#define		W1_CH0						GPIOJ_PIN_4		
+#define		W1_CH2						GPIOI_PIN_3		
+#define		W1_CH3						GPIOF_PIN_7		
+#define		I_W1_ADC_OUT			GPIOC_PIN_8		
+#define		ADC_CS						GPIOJ_PIN_0		
+#define 	ADC_CLK						GPIOF_PIN_6		
+#define		FILT_W1_ON_OFF		GPIOJ_PIN_1		
+#define		AUX_ON_OFF				GPIOA_PIN_6		
+#define		W1_ON_OFF					GPIOA_PIN_4		
+#define 	BT_RESET_PIN				GPIOC_PIN_2				// Actualmente no se utiliza
+/* --------------------------------------------------------------- */
+
+/* Macros used for configuring gpios for LEDs */
 #define GPIOJ_PIN_13  13
 #define GPIOJ_PIN_5   5	
 
 
 #define LED_RED			GPIOJ_PIN_13
 #define LED_GREEN		GPIOJ_PIN_5
-
-
-
-
+/* --------------------------------------------------------------- */
 
 /* Macros used for configuring gpios for SPI functionality */
 #define GPIOA_PIN_12	12
@@ -33,7 +62,7 @@
 /* Definition for SPIx's NVIC */
 #define SPIx_IRQn					SPI2_IRQn
 #define SPIx_IRQHandler				SPI2_IRQHandler
-
+/* --------------------------------------------------------------- */
 
 
 
@@ -55,17 +84,27 @@
 /* Definition for USARTx's NVIC */
 #define USARTx_IRQn						USART6_IRQn
 #define USARTx_IRQHandler				USART6_IRQHandler
-
+/* --------------------------------------------------------------- */
 
 
 
 /* Macros used for GPIOs configuration of diferent funcionalities */
 // Bluetooth reset
-#define GPIOC_PIN_2			2
-#define BT_RESET_PIN		GPIOC_PIN_2
+
+/* --------------------------------------------------------------- */
 
 
 
+
+
+
+
+
+
+
+
+
+// -------------------------------------------------------------------
 
 /**
 * @brief  Initialize the LEDs 
