@@ -451,8 +451,8 @@ int main(void)
 	//hal_uart_tx(&uartHandle, message1, sizeof(message1)-1);
 		
 	/* TEST UART RECEIVING */
-	while(uartHandle.rx_state != HAL_UART_STATE_READY);
-	hal_uart_rx(&uartHandle, UART_rxBuff, 6);
+	//while(uartHandle.rx_state != HAL_UART_STATE_READY);
+	//hal_uart_rx(&uartHandle, UART_rxBuff, 6);
 		
 
 	/* Test SPI Master sending */
@@ -462,7 +462,7 @@ int main(void)
 #if 1
 	while(1)
 	{
-
+			sendSineSPI();
 
 	}
 

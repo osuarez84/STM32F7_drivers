@@ -130,10 +130,10 @@ static void hal_spi_configure_datasize(SPI_TypeDef *SPIx, uint32_t datasize, uin
 	}
 	
 	if(lsbfirst){
-		SPIx->CR2 |= SPI_CR1_LSBFRIST;
+		SPIx->CR1 |= SPI_CR1_LSBFRIST;
 	}
 	else{
-		SPIx->CR2 &= ~SPI_CR1_LSBFRIST;
+		SPIx->CR1 &= ~SPI_CR1_LSBFRIST;
 	}
 	
 }
