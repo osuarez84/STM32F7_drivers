@@ -281,7 +281,7 @@
         <Bp>
           <Number>5</Number>
           <Type>0</Type>
-          <LineNumber>613</LineNumber>
+          <LineNumber>612</LineNumber>
           <EnabledFlag>1</EnabledFlag>
           <Address>0</Address>
           <ByteObject>0</ByteObject>
@@ -604,6 +604,30 @@
       <bDave2>0</bDave2>
       <PathWithFileName>.\hal_EQ_techniques.h</PathWithFileName>
       <FilenameWithoutPath>hal_EQ_techniques.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>2</GroupNumber>
+      <FileNumber>13</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>.\auxFunctions.c</PathWithFileName>
+      <FilenameWithoutPath>auxFunctions.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>2</GroupNumber>
+      <FileNumber>14</FileNumber>
+      <FileType>5</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>.\auxFunctions.h</PathWithFileName>
+      <FilenameWithoutPath>auxFunctions.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

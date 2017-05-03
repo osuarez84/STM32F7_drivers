@@ -481,6 +481,16 @@
               <FileType>5</FileType>
               <FilePath>.\hal_EQ_techniques.h</FilePath>
             </File>
+            <File>
+              <FileName>auxFunctions.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\auxFunctions.c</FilePath>
+            </File>
+            <File>
+              <FileName>auxFunctions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\auxFunctions.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

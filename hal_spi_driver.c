@@ -323,7 +323,7 @@ static void hal_spi_rx_close_interrupt(spi_handle_t *hspi){
 */
 void hal_spi_init(spi_handle_t *spi_handle){
 	
-	/* Configure the phase and polerity */
+	/* Configure the phase and polarity */
 	hal_spi_configure_phase_and_polarity(spi_handle->Instance, \
 				spi_handle->Init.CLKPhase, spi_handle->Init.CLKPolarity);
 	

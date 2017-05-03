@@ -1,7 +1,6 @@
 #ifndef __LED_H
 #define __LED_H
 
-#include "hal_gpio_driver.h"
 
 /* Macros used for configuring gpios for I/O s */
 #define 	GPIOA_PIN_6			6
