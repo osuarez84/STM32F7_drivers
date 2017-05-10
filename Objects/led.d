@@ -8,4 +8,6 @@
 .\objects\led.o: C:\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\Drivers\CMSIS\Device\ST\STM32F7xx\Include\system_stm32f7xx.h
 .\objects\led.o: hal_spi_driver.h
 .\objects\led.o: hal_usart_driver.h
+.\objects\led.o: hal_EQ_techniques.h 
+.\objects\led.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
 .\objects\led.o: led.h

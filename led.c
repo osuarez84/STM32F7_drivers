@@ -2,6 +2,7 @@
 #include "hal_gpio_driver.h"
 #include "hal_spi_driver.h"
 #include "hal_usart_driver.h"
+#include "hal_EQ_techniques.h "
 #include "led.h"
 
 
@@ -29,7 +30,15 @@ uint8_t message1[] = "DAT1234567891F";
 uint8_t UART_rxBuff[39];
 
 																
+/* LUTs for generating waveforms*/
+float LUT1[10001];
+float LUT2[10001];
+float LUT3[10001];
+float LUTcomplete[31000];																
 																
+													
+													
+															
 																
 																
 																
@@ -139,12 +148,12 @@ void gpio_init(void){
 	W1_gpio_conf.speed =		GPIO_PIN_SPEED_HIGH;
 	W1_gpio_conf.pull = 		GPIO_PIN_NO_PULL_PUSH;
 	
-	hal_gpio_init(GPIOB, &W1_gpio_conf);
+	hal_gpio_init(GPIOJ, &W1_gpio_conf);
 	
 	// CH1
 	W1_gpio_conf.pin = 		W1_CH1;
 
-	hal_gpio_init(GPIOJ, &W1_gpio_conf);
+	hal_gpio_init(GPIOH, &W1_gpio_conf);
 	
 	// CH2
 	W1_gpio_conf.pin =		W1_CH2;
@@ -458,7 +467,7 @@ void sendValueSPI(){
 
 }
 
-/* Testing functions *************************************************************/
+/* *************************************************************/
 
 
 
@@ -538,6 +547,35 @@ int main(void)
 	/* I/Os SECTION ---------------------------------------- */
 	/* Configure GPIO for I/Os */
 	gpio_init();
+	
+	/* Init the I/Os */
+	/* Working 1 Channels */
+	hal_gpio_write_to_pin(GPIOJ, W1_CH0, 1);
+	hal_gpio_write_to_pin(GPIOH, W1_CH1, 0);
+	hal_gpio_write_to_pin(GPIOI, W1_CH2, 0);
+	hal_gpio_write_to_pin(GPIOF, W1_CH3, 0);
+	hal_gpio_write_to_pin(GPIOB, W1_CH4, 0);
+	hal_gpio_write_to_pin(GPIOB, W1_CH5, 0);
+	
+	/* ADCs : I W1 y V REF */
+	hal_gpio_write_to_pin(GPIOJ, ADC_CS, 1);
+	hal_gpio_write_to_pin(GPIOF, ADC_CLK, 1);
+	
+	
+	/* ON/OFFs */
+	// Filter ON/OFF
+	hal_gpio_write_to_pin(GPIOJ, FILT_W1_ON_OFF, 0);
+
+	
+	// CE ON/OFF 
+	hal_gpio_write_to_pin(GPIOA, AUX_ON_OFF, 0);
+	
+	// W1 ON/OFF
+	hal_gpio_write_to_pin(GPIOA, W1_ON_OFF, 0);
+	
+	/* Bluetooth */
+	// No utilizamos el reset aquí
+	
 	
 	
 	

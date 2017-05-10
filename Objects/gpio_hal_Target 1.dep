@@ -1,5 +1,5 @@
 Dependencies for Project 'gpio_hal', Target 'Target 1': (DO NOT MODIFY !)
-F (.\led.c)(0x5908B106)(-c --cpu Cortex-M7.fp.dp -D__EVAL -g -O0 --apcs=interwork --split_sections-I D:\01_Omar\04_proyectos_para_pruebas\02_Micrux\01_STM32F769\05\STM32F7_drivers\RTE-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.0.1\CMSIS\Include-I C:\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\Drivers\CMSIS\Device\ST\STM32F7xx\Include-D__UVISION_VERSION="517" -D_RTE_ -DSTM32F769xx-o .\objects\led.o --omf_browse .\objects\led.crf --depend .\objects\led.d)
+F (.\led.c)(0x5912F7BA)(-c --cpu Cortex-M7.fp.dp -D__EVAL -g -O0 --apcs=interwork --split_sections-I D:\01_Omar\04_proyectos_para_pruebas\02_Micrux\01_STM32F769\05\STM32F7_drivers\RTE-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.0.1\CMSIS\Include-I C:\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\Drivers\CMSIS\Device\ST\STM32F7xx\Include-D__UVISION_VERSION="517" -D_RTE_ -DSTM32F769xx-o .\objects\led.o --omf_browse .\objects\led.crf --depend .\objects\led.d)
 I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x55DB8DF0)
 I (hal_gpio_driver.h)(0x58FDA71A)
 I (C:\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\Drivers\CMSIS\Device\ST\STM32F7xx\Include\stm32f769xx.h)(0x5866AB5E)
@@ -9,8 +9,10 @@ I (C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.0.1\CMSIS\Include\cmsis_armcc.h)(0x589AF06C)
 I (C:\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\Drivers\CMSIS\Device\ST\STM32F7xx\Include\system_stm32f7xx.h)(0x5866AB5E)
 I (hal_spi_driver.h)(0x59084AF9)
 I (hal_usart_driver.h)(0x58FDFA68)
-I (led.h)(0x5908ADF1)
-F (.\led.h)(0x5908ADF1)()
+I (hal_EQ_techniques.h )(0x5912E18E)
+I (C:\Keil_v5\ARM\ARMCC\include\math.h)(0x55DB8DEE)
+I (led.h)(0x5912F774)
+F (.\led.h)(0x5912F774)()
 F (.\hal_gpio_driver.c)(0x58FD976D)(-c --cpu Cortex-M7.fp.dp -D__EVAL -g -O0 --apcs=interwork --split_sections-I D:\01_Omar\04_proyectos_para_pruebas\02_Micrux\01_STM32F769\05\STM32F7_drivers\RTE-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.0.1\CMSIS\Include-I C:\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\Drivers\CMSIS\Device\ST\STM32F7xx\Include-D__UVISION_VERSION="517" -D_RTE_ -DSTM32F769xx-o .\objects\hal_gpio_driver.o --omf_browse .\objects\hal_gpio_driver.crf --depend .\objects\hal_gpio_driver.d)
 I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x55DB8DF0)
 I (hal_gpio_driver.h)(0x58FDA71A)
@@ -20,9 +22,9 @@ I (C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.0.1\CMSIS\Include\cmsis_compiler.h)(0x589AF06
 I (C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.0.1\CMSIS\Include\cmsis_armcc.h)(0x589AF06C)
 I (C:\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\Drivers\CMSIS\Device\ST\STM32F7xx\Include\system_stm32f7xx.h)(0x5866AB5E)
 F (.\hal_gpio_driver.h)(0x58FDA71A)()
-F (.\hal_timer6_driver.c)(0x5908A93B)(-c --cpu Cortex-M7.fp.dp -D__EVAL -g -O0 --apcs=interwork --split_sections-I D:\01_Omar\04_proyectos_para_pruebas\02_Micrux\01_STM32F769\05\STM32F7_drivers\RTE-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.0.1\CMSIS\Include-I C:\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\Drivers\CMSIS\Device\ST\STM32F7xx\Include-D__UVISION_VERSION="517" -D_RTE_ -DSTM32F769xx-o .\objects\hal_timer6_driver.o --omf_browse .\objects\hal_timer6_driver.crf --depend .\objects\hal_timer6_driver.d)
-F (.\hal_timer6_driver.h)(0x5908A92F)()
-F (.\hal_spi_driver.c)(0x59084AE7)(-c --cpu Cortex-M7.fp.dp -D__EVAL -g -O0 --apcs=interwork --split_sections-I D:\01_Omar\04_proyectos_para_pruebas\02_Micrux\01_STM32F769\05\STM32F7_drivers\RTE-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.0.1\CMSIS\Include-I C:\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\Drivers\CMSIS\Device\ST\STM32F7xx\Include-D__UVISION_VERSION="517" -D_RTE_ -DSTM32F769xx-o .\objects\hal_spi_driver.o --omf_browse .\objects\hal_spi_driver.crf --depend .\objects\hal_spi_driver.d)
+F (.\hal_timer6_driver.c)(0x5909FC11)(-c --cpu Cortex-M7.fp.dp -D__EVAL -g -O0 --apcs=interwork --split_sections-I D:\01_Omar\04_proyectos_para_pruebas\02_Micrux\01_STM32F769\05\STM32F7_drivers\RTE-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.0.1\CMSIS\Include-I C:\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\Drivers\CMSIS\Device\ST\STM32F7xx\Include-D__UVISION_VERSION="517" -D_RTE_ -DSTM32F769xx-o .\objects\hal_timer6_driver.o --omf_browse .\objects\hal_timer6_driver.crf --depend .\objects\hal_timer6_driver.d)
+F (.\hal_timer6_driver.h)(0x5909FA38)()
+F (.\hal_spi_driver.c)(0x5909F7AD)(-c --cpu Cortex-M7.fp.dp -D__EVAL -g -O0 --apcs=interwork --split_sections-I D:\01_Omar\04_proyectos_para_pruebas\02_Micrux\01_STM32F769\05\STM32F7_drivers\RTE-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.0.1\CMSIS\Include-I C:\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\Drivers\CMSIS\Device\ST\STM32F7xx\Include-D__UVISION_VERSION="517" -D_RTE_ -DSTM32F769xx-o .\objects\hal_spi_driver.o --omf_browse .\objects\hal_spi_driver.crf --depend .\objects\hal_spi_driver.d)
 I (hal_spi_driver.h)(0x59084AF9)
 I (C:\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\Drivers\CMSIS\Device\ST\STM32F7xx\Include\stm32f769xx.h)(0x5866AB5E)
 I (C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.0.1\CMSIS\Include\core_cm7.h)(0x589AF06C)
@@ -40,11 +42,24 @@ I (C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.0.1\CMSIS\Include\cmsis_compiler.h)(0x589AF06
 I (C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.0.1\CMSIS\Include\cmsis_armcc.h)(0x589AF06C)
 I (C:\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\Drivers\CMSIS\Device\ST\STM32F7xx\Include\system_stm32f7xx.h)(0x5866AB5E)
 I (hal_gpio_driver.h)(0x58FDA71A)
-I (led.h)(0x5908ADF1)
+I (led.h)(0x5912F774)
 I (C:\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\Drivers\CMSIS\Device\ST\STM32F7xx\Include\stm32f7xx.h)(0x5866AB5E)
 F (.\hal_usart_driver.h)(0x58FDFA68)()
-F (.\hal_EQ_techniques.c)(0x5908A9B0)(-c --cpu Cortex-M7.fp.dp -D__EVAL -g -O0 --apcs=interwork --split_sections-I D:\01_Omar\04_proyectos_para_pruebas\02_Micrux\01_STM32F769\05\STM32F7_drivers\RTE-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.0.1\CMSIS\Include-I C:\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\Drivers\CMSIS\Device\ST\STM32F7xx\Include-D__UVISION_VERSION="517" -D_RTE_ -DSTM32F769xx-o .\objects\hal_eq_techniques.o --omf_browse .\objects\hal_eq_techniques.crf --depend .\objects\hal_eq_techniques.d)
-F (.\hal_EQ_techniques.h)(0x5908A9B0)()
+F (.\hal_EQ_techniques.c)(0x5912E314)(-c --cpu Cortex-M7.fp.dp -D__EVAL -g -O0 --apcs=interwork --split_sections-I D:\01_Omar\04_proyectos_para_pruebas\02_Micrux\01_STM32F769\05\STM32F7_drivers\RTE-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.0.1\CMSIS\Include-I C:\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\Drivers\CMSIS\Device\ST\STM32F7xx\Include-D__UVISION_VERSION="517" -D_RTE_ -DSTM32F769xx-o .\objects\hal_eq_techniques.o --omf_browse .\objects\hal_eq_techniques.crf --depend .\objects\hal_eq_techniques.d)
+I (hal_EQ_techniques.h)(0x5912E18E)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x55DB8DF0)
+I (C:\Keil_v5\ARM\ARMCC\include\math.h)(0x55DB8DEE)
+F (.\hal_EQ_techniques.h)(0x5912E18E)()
+F (.\auxFunctions.c)(0x5912D8CD)(-c --cpu Cortex-M7.fp.dp -D__EVAL -g -O0 --apcs=interwork --split_sections-I D:\01_Omar\04_proyectos_para_pruebas\02_Micrux\01_STM32F769\05\STM32F7_drivers\RTE-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.0.1\CMSIS\Include-I C:\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\Drivers\CMSIS\Device\ST\STM32F7xx\Include-D__UVISION_VERSION="517" -D_RTE_ -DSTM32F769xx-o .\objects\auxfunctions.o --omf_browse .\objects\auxfunctions.crf --depend .\objects\auxfunctions.d)
+I (hal_gpio_driver.h)(0x58FDA71A)
+I (C:\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\Drivers\CMSIS\Device\ST\STM32F7xx\Include\stm32f769xx.h)(0x5866AB5E)
+I (C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.0.1\CMSIS\Include\core_cm7.h)(0x589AF06C)
+I (C:\Keil_v5\ARM\ARMCC\include\stdint.h)(0x55DB8DF0)
+I (C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.0.1\CMSIS\Include\cmsis_compiler.h)(0x589AF06C)
+I (C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.0.1\CMSIS\Include\cmsis_armcc.h)(0x589AF06C)
+I (C:\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\Drivers\CMSIS\Device\ST\STM32F7xx\Include\system_stm32f7xx.h)(0x5866AB5E)
+I (led.h)(0x5912F774)
+F (.\auxFunctions.h)(0x5909D644)()
 F (RTE\Device\STM32F769NIHx\startup_stm32f769xx.s)(0x590335AE)(--cpu Cortex-M7.fp.dp --pd "__EVAL SETA 1" -g --apcs=interwork -I D:\01_Omar\04_proyectos_para_pruebas\02_Micrux\01_STM32F769\05\STM32F7_drivers\RTE-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.0.1\CMSIS\Include-I C:\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\Drivers\CMSIS\Device\ST\STM32F7xx\Include--pd "__UVISION_VERSION SETA 517" --pd "_RTE_ SETA 1" --pd "STM32F769xx SETA 1"--list .\listings\startup_stm32f769xx.lst --xref -o .\objects\startup_stm32f769xx.o --depend .\objects\startup_stm32f769xx.d)
 F (RTE\Device\STM32F769NIHx\system_stm32f7xx.c)(0x58FD976D)(-c --cpu Cortex-M7.fp.dp -D__EVAL -g -O0 --apcs=interwork --split_sections-I D:\01_Omar\04_proyectos_para_pruebas\02_Micrux\01_STM32F769\05\STM32F7_drivers\RTE-I C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.0.1\CMSIS\Include-I C:\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\Drivers\CMSIS\Device\ST\STM32F7xx\Include-D__UVISION_VERSION="517" -D_RTE_ -DSTM32F769xx-o .\objects\system_stm32f7xx.o --omf_browse .\objects\system_stm32f7xx.crf --depend .\objects\system_stm32f7xx.d)
 I (C:\Keil_v5\ARM\PACK\Keil\STM32F7xx_DFP\2.9.0\Drivers\CMSIS\Device\ST\STM32F7xx\Include\stm32f7xx.h)(0x5866AB5E)

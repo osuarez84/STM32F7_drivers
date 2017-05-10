@@ -87,23 +87,10 @@
 
 
 
-/* Macros used for GPIOs configuration of diferent funcionalities */
-// Bluetooth reset
-
-/* --------------------------------------------------------------- */
 
 
 
 
-
-
-
-
-
-
-
-
-// -------------------------------------------------------------------
 
 /**
 * @brief  Initialize the LEDs 
