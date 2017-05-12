@@ -15,12 +15,36 @@
 /************************************************/
 
 /* CR1 */
+#define TIM_REG_CR1_ARPE								((uint32_t) 1 << 7);				// Auto-reload preload enable
+#define TIM_ENABLE_AUTO_RELOAD					1
+#define TIM_DISABLE_AUTO_RELOAD 				0
+
+#define TIM_REG_CR1_CEN									((uint32_t) 1 << 0);				// Counter enable
+#define TIM_COUNTER_ENABLE							1
+#define TIM_COUNTER_DISABLE							0
+
+#define TIM_REG_CR1_OPM									((uint32_t) 1 << 3);				// One-pulse mode
+#define TIM_OPM_ENABLE									1														// counter stops at next update event (clearing CEN bit)
+#define TIM_OPM_DISABLE									0
+
+
+
 
 /* CR2 */
 
 /* DIER */
+#define TIM_REG_DIER_UDE								((uint32_t) 1 << 8);				// Update DMA request enable
+#define TIM_DMA_REQ_ENABLE							1
+#define TIM_DMA_REQ_DISABLE							0
+
+#define TIM_REG_DIER_UIE								((uint32_t) 1 << 0);				// Update interrupt enable
+#define TIM_INT_ENABLE									1
+#define TIM_INT_DISABLE									0
+
 
 /* SR */
+// TIM6/TIM7
+#define TIM_REG_SR_UI_FLAG							((uint32_t) 1 << 0);				// Update interrupt flag (Set by HW. Cleared by SW)
 
 /* EGR */
 
@@ -52,7 +76,7 @@ typedef struct{
 
 typedef struct __tim67_handle_t{
 
-	TIM_TypeDef				*Instance;		/* Register base address */
+	TIM_TypeDef					*Instance;		/* Register base address */
 	
 	tim67_init_t				Init;					/* Time base required parameters */
 	

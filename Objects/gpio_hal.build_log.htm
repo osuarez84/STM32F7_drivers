@@ -27,24 +27,6 @@ Project File Date:  05/03/2017
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 1 (build 61)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'Target 1'
-compiling auxFunctions.c...
-hal_gpio_driver.h(170): warning:  #1-D: last line of file ends without a newline
-  #endif 
-led.h(138): warning:  #1-D: last line of file ends without a newline
-  #endif 
-auxFunctions.c(33): warning:  #1-D: last line of file ends without a newline
-  }
-auxFunctions.c: 3 warnings, 0 errors
-compiling hal_usart_driver.c...
-hal_gpio_driver.h(170): warning:  #1-D: last line of file ends without a newline
-  #endif 
-led.h(138): warning:  #1-D: last line of file ends without a newline
-  #endif 
-hal_usart_driver.c(217): warning:  #550-D: variable "tmpreg" was set but never used
-  	uint32_t tmpreg = 0x00;
-hal_usart_driver.c(401): warning:  #550-D: variable "val" was set but never used
-  	uint32_t val;
-hal_usart_driver.c: 4 warnings, 0 errors
 compiling led.c...
 hal_gpio_driver.h(170): warning:  #1-D: last line of file ends without a newline
   #endif 
@@ -52,16 +34,16 @@ hal_EQ_techniques.h (75): warning:  #1-D: last line of file ends without a newli
   // TODO
 led.h(138): warning:  #1-D: last line of file ends without a newline
   #endif 
-led.c(476): warning:  #177-D: variable "i" was declared but never referenced
+led.c(489): warning:  #177-D: variable "i" was declared but never referenced
   	uint32_t i;
-led.c(478): warning:  #177-D: variable "count" was declared but never referenced
+led.c(491): warning:  #177-D: variable "count" was declared but never referenced
   	uint32_t count = 0;
-led.c(709): warning:  #1-D: last line of file ends without a newline
+led.c(722): warning:  #1-D: last line of file ends without a newline
   //================================================
 led.c: 6 warnings, 0 errors
 linking...
-Program Size: Code=4074 RO-data=562 RW-data=64 ZI-data=245808  
-".\Objects\gpio_hal.axf" - 0 Error(s), 13 Warning(s).
+Program Size: Code=4158 RO-data=562 RW-data=64 ZI-data=245864  
+".\Objects\gpio_hal.axf" - 0 Error(s), 6 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -87,12 +69,12 @@ Package Vendor: Keil
    * Component: ARM::CMSIS:CORE:5.0.1
 
    * Component: Keil::Device:Startup:1.2.0
-      Include file:  Drivers\CMSIS\Device\ST\STM32F7xx\Include\stm32f7xx.h
-      Source file:   MDK\Device\Source\ARM\STM32F7xx_OPT.s
-      Source file:   MDK\Device\Source\ARM\STM32F7xx_OTP.s
       Source file:   Drivers\CMSIS\Device\ST\STM32F7xx\Source\Templates\arm\startup_stm32f769xx.s
       Source file:   Drivers\CMSIS\Device\ST\STM32F7xx\Source\Templates\system_stm32f7xx.c
-Build Time Elapsed:  00:00:18
+      Source file:   MDK\Device\Source\ARM\STM32F7xx_OPT.s
+      Source file:   MDK\Device\Source\ARM\STM32F7xx_OTP.s
+      Include file:  Drivers\CMSIS\Device\ST\STM32F7xx\Include\stm32f7xx.h
+Build Time Elapsed:  00:00:10
 </pre>
 </body>
 </html>

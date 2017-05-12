@@ -27,7 +27,7 @@ uint8_t message1[] = "DAT1234567891F";
 
 
 /* UART buffers */
-uint8_t UART_rxBuff[39];
+uint8_t UART_rxBuff[100];
 
 																
 /* LUTs for generating waveforms*/
@@ -356,7 +356,7 @@ void 	parse_cmd(uint8_t *cmd)
 	/* TESTING COMMAND RECEPTION */
 	uint32_t c;
 	
-	
+	// CONECT command 
 	if (cmd[0] == 'C' && cmd[1] == 'O' && cmd[2] == 'N' && \
 		cmd[3] == 'E' && cmd[4] == 'C' && cmd[5] == 'T'){
 		
@@ -369,9 +369,22 @@ void 	parse_cmd(uint8_t *cmd)
 				
 
 			sendDFUART();
-
+			
+			while(uartHandle.rx_state != HAL_UART_STATE_READY);
+			hal_uart_rx(&uartHandle, UART_rxBuff, 6);						// Dejamos la recepción prevista para empezar a recibir datos
 				
 		}
+		
+	// DAT command 
+	else if(cmd[0] == 'D' && cmd[1] == 'A' && cmd[2] == 'T'){			// Vamos a recibir datos 
+			
+		// Hacemos la tarea que toque
+			
+			
+		while(uartHandle.rx_state != HAL_UART_STATE_READY);		// Dejamos la recepción prevista para empezar a recibir datos 
+		hal_uart_rx(&uartHandle, UART_rxBuff, 42);
+		
+	}
 		
 	
 	
@@ -425,32 +438,30 @@ void sendSineSPI(){
 	
 	uint32_t count, c;
 	
-	// CS = 0
-
-	
 	
 	for (count = 0; count <= 20; count++){
 			
 			while(SpiHandle.State != HAL_SPI_STATE_READY);
 	
+			//hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 0);
 			addrcmd[0] = (uint8_t) master_write_data[count];
 			addrcmd[1] = (uint8_t) (master_write_data[count] >> 8);
 		
 			/* first send the master write cmd to slave */
 			hal_spi_master_tx(&SpiHandle, addrcmd, 2);
-			
+			//hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 1);
 			
 			// Delay entre envíos
-			for(c = 0; c < 2000; c++){}
+			for(c = 0; c < 20; c++){}
 			
 	}
 	
 		
-		
-	// CS = 1
-	//hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 1);
+
 
 }
+
+
 
 
 void sendValueSPI(){
@@ -592,7 +603,7 @@ int main(void)
 		
 	/* TEST UART RECEIVING */
 	//while(uartHandle.rx_state != HAL_UART_STATE_READY);
-	//hal_uart_rx(&uartHandle, UART_rxBuff, 6);
+	hal_uart_rx(&uartHandle, UART_rxBuff, 6);		// Recibimos la ADDR
 		
 
 	/* Test SPI Master sending */

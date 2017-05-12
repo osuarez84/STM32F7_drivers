@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\Objects\gpio_hal.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Objects\gpio_hal.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060061: Last Updated: Wed May 10 13:21:51 2017
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060061: Last Updated: Fri May 12 12:53:02 2017
 <BR><P>
 <H3>Maximum Stack Usage =        124 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -757,7 +757,7 @@ Global Symbols
 <BR>[Address Reference Count : 1]<UL><LI> startup_stm32f769xx.o(RESET)
 </UL>
 <P><STRONG><a name="[7c]"></a>app_rx_cmp_callback</STRONG> (Thumb, 34 bytes, Stack size 8 bytes, led.o(i.app_rx_cmp_callback))
-<BR><BR>[Stack]<UL><LI>Max Depth = 48<LI>Call Chain = app_rx_cmp_callback &rArr; parse_cmd &rArr; sendDFUART &rArr; hal_uart_tx
+<BR><BR>[Stack]<UL><LI>Max Depth = 48<LI>Call Chain = app_rx_cmp_callback &rArr; parse_cmd &rArr; hal_uart_rx
 </UL>
 <BR>[Calls]<UL><LI><a href="#[96]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;hal_uart_rx
 <LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;parse_cmd
@@ -909,7 +909,9 @@ Global Symbols
 <LI><a href="#[bd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;hal_uart_configure_parity_error_interrupt
 <LI><a href="#[be]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;hal_uart_configure_error_interrupt
 </UL>
-<BR>[Called By]<UL><LI><a href="#[7c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;app_rx_cmp_callback
+<BR>[Called By]<UL><LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;parse_cmd
+<LI><a href="#[8b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+<LI><a href="#[7c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;app_rx_cmp_callback
 </UL>
 
 <P><STRONG><a name="[c0]"></a>hal_uart_tx</STRONG> (Thumb, 36 bytes, Stack size 16 bytes, hal_usart_driver.o(i.hal_uart_tx))
@@ -955,10 +957,11 @@ Global Symbols
 <LI><a href="#[7b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;app_tx_cmp_callback
 </UL>
 
-<P><STRONG><a name="[8b]"></a>main</STRONG> (Thumb, 324 bytes, Stack size 0 bytes, led.o(i.main))
+<P><STRONG><a name="[8b]"></a>main</STRONG> (Thumb, 334 bytes, Stack size 0 bytes, led.o(i.main))
 <BR><BR>[Stack]<UL><LI>Max Depth = 124<LI>Call Chain = main &rArr; gpio_init &rArr; hal_gpio_init &rArr; hal_gpio_configure_pin_speed
 </UL>
-<BR>[Calls]<UL><LI><a href="#[b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;hal_uart_init
+<BR>[Calls]<UL><LI><a href="#[96]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;hal_uart_rx
+<LI><a href="#[b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;hal_uart_init
 <LI><a href="#[a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;hal_spi_init
 <LI><a href="#[c5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;hal_gpio_write_to_pin
 <LI><a href="#[c8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;uart_gpio_init
@@ -972,10 +975,11 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[8a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__rt_entry_main
 </UL>
 
-<P><STRONG><a name="[95]"></a>parse_cmd</STRONG> (Thumb, 74 bytes, Stack size 16 bytes, led.o(i.parse_cmd))
-<BR><BR>[Stack]<UL><LI>Max Depth = 40<LI>Call Chain = parse_cmd &rArr; sendDFUART &rArr; hal_uart_tx
+<P><STRONG><a name="[95]"></a>parse_cmd</STRONG> (Thumb, 138 bytes, Stack size 16 bytes, led.o(i.parse_cmd))
+<BR><BR>[Stack]<UL><LI>Max Depth = 40<LI>Call Chain = parse_cmd &rArr; hal_uart_rx
 </UL>
-<BR>[Calls]<UL><LI><a href="#[ca]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;sendDFUART
+<BR>[Calls]<UL><LI><a href="#[96]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;hal_uart_rx
+<LI><a href="#[ca]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;sendDFUART
 <LI><a href="#[97]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;led_turn_on
 <LI><a href="#[98]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;led_turn_off
 </UL>
@@ -990,7 +994,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;parse_cmd
 </UL>
 
-<P><STRONG><a name="[c9]"></a>sendSineSPI</STRONG> (Thumb, 66 bytes, Stack size 16 bytes, led.o(i.sendSineSPI))
+<P><STRONG><a name="[c9]"></a>sendSineSPI</STRONG> (Thumb, 64 bytes, Stack size 16 bytes, led.o(i.sendSineSPI))
 <BR><BR>[Stack]<UL><LI>Max Depth = 32<LI>Call Chain = sendSineSPI &rArr; hal_spi_master_tx
 </UL>
 <BR>[Calls]<UL><LI><a href="#[ab]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;hal_spi_master_tx
