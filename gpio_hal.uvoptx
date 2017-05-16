@@ -197,7 +197,24 @@
           <Name>UL2CM3(-S0 -C0 -P0 -FD20020000 -FC1000 -FN2 -FF0STM32F7x_2048 -FS08000000 -FL0200000 -FF1STM32F7xTCM_2048 -FS1200000 -FL1200000 -FP0($$Device:STM32F769NIHx$CMSIS\Flash\STM32F7x_2048.FLM) -FP1($$Device:STM32F769NIHx$CMSIS\Flash\STM32F7xTCM_2048.FLM))</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint/>
+      <Breakpoint>
+        <Bp>
+          <Number>0</Number>
+          <Type>0</Type>
+          <LineNumber>135</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134219384</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>.\hal_EQ_techniques.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\gpio_hal\hal_EQ_techniques.c\135</Expression>
+        </Bp>
+      </Breakpoint>
       <WatchWindow1>
         <Ww>
           <count>0</count>
@@ -243,6 +260,21 @@
           <count>8</count>
           <WinNumber>1</WinNumber>
           <ItemText>UART_rxBuff</ItemText>
+        </Ww>
+        <Ww>
+          <count>9</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>LUTcomplete</ItemText>
+        </Ww>
+        <Ww>
+          <count>10</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>LUTdac</ItemText>
+        </Ww>
+        <Ww>
+          <count>11</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>contRow</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>
@@ -302,7 +334,7 @@
         <AscS3>0</AscS3>
         <aSer3>0</aSer3>
         <eProf>0</eProf>
-        <aLa>1</aLa>
+        <aLa>0</aLa>
         <aPa1>0</aPa1>
         <AscS4>0</AscS4>
         <aSer4>0</aSer4>

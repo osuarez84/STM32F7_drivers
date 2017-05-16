@@ -22,7 +22,6 @@ uint16_t master_write_data[]={ 	0x8000,0xa78d,0xcb3c,0xe78d,0xf9bb,0xffff,0xf9bb
 uint8_t addrcmd[2];
 
 // UART messages
-//uint8_t message1[] = "STM32F7xx Hello world!!";
 uint8_t message1[] = "DAT1234567891F";
 
 
@@ -35,8 +34,10 @@ float LUT1[10001];
 float LUT2[10001];
 float LUT3[10001];
 float LUTcomplete[31000];																
-																
-													
+uint16_t LUTdac[31000];												
+		
+DF_CVTypeDef DF_CV;
+DF_DPVTypeDef DF_DPV;																
 													
 															
 																
@@ -421,7 +422,6 @@ void initClock(){
 
 
 
-
 /* Testing functions *************************************************************/
 
 void sendDFUART(){
@@ -440,20 +440,16 @@ void sendSineSPI(){
 	
 	
 	for (count = 0; count <= 20; count++){
-			
-			while(SpiHandle.State != HAL_SPI_STATE_READY);
-	
-			//hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 0);
+
+			hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 0);				// CS to LOW
 			addrcmd[0] = (uint8_t) master_write_data[count];
 			addrcmd[1] = (uint8_t) (master_write_data[count] >> 8);
-		
-			/* first send the master write cmd to slave */
 			hal_spi_master_tx(&SpiHandle, addrcmd, 2);
-			//hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 1);
-			
-			// Delay entre envíos
-			for(c = 0; c < 20; c++){}
-			
+			while(SpiHandle.State != HAL_SPI_STATE_READY);
+			for(c = 0; c < 3000; c++){}													// MUST : Esperamos 0.1 ms entre cada envío para cumplir Timing del CLK (medido con Saleae)
+			hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 1);				// CS to HIGH
+			for(c = 0; c < 30; c++){}														// MUST : Generamos un CS HIGH de 4.5us para cumplir los requisitos de Timing del CS (medido con Saleae)
+
 	}
 	
 		
@@ -461,22 +457,30 @@ void sendSineSPI(){
 
 }
 
-
-
-
-void sendValueSPI(){
-
-	while(SpiHandle.State != HAL_SPI_STATE_READY);
+void sendLUTSPI(uint32_t n){
+	
+	uint32_t count, c;
 	
 	
-	addrcmd[0] = (uint8_t) master_write_data[0];
-	addrcmd[1] = (uint8_t) (master_write_data[0] >> 8);
-		
-	/* first send the master write cmd to slave */
-	hal_spi_master_tx(&SpiHandle, addrcmd, 2);
+	for (count = 0; count <= n; count++){
+
+			hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 0);				// CS to LOW
+			addrcmd[0] = (uint8_t) LUTdac[count];
+			addrcmd[1] = (uint8_t) (LUTdac[count] >> 8);
+			hal_spi_master_tx(&SpiHandle, addrcmd, 2);
+			while(SpiHandle.State != HAL_SPI_STATE_READY);
+			for(c = 0; c < 3000; c++){}													// MUST : Esperamos 0.1 ms entre cada envío para cumplir Timing del CLK (medido con Saleae)
+			hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 1);				// CS to HIGH 
+			for(c = 0; c < 30; c++){}														// MUST : Generamos un CS HIGH de 4.5us para cumplir los requisitos de Timing del CS (medido con Saleae)
+	}
 	
+	
+
 
 }
+
+
+
 
 /* *************************************************************/
 
@@ -484,7 +488,7 @@ void sendValueSPI(){
 
 int main(void)
 {
-	uint32_t i;
+	uint32_t n;
 	int32_t c;
 	uint32_t count = 0;
 	
@@ -608,14 +612,42 @@ int main(void)
 
 	/* Test SPI Master sending */
 	//sendSineSPI();
+	hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 1);
 
-	hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 0);
-
+	/* Cargamos datos CV */
+	DF_CV.Measurement.start = 1.4;
+	DF_CV.Measurement.vtx1 = 2;
+	DF_CV.Measurement.vtx2 = 1.1;
+	DF_CV.Measurement.step = 0.001;
+	DF_CV.Measurement.sr = 1;
+	DF_CV.Measurement.scans = 1;
+		
+	/* Cargamos datos DPV */
+	DF_DPV.Measurement.start = 0.38;
+	DF_DPV.Measurement.stop = 1;
+	DF_DPV.Measurement.step = 0.04;
+	DF_DPV.Measurement.ePulse = 0.1;
+	DF_DPV.Measurement.tPulse = 0.0012;
+	DF_DPV.Measurement.sr = 8;
+	
+	/* Generamos LUT */
+	
+	/* CV */
+	//n = generateCVsignal(&DF_CV, LUT1, LUT2, LUT3, LUTcomplete);
+	//generateDACValues(LUTcomplete, LUTdac, n);
+	
+	/* DPV */
+	n = generateDPVsignal(&DF_DPV, LUTcomplete);
+	generateDACValues(LUTcomplete, LUTdac, n);
+	
+		
 		
 #if 1
 	while(1)
 	{
+
 		sendSineSPI();
+		//sendLUTSPI(n);
 
 	}
 

@@ -2,6 +2,12 @@
 // Se establecerán unas APIs para su utilización
 #include <stdint.h>
 #include <math.h>
+#include <stdlib.h>
+
+
+#define		NBITSDAC	16
+#define		VREF		5
+#define		PI			3.14159
 
 // TODO : WORK IN PROGRESS
 
@@ -42,6 +48,17 @@ typedef struct {
 	uint16_t scans;
 } DF_MEASUREMENT_PAR_CV;
 
+
+// DPV
+typedef struct {
+	float start;
+	float stop;
+	float step;
+	float ePulse;
+	float tPulse;
+	float sr;
+}DF_MEASUREMENT_PAR_DPV;
+
 /* DEFINICIÓN DE DATA FRAMES COMPLETOS */
 /* Data frames de VOLTAMETRIAS */
 
@@ -53,18 +70,28 @@ typedef struct {
 } DF_CVTypeDef;
 
 
+// DPV
+typedef struct {
+	DF_HEADER Header;
+	DF_PRETREATMENT_PAR Pretreatment;
+	DF_MEASUREMENT_PAR_DPV Measurement;
+}DF_DPVTypeDef;
+
 
 /************************************************/
 /*					APIs						*/
 /************************************************/
+void generateDACValues(float* lut, uint16_t* data, uint32_t n);
+
 
 /* Pretreatment */
 // TODO
 
 
 /* Voltammetries */
-void generateCVsignal(DF_CVTypeDef df, float* LUT1, float* LUT2, float* LUT3, float* LUTcomplete);
+uint32_t generateCVsignal(DF_CVTypeDef* df, float* LUT1, float* LUT2, float* LUT3, float* LUTcomplete);
 
+uint32_t generateDPVsignal(DF_DPVTypeDef* df, float* LUTcomplete);
 // TODO
 
 /* Amperometries */

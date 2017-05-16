@@ -30,20 +30,18 @@ Build target 'Target 1'
 compiling led.c...
 hal_gpio_driver.h(170): warning:  #1-D: last line of file ends without a newline
   #endif 
-hal_EQ_techniques.h (75): warning:  #1-D: last line of file ends without a newline
+hal_EQ_techniques.h (102): warning:  #1-D: last line of file ends without a newline
   // TODO
 led.h(138): warning:  #1-D: last line of file ends without a newline
   #endif 
-led.c(489): warning:  #177-D: variable "i" was declared but never referenced
-  	uint32_t i;
-led.c(491): warning:  #177-D: variable "count" was declared but never referenced
+led.c(554): warning:  #177-D: variable "count" was declared but never referenced
   	uint32_t count = 0;
-led.c(722): warning:  #1-D: last line of file ends without a newline
+led.c(813): warning:  #1-D: last line of file ends without a newline
   //================================================
-led.c: 6 warnings, 0 errors
+led.c: 5 warnings, 0 errors
 linking...
-Program Size: Code=4158 RO-data=562 RW-data=64 ZI-data=245864  
-".\Objects\gpio_hal.axf" - 0 Error(s), 6 Warning(s).
+Program Size: Code=5070 RO-data=562 RW-data=64 ZI-data=308000  
+".\Objects\gpio_hal.axf" - 0 Error(s), 5 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -69,12 +67,12 @@ Package Vendor: Keil
    * Component: ARM::CMSIS:CORE:5.0.1
 
    * Component: Keil::Device:Startup:1.2.0
-      Source file:   Drivers\CMSIS\Device\ST\STM32F7xx\Source\Templates\arm\startup_stm32f769xx.s
-      Source file:   Drivers\CMSIS\Device\ST\STM32F7xx\Source\Templates\system_stm32f7xx.c
-      Source file:   MDK\Device\Source\ARM\STM32F7xx_OPT.s
       Source file:   MDK\Device\Source\ARM\STM32F7xx_OTP.s
       Include file:  Drivers\CMSIS\Device\ST\STM32F7xx\Include\stm32f7xx.h
-Build Time Elapsed:  00:00:10
+      Source file:   MDK\Device\Source\ARM\STM32F7xx_OPT.s
+      Source file:   Drivers\CMSIS\Device\ST\STM32F7xx\Source\Templates\arm\startup_stm32f769xx.s
+      Source file:   Drivers\CMSIS\Device\ST\STM32F7xx\Source\Templates\system_stm32f7xx.c
+Build Time Elapsed:  00:00:06
 </pre>
 </body>
 </html>
