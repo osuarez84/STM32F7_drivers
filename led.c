@@ -37,7 +37,13 @@ float LUTcomplete[31000];
 uint16_t LUTdac[31000];												
 		
 DF_CVTypeDef DF_CV;
-DF_DPVTypeDef DF_DPV;																
+DF_LSVTypeDef DF_LSV;
+DF_SCVTypeDef DF_SCV;
+DF_DPVTypeDef DF_DPV;			
+DF_NPVTypeDef DF_NPV;
+DF_DNPVTypeDef DF_DNPV;
+DF_SWVTypeDef DF_SWV;
+DF_ACTypeDef DF_ACV;
 													
 															
 																
@@ -611,10 +617,7 @@ int main(void)
 		
 
 	/* Test SPI Master sending */
-	//sendSineSPI();
-	hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 1);
-
-	/* Cargamos datos CV */
+	/* Load CV data */
 	DF_CV.Measurement.start = 1.4;
 	DF_CV.Measurement.vtx1 = 2;
 	DF_CV.Measurement.vtx2 = 1.1;
@@ -622,7 +625,17 @@ int main(void)
 	DF_CV.Measurement.sr = 1;
 	DF_CV.Measurement.scans = 1;
 		
-	/* Cargamos datos DPV */
+	/* Load LSV data */
+	DF_LSV.Measurement.start = 0.3;
+	DF_LSV.Measurement.stop = 4.3;
+	DF_LSV.Measurement.step = 0.21;
+	
+	/* Load SCV data */
+	DF_SCV.Measurement.start = 0.3;
+	DF_SCV.Measurement.stop = 4;
+	DF_SCV.Measurement.step = 0.46;
+		
+	/* Load DPV data */
 	DF_DPV.Measurement.start = 0.38;
 	DF_DPV.Measurement.stop = 1;
 	DF_DPV.Measurement.step = 0.04;
@@ -630,24 +643,77 @@ int main(void)
 	DF_DPV.Measurement.tPulse = 0.0012;
 	DF_DPV.Measurement.sr = 8;
 	
-	/* Generamos LUT */
+	/* Load NPV data */
+	DF_NPV.Measurement.start = 1.96;
+	DF_NPV.Measurement.start = 4.66;
+	DF_NPV.Measurement.step = 0.1;
+	DF_NPV.Measurement.tPulse = 0.002;
+	DF_NPV.Measurement.sr = 6;
 	
+	/* Load DNPV data */
+	DF_DNPV.Measurement.start = 1.26;
+	DF_DNPV.Measurement.stop = 2.88;
+	DF_DNPV.Measurement.step = 0.24;
+	DF_DNPV.Measurement.ePulse = 0.13;
+	DF_DNPV.Measurement.tPulse1 = 0.002;
+	DF_DNPV.Measurement.tPulse2 = 0.002;
+	DF_DNPV.Measurement.sr = 25;
+	
+	/* Load SWV data */
+	DF_SWV.Measurement.start = 3.33;
+	DF_SWV.Measurement.stop = 4.60;
+	DF_SWV.Measurement.step = 0.13;
+	DF_SWV.Measurement.amplitude = 0.12;
+	DF_SWV.Measurement.freq = 13;
+	
+	/* Load ACV data */
+	DF_ACV.Measurement.start = 2.21;
+	DF_ACV.Measurement.stop = 3.9;
+	DF_ACV.Measurement.step = 0.17;
+	DF_ACV.Measurement.ACamplitude = 0.04;
+	DF_ACV.Measurement.sr = 13;
+	DF_ACV.Measurement.freq = 600;
+	
+	
+	
+	/* Generamos LUT */
+	/* Descomentar aquella que quiera probarse */
 	/* CV */
 	//n = generateCVsignal(&DF_CV, LUT1, LUT2, LUT3, LUTcomplete);
-	//generateDACValues(LUTcomplete, LUTdac, n);
+
 	
 	/* DPV */
-	n = generateDPVsignal(&DF_DPV, LUTcomplete);
-	generateDACValues(LUTcomplete, LUTdac, n);
+	//n = generateDPVsignal(&DF_DPV, LUTcomplete);
+
 	
+	/* NPV */
+	//n = generateNPVsignal(&DF_NPV, LUTcomplete);
+
+	
+	/* DNPV */
+	n = generateDNPVsignal(&DF_DNPV, LUTcomplete);
+
+	
+	/* SWV */
+	//n = generateSWVsignal(&DF_SWV, LUT1, LUT2, LUTcomplete);
+
+	
+	/* ACV */
+	//n = generateACVsignal(&DF_ACV, LUT1, LUTcomplete);
+	
+	
+	
+	
+	/* Generamos valores para el DAC */
+	generateDACValues(LUTcomplete, LUTdac, n);
 		
 		
 #if 1
 	while(1)
 	{
 
-		sendSineSPI();
-		//sendLUTSPI(n);
+		//sendSineSPI();
+		sendLUTSPI(n);
 
 	}
 
