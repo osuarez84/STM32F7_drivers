@@ -1,3 +1,6 @@
+#ifndef __HAL_EQ_TECHNIQUES_H
+#define __HAL_EQ_TECHNIQUES_H
+
 // template para preparar una HAL para la generación de las señales de cada técnica
 // Se establecerán unas APIs para su utilización
 #include <stdint.h>
@@ -201,3 +204,6 @@ uint32_t generateACVsignal(DF_ACTypeDef* df, float* LUT1, float* LUTcomplete) ;
 
 /* Potentiometries */
 // TODO
+
+#endif
+

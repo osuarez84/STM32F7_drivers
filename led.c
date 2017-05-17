@@ -667,12 +667,12 @@ int main(void)
 	DF_SWV.Measurement.freq = 13;
 	
 	/* Load ACV data */
-	DF_ACV.Measurement.start = 2.21;
-	DF_ACV.Measurement.stop = 3.9;
+	DF_ACV.Measurement.start = 1.21;
+	DF_ACV.Measurement.stop = 2;
 	DF_ACV.Measurement.step = 0.17;
 	DF_ACV.Measurement.ACamplitude = 0.04;
 	DF_ACV.Measurement.sr = 13;
-	DF_ACV.Measurement.freq = 600;
+	DF_ACV.Measurement.freq = 2000;
 	
 	
 	
@@ -680,6 +680,12 @@ int main(void)
 	/* Descomentar aquella que quiera probarse */
 	/* CV */
 	//n = generateCVsignal(&DF_CV, LUT1, LUT2, LUT3, LUTcomplete);
+	
+	/* LSV */
+	//n = generateLSVsignal(&DF_LSV, LUTcomplete);
+	
+	/* SCV */
+	n = generateSCVsignal(&DF_SCV, LUT1, LUT2, LUT3, LUTcomplete);
 
 	
 	/* DPV */
@@ -691,7 +697,7 @@ int main(void)
 
 	
 	/* DNPV */
-	n = generateDNPVsignal(&DF_DNPV, LUTcomplete);
+	//n = generateDNPVsignal(&DF_DNPV, LUTcomplete);
 
 	
 	/* SWV */
