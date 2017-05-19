@@ -13,7 +13,7 @@ uint16_t read_ADC_W1(void){
 	uint16_t data = 0;
 	
 	// Poner a 0 CS y CLK
-	hal_gpio_write_to_pin(GPIOC, ADC_CS, 0);
+	hal_gpio_write_to_pin(GPIOJ, ADC_CS, 0);
 	hal_gpio_write_to_pin(GPIOF, ADC_CLK, 0);
 	
 	
@@ -26,7 +26,7 @@ uint16_t read_ADC_W1(void){
 	}
 	
 	// Poner a 1 CS y CLK
-	hal_gpio_write_to_pin(GPIOC, ADC_CS, 1);
+	hal_gpio_write_to_pin(GPIOJ, ADC_CS, 1);
 	hal_gpio_write_to_pin(GPIOF, ADC_CLK, 1);
 	return data;
 

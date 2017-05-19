@@ -3,6 +3,7 @@
 #include "hal_spi_driver.h"
 #include "hal_usart_driver.h"
 #include "hal_EQ_techniques.h "
+#include "auxFunctions.h"
 #include "led.h"
 
 
@@ -27,6 +28,7 @@ uint8_t message1[] = "DAT1234567891F";
 
 /* UART buffers */
 uint8_t UART_rxBuff[100];
+uint8_t UART_txBuff[100];
 
 																
 /* LUTs for generating waveforms*/
@@ -34,7 +36,10 @@ float LUT1[10001];
 float LUT2[10001];
 float LUT3[10001];
 float LUTcomplete[31000];																
-uint16_t LUTdac[31000];												
+uint16_t LUTdac[31000];				
+
+uint16_t dataADC = 0x0000;
+
 		
 DF_CVTypeDef DF_CV;
 DF_LSVTypeDef DF_LSV;
@@ -485,7 +490,42 @@ void sendLUTSPI(uint32_t n){
 
 }
 
+/* Función de ejemplo para testear lectura ADC para una CV. Los tiempos de los bucles
+están calculados de fomar empírica y aproximada. */
+void sendLUTSPIandADC_CV(uint32_t n){
+	
+	uint32_t count, c;
+	
+	
+	for (count = 0; count <= n; count++){
+	
+			uint32_t n = 0;
+		
+			hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 0);				// CS to LOW
+			addrcmd[0] = (uint8_t) LUTdac[count];
+			addrcmd[1] = (uint8_t) (LUTdac[count] >> 8);
+			hal_spi_master_tx(&SpiHandle, addrcmd, 2);
+			while(SpiHandle.State != HAL_SPI_STATE_READY);
+			for(c = 0; c < 3000; c++){}													// MUST : Esperamos 0.1 ms entre cada envío para cumplir Timing del CLK (medido con Saleae)
+			hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 1);				// CS to HIGH 
+			for(c = 0; c < 30; c++){}														// MUST : Generamos un CS HIGH de 4.5us para cumplir los requisitos de Timing del CS (medido con Saleae)
+			dataADC = read_ADC_W1();
 
+			
+			/* Send data using BT */
+			UART_txBuff[0] = (uint8_t) dataADC;
+			UART_txBuff[1] = (uint8_t) (dataADC >> 8);
+			while(uartHandle.tx_state != HAL_UART_STATE_READY);
+			hal_uart_tx(&uartHandle, UART_txBuff, 2);
+
+			
+			
+	}
+	
+	
+
+
+}
 
 
 /* *************************************************************/
@@ -621,7 +661,7 @@ int main(void)
 	DF_CV.Measurement.start = 1.4;
 	DF_CV.Measurement.vtx1 = 2;
 	DF_CV.Measurement.vtx2 = 1.1;
-	DF_CV.Measurement.step = 0.001;
+	DF_CV.Measurement.step = 0.1;
 	DF_CV.Measurement.sr = 1;
 	DF_CV.Measurement.scans = 1;
 		
@@ -679,13 +719,13 @@ int main(void)
 	/* Generamos LUT */
 	/* Descomentar aquella que quiera probarse */
 	/* CV */
-	//n = generateCVsignal(&DF_CV, LUT1, LUT2, LUT3, LUTcomplete);
+	n = generateCVsignal(&DF_CV, LUT1, LUT2, LUT3, LUTcomplete);
 	
 	/* LSV */
 	//n = generateLSVsignal(&DF_LSV, LUTcomplete);
 	
 	/* SCV */
-	n = generateSCVsignal(&DF_SCV, LUT1, LUT2, LUT3, LUTcomplete);
+	//n = generateSCVsignal(&DF_SCV, LUT1, LUT2, LUT3, LUTcomplete);
 
 	
 	/* DPV */
@@ -714,12 +754,14 @@ int main(void)
 	generateDACValues(LUTcomplete, LUTdac, n);
 		
 		
+
+		
 #if 1
 	while(1)
 	{
-
+		sendLUTSPIandADC_CV(n);
 		//sendSineSPI();
-		sendLUTSPI(n);
+		//sendLUTSPI(n);
 
 	}
 
