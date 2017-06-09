@@ -5,9 +5,9 @@
 /* Macros used for configuring gpios for I/O s */
 #define 	GPIOA_PIN_6			6
 #define 	GPIOA_PIN_4			4
+#define 	GPIOA_PIN_11		11
 #define 	GPIOB_PIN_14		14
 #define 	GPIOB_PIN_8			8
-#define 	GPIOB_PIN_11		11
 #define 	GPIOC_PIN_8			8
 #define 	GPIOF_PIN_6			6
 #define 	GPIOF_PIN_7			7
@@ -20,7 +20,7 @@
 
 #define		V_REF_ADC_DOUT		GPIOB_PIN_14		
 #define 	W1_CH4						GPIOB_PIN_8		
-#define 	W1_CH5						GPIOB_PIN_11		
+#define 	W1_CH5						GPIOA_PIN_11		
 #define		W1_CH1						GPIOH_PIN_6		
 #define		W1_CH0						GPIOJ_PIN_4		
 #define		W1_CH2						GPIOI_PIN_3		

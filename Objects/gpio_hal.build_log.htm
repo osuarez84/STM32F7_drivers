@@ -32,14 +32,16 @@ hal_gpio_driver.h(170): warning:  #1-D: last line of file ends without a newline
   #endif 
 led.h(138): warning:  #1-D: last line of file ends without a newline
   #endif 
-led.c(543): warning:  #177-D: variable "count" was declared but never referenced
+led.c(502): warning:  #177-D: variable "n" was declared but never referenced
+  			uint32_t n = 0;
+led.c(539): warning:  #177-D: variable "count" was declared but never referenced
   	uint32_t count = 0;
-led.c(870): warning:  #1-D: last line of file ends without a newline
+led.c(866): warning:  #1-D: last line of file ends without a newline
   //================================================
-led.c: 4 warnings, 0 errors
+led.c: 5 warnings, 0 errors
 linking...
-Program Size: Code=5642 RO-data=562 RW-data=72 ZI-data=308496  
-".\Objects\gpio_hal.axf" - 0 Error(s), 4 Warning(s).
+Program Size: Code=5578 RO-data=562 RW-data=68 ZI-data=308500  
+".\Objects\gpio_hal.axf" - 0 Error(s), 5 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -65,12 +67,12 @@ Package Vendor: Keil
    * Component: ARM::CMSIS:CORE:5.0.1
 
    * Component: Keil::Device:Startup:1.2.0
-      Include file:  Drivers\CMSIS\Device\ST\STM32F7xx\Include\stm32f7xx.h
       Source file:   MDK\Device\Source\ARM\STM32F7xx_OPT.s
+      Include file:  Drivers\CMSIS\Device\ST\STM32F7xx\Include\stm32f7xx.h
       Source file:   MDK\Device\Source\ARM\STM32F7xx_OTP.s
       Source file:   Drivers\CMSIS\Device\ST\STM32F7xx\Source\Templates\arm\startup_stm32f769xx.s
       Source file:   Drivers\CMSIS\Device\ST\STM32F7xx\Source\Templates\system_stm32f7xx.c
-Build Time Elapsed:  00:00:08
+Build Time Elapsed:  00:00:09
 </pre>
 </body>
 </html>

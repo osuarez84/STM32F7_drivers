@@ -611,12 +611,12 @@ int main(void)
 	
 	/* Init the I/Os */
 	/* Working 1 Channels */
-	hal_gpio_write_to_pin(GPIOJ, W1_CH0, 1);
+	hal_gpio_write_to_pin(GPIOJ, W1_CH0, 0);
 	hal_gpio_write_to_pin(GPIOH, W1_CH1, 0);
 	hal_gpio_write_to_pin(GPIOI, W1_CH2, 0);
 	hal_gpio_write_to_pin(GPIOF, W1_CH3, 0);
 	hal_gpio_write_to_pin(GPIOB, W1_CH4, 0);
-	hal_gpio_write_to_pin(GPIOB, W1_CH5, 0);
+	hal_gpio_write_to_pin(GPIOA, W1_CH5, 1);
 	
 	/* ADCs : I W1 y V REF */
 	hal_gpio_write_to_pin(GPIOJ, ADC_CS, 1);
@@ -625,7 +625,7 @@ int main(void)
 	
 	/* ON/OFFs */
 	// Filter ON/OFF
-	hal_gpio_write_to_pin(GPIOJ, FILT_W1_ON_OFF, 0);
+	hal_gpio_write_to_pin(GPIOJ, FILT_W1_ON_OFF, 1);
 
 	
 	// CE ON/OFF 
@@ -719,7 +719,7 @@ int main(void)
 	/* Generamos LUT */
 	/* Descomentar aquella que quiera probarse */
 	/* CV */
-	n = generateCVsignal(&DF_CV, LUT1, LUT2, LUT3, LUTcomplete);
+	//n = generateCVsignal(&DF_CV, LUT1, LUT2, LUT3, LUTcomplete);
 	
 	/* LSV */
 	//n = generateLSVsignal(&DF_LSV, LUTcomplete);
@@ -729,7 +729,7 @@ int main(void)
 
 	
 	/* DPV */
-	//n = generateDPVsignal(&DF_DPV, LUTcomplete);
+	n = generateDPVsignal(&DF_DPV, LUTcomplete);
 
 	
 	/* NPV */
