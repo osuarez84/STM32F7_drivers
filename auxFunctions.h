@@ -15,8 +15,12 @@
 uint16_t read_ADC_W1(void);
 
 
-
-
+/**
+* @brief  This function parses the command and takes action
+* @param  *cmd :
+* @retval None
+*/
+void 	parse_cmd(uint8_t *cmd);
 
 
 

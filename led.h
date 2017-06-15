@@ -1,6 +1,17 @@
 #ifndef __LED_H
 #define __LED_H
 
+#include "hal_usart_driver.h"
+#include "hal_spi_driver.h"
+#include "hal_timer6_driver.h"
+
+/* Global variables */
+
+extern uint8_t UART_rxBuff[];
+extern uint8_t UART_txBuff[];
+
+extern spi_handle_t SpiHandle;
+extern uart_handle_t uartHandle;
 
 /* Macros used for configuring gpios for I/O s */
 #define 	GPIOA_PIN_6			6
@@ -86,8 +97,111 @@
 /* --------------------------------------------------------------- */
 
 
+/* FSM definitions ----------------------------------------------- */
+
+/* FSM defines */
+#define NSTATES			60
+#define DEBUG			1
 
 
+typedef enum {
+	CONECT = 0,
+	IDLE,
+	CAL,
+	BIPOT,
+	POT,
+	GALV,
+	EIS,
+	PREP_E,
+	PRETREATMENT,
+	MEASURING,
+	FS_CH,
+	ENDING,
+	ERR
+
+}stateType;
+
+typedef enum {
+	S_WAITING = 0x00,
+	S_RUNNING = 0x01,
+	S_ERROR = 0x02,
+
+}general_state;
+
+typedef enum {
+	M_NONE = 0x00,
+	M_BIPOT = 0x01,
+	M_POT = 0x02,
+	M_GALV = 0x03,
+	M_EIS = 0x04
+}mode;
+
+
+typedef enum {
+	I_DEFAULT = 0x00,
+	I_SATURA = 0x01,
+	I_BELOW_THRESHOLD = 0x02
+}status_I_measure;
+
+typedef enum {
+	C_NONE = 0x00,
+	C_BT = 0x01,
+	C_USB = 0x02
+}mode_com;
+
+typedef enum {
+	L_EMPTY = 0x00,
+	L_REFRESHED = 0x01,
+	L_FINISHED = 0x02
+}lut_state;
+
+typedef enum {
+	P_NONE = 0x00,
+	P_RUNNING = 0x01,
+	P_FINISHED = 0x02
+}state_pretreatment;
+
+typedef enum {
+	E_NONE = 0x00,
+	E_RUNNING = 0x01,
+	E_CANCELLED = 0x02,
+	E_FINISHED = 0x03,
+	E_ERROR = 0x04
+}state_experiment;
+
+/* FSM global variables */
+extern stateType next_state;
+extern status_I_measure status_I_we1;
+extern status_I_measure status_I_we2;
+extern mode_com communication_mode;
+extern state_experiment experiment;
+extern lut_state lut1A_state;
+extern lut_state lut1B_state;
+extern lut_state lut2A_state;
+extern lut_state lut2B_state;
+extern mode df_mode;
+extern mode mode_working;
+extern state_pretreatment pretreatment;
+extern general_state state_equipment;	
+
+
+
+
+/* FSM Functions definition */
+void start(void);
+void conection(void);
+void Idle(void);
+void bipot(void);
+void pot(void);
+void galv(void);
+void eis(void);
+void PrepE(void);
+void Pretreatment(void);
+void Measuring(void);
+void FS_ch(void);
+void Ending(void);
+void Error(void);
+void calibration(void);
 
 
 
@@ -130,9 +244,10 @@ void led_toggle(GPIO_TypeDef *GPIOx, uint16_t pin);
 void app_tx_cmp_callback(void *size);
 void app_rx_cmp_callback(void *size);
 
-
+void app_update_event_callback(TIM_TypeDef *i, hal_tim67_state_t s);
 
 
 void sendDFUART(void);
 
 #endif 
+

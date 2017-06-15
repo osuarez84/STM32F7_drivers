@@ -144,8 +144,8 @@ ahora mismo el DATASIZE_8 o el DATASIZE_16. */
 
 
 
-#define RESET				0
-#define	SET					!RESET
+#define RESET_S				0
+//#define	SET					!RESET
 
 
 

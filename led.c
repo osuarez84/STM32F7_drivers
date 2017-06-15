@@ -3,6 +3,7 @@
 #include "hal_spi_driver.h"
 #include "hal_usart_driver.h"
 #include "hal_EQ_techniques.h "
+//#include "hal_timer6_driver.h"
 #include "auxFunctions.h"
 #include "led.h"
 
@@ -13,7 +14,8 @@
 /* Devices handlers */
 spi_handle_t SpiHandle;
 uart_handle_t uartHandle;
-
+tim67_handle_t tim6Handle;
+tim67_handle_t tim7Handle;
 
 /* master read/write buffers */
 // TEST DATA
@@ -22,6 +24,9 @@ uint16_t master_write_data[]={ 	0x8000,0xa78d,0xcb3c,0xe78d,0xf9bb,0xffff,0xf9bb
 																0x644,0x1872,0x34c3,0x5872,0x8000};
 uint8_t addrcmd[2];
 
+uint16_t dataADC;
+uint32_t cont = 2000000;
+																
 // UART messages
 uint8_t message1[] = "DAT1234567891F";
 
@@ -38,9 +43,8 @@ float LUT3[10001];
 float LUTcomplete[31000];																
 uint16_t LUTdac[31000];				
 
-uint16_t dataADC = 0x0000;
 
-		
+/* Variables para guardar datos experimentos */
 DF_CVTypeDef DF_CV;
 DF_LSVTypeDef DF_LSV;
 DF_SCVTypeDef DF_SCV;
@@ -51,7 +55,21 @@ DF_SWVTypeDef DF_SWV;
 DF_ACTypeDef DF_ACV;
 													
 															
-																
+/* Variables para el seguimiento de los estados
+y eventos que disparan las transiciones */
+stateType next_state;
+status_I_measure status_I_we1;
+status_I_measure status_I_we2;
+mode_com communication_mode;
+state_experiment experiment;
+lut_state lut1A_state;
+lut_state lut1B_state;
+lut_state lut2A_state;
+lut_state lut2B_state;
+mode df_mode;
+mode mode_working;
+state_pretreatment pretreatment;
+general_state state_equipment;																
 																
 																
 /**
@@ -127,6 +145,7 @@ void uart_gpio_init(void){
 	hal_gpio_set_alt_function(GPIOC, USARTx_RX_PIN, USARTx_RX_AF);
 	hal_gpio_init(GPIOC, &uart_pin_conf);
 }
+
 
 
 /**
@@ -322,85 +341,7 @@ void led_toggle(GPIO_TypeDef *GPIOx, uint16_t pin)
 }
 
 
-/**
-* @brief  This function parses the command and takes action
-* @param  *cmd :
-* @retval None
-*/
-void 	parse_cmd(uint8_t *cmd)
-{
-	/*
-	if( cmd[0] == 'L' && cmd[1] == 'E' && cmd[2] == 'D' )
-	{
-		if(cmd[3] == 'O' )
-		{
-			handle_cmd(cmd[4],LED_ORANGE);
-			
-		}else if(cmd[3] == 'B' )
-		{
-			handle_cmd(cmd[4],LED_BLUE);
-			
-		}else if(cmd[3] == 'G' )
-		{
-				handle_cmd(cmd[4],LED_GREEN);
-			
-		}else if(cmd[3] == 'R' )
-		{
-	    	handle_cmd(cmd[4],LED_RED);
-		}else if (cmd[3] == 'A' )
-		{
-			handle_cmd(cmd[4],0xff);
-		}
-		else 
-		{
-			;
-		}
-		
-		
-		
-	}else
-	{
-		error_handler();
-		
-	}
-	*/
-	
-	/* TESTING COMMAND RECEPTION */
-	uint32_t c;
-	
-	// CONECT command 
-	if (cmd[0] == 'C' && cmd[1] == 'O' && cmd[2] == 'N' && \
-		cmd[3] == 'E' && cmd[4] == 'C' && cmd[5] == 'T'){
-		
-			led_turn_on(GPIOJ, LED_GREEN);
-			
-			// delay
-			for (c = 0; c <= 2000; c++){}
-			
-			led_turn_off(GPIOJ, LED_GREEN);
-				
 
-			sendDFUART();
-			
-			while(uartHandle.rx_state != HAL_UART_STATE_READY);
-			hal_uart_rx(&uartHandle, UART_rxBuff, 6);						// Dejamos la recepción prevista para empezar a recibir datos
-				
-		}
-		
-	// DAT command 
-	else if(cmd[0] == 'D' && cmd[1] == 'A' && cmd[2] == 'T'){			// Vamos a recibir datos 
-			
-		// Hacemos la tarea que toque
-			
-			
-		while(uartHandle.rx_state != HAL_UART_STATE_READY);		// Dejamos la recepción prevista para empezar a recibir datos 
-		hal_uart_rx(&uartHandle, UART_rxBuff, 42);
-		
-	}
-		
-	
-	
-}
 
 
 
@@ -511,12 +452,14 @@ void sendLUTSPIandADC_CV(uint32_t n){
 			for(c = 0; c < 30; c++){}														// MUST : Generamos un CS HIGH de 4.5us para cumplir los requisitos de Timing del CS (medido con Saleae)
 			dataADC = read_ADC_W1();
 
+
 			
 			/* Send data using BT */
 			UART_txBuff[0] = (uint8_t) dataADC;
 			UART_txBuff[1] = (uint8_t) (dataADC >> 8);
 			while(uartHandle.tx_state != HAL_UART_STATE_READY);
 			hal_uart_tx(&uartHandle, UART_txBuff, 2);
+
 
 			
 			
@@ -529,6 +472,439 @@ void sendLUTSPIandADC_CV(uint32_t n){
 
 
 /* *************************************************************/
+
+/* FSM functions -------------------------------------------- */
+// Array que apunta a las funciones que corren en cada estado
+void(*state_table[])(void) = {
+	conection,
+	Idle,
+	calibration,
+	bipot,
+	pot,
+	galv,
+	eis,
+	PrepE,
+	Pretreatment,
+	Measuring,
+	FS_ch,
+	Ending,
+	Error
+};
+
+void start() {
+
+	// inicializamos todo el equipo paso a paso
+	mode_working = M_NONE;
+	df_mode = M_NONE;
+	status_I_we1 = I_DEFAULT;
+	status_I_we2 = I_DEFAULT;
+	communication_mode = C_NONE;
+	pretreatment = P_NONE;
+	lut1A_state = L_EMPTY;
+	lut1B_state = L_EMPTY;
+	lut2A_state = L_EMPTY;
+	lut2B_state = L_EMPTY;
+	experiment = E_NONE;
+
+	next_state = CONECT;
+
+}
+
+void conection() {
+
+	if (communication_mode == C_BT) {
+		// Recibimos los datos de conexión
+		// Enviamos el ACK al PC
+		next_state = IDLE;
+
+	}
+	else if (communication_mode == C_USB) {
+
+		// Recibimos los datos de conexión
+		// Enviamos el ACK al PC
+		next_state = IDLE;
+	}
+
+}
+
+void Idle() {
+
+	if (df_mode == M_BIPOT) {
+		next_state = BIPOT;
+	}
+	else if (df_mode == M_POT) {
+		next_state = POT;
+	}
+	else if (df_mode == M_GALV) {
+		next_state = GALV;
+	}
+	else if (df_mode == M_EIS) {
+		next_state = EIS;
+	}
+
+
+}
+
+void bipot() {
+	mode_working = M_BIPOT;
+	next_state = PREP_E;
+
+}
+
+void pot() {
+	mode_working = M_POT;
+	next_state = PREP_E;
+}
+
+void galv() {
+
+	mode_working = M_GALV;
+	next_state = PREP_E;
+}
+
+
+void eis() {
+
+	// TODO : OJO a este modo. Vamos a poder funcionar como potenciostato o galvanostato. Tenerlo en
+	// cuenta a la hora de gestionar el estado y la configuración del equipo en base a lo que se
+	// seleccione.
+	mode_working = M_EIS;
+	next_state = PREP_E;
+}
+
+
+
+void PrepE() {
+
+	/* MODO POT/BIPOT */
+	if (mode_working == M_BIPOT) {
+		// Configuramos FS
+		// Configuramos filtros
+		// Generamos primer refresco LUT1 y LUT2
+		// lut1A_state = REFRESHED y lut2A_state
+
+		// Habilitamos electródos
+
+		/* Hay que preparar dos LUTs, una hará de buffer y se irá cargando mientras se envía la primera */
+
+		// Aplicamos el pretratamiento que proceda
+
+	}
+	else if (mode_working == M_POT) {
+		// Configuramos FS auto o no
+		// Configuramos filtros
+		//Generamos primer refresco de LUT
+		// lut1A_state = REFRESHED;
+
+		// Habilitamos electródos
+
+		// Aplicamos el pretratamiento que proceda
+
+
+	}
+	else if (mode_working == M_GALV) {
+		// Configuramos FS auto o no
+		// Configuramos filtros
+		//Generamos primer refresco de LUT
+		// lut1A_state = REFRESHED;
+
+		// Habilitamos electródos
+
+		// Aplicamos el pretratamiento que proceda
+
+	}
+	else if (mode_working == M_EIS) {
+		// TODO
+
+	}
+
+	next_state = PRETREATMENT;
+}
+
+
+void Pretreatment() {
+	
+	if (pretreatment == P_NONE){
+		
+		// Lanzame la temporización para el pretreatment
+		if(mode_working == M_BIPOT){
+			// TODO: configurame la temporización para los dos WE
+		
+		}
+		
+		else if ((mode_working == M_POT) || (mode_working == M_GALV)){
+			
+			// Configuramos TIM6 para WE1
+			hal_tim67_int_enable(&tim6Handle);
+			hal_tim67_init(&tim6Handle);
+
+			//hal_tim67_clear_flag(&tim6Handle);
+
+		
+		}
+
+		else if(mode_working == M_EIS){
+			// TODO
+			
+		
+		}
+		
+		
+		pretreatment = P_RUNNING;
+	}
+	
+	else if(pretreatment == P_RUNNING){
+		// Esperamos a que termine el pretreatment
+	
+	}
+	
+	else if (pretreatment == P_FINISHED) {
+		// Esperamos a que el pretratamiento termine
+		if (mode_working == M_BIPOT) {
+			// Enviamos LUT1A a DAC WE1
+			// Enviamos LUT2A a DAC WE2
+
+			// Comenzamos siguiente refresco LUT1B
+			// Comenzamos siguiente refresco LUT2B
+
+		}
+		else if (mode_working == M_POT) {
+			// Enviamos LUT1A a DAC WE1
+
+			// Comenzamos siguiente refresco LUT1B
+
+		}
+		else if (mode_working == M_GALV) {
+			// Enviamos LUT1A a DAC WE1
+
+			// Comenzamos siguiente refresco LUT1B
+		}
+		else if (mode_working == M_EIS) {
+			// TODO
+
+		}
+
+		next_state = MEASURING;
+	}
+
+}
+
+
+void Measuring() {
+	// TODO: puede utilizarse el estado de experiment para inicializar
+	// todo solamente en la primera entrada al estado Measuring().
+	// P.Ej:
+	// if(experiment == E_NONE){
+	//		+ Inicializame toda la temporización para recoger muestras en el ADC
+	//		+ Inicializame toda la temporización para lanzar las muestras al DAC
+	//		
+	//		experiment = E_RUNNING; => de esta manera no vuelve a entrar en esta parte
+	// }
+	// else if(experiment == E_RUNNING){
+	// ....
+	// }
+	// else if(experiment == E_FINISHED | experiment == E_CANCELLED){
+	// ...
+	// }
+	// Esto significaría hacer una FSM dentro del propio estado, pasando a trabajar tipo HSM.
+
+	if(experiment == E_NONE){
+		// Inicializame toda la temporización para recoger muestras en el ADC
+		// Inicializame toda la temporización para lanzar las muestras al DAC
+		
+		experiment = E_RUNNING;	
+	
+	}
+	
+	else if(experiment == E_RUNNING){
+		
+		// En la ISR pondremos experiment = E_FINISHED o E_CANCELLED cuando corresponda
+		
+		
+		if (mode_working == M_POT) {
+
+
+			/* Comprobamos si debemos de refrescar alguna LUT */
+			if (lut1A_state == L_FINISHED) {
+				// Refrescamos la LUT
+				lut1A_state = L_REFRESHED;
+			}
+			else if (lut1B_state == L_FINISHED) {
+				// Refrescamos la LUT
+				lut1A_state = L_REFRESHED;
+			}
+
+
+			/* Comprobamos si debemos cambiar el FS */
+			if (status_I_we1 != I_DEFAULT) {
+				next_state = FS_CH;
+			}
+
+		}
+		else if (mode_working == M_BIPOT) {
+			if (lut1A_state == L_FINISHED) {
+				// Refrescamos la LUT
+				lut1A_state = L_REFRESHED;
+			}
+			else if (lut1B_state == L_FINISHED) {
+				// Refrescamos la LUT
+				lut2A_state = L_REFRESHED;
+			}
+			if (lut1B_state == L_FINISHED) {
+				// Refrescamos la LUT
+				lut1B_state = L_REFRESHED;
+			}
+			else if (lut2B_state == L_FINISHED) {
+				// Refrescamos la LUT
+				lut2B_state = L_REFRESHED;
+			}
+
+			if ((status_I_we1 != I_DEFAULT) | (status_I_we2 != I_DEFAULT)) {
+				next_state = FS_CH;
+			}
+		}
+		else if (mode_working == M_GALV) {
+			/* Comprobamos si debemos de refrescar alguna LUT */
+			if (lut1A_state == L_FINISHED) {
+				// Refrescamos la LUT
+				lut1A_state = L_REFRESHED;
+			}
+			else if (lut1B_state == L_FINISHED) {
+				// Refrescamos la LUT
+				lut2A_state = L_REFRESHED;
+			}
+			if (lut1B_state == L_FINISHED) {
+				// Refrescamos la LUT
+				lut1B_state = L_REFRESHED;
+			}
+
+			/* Comprobamos si debemos cambiar el FS */
+			if (status_I_we1 != I_DEFAULT) {
+				next_state = FS_CH;
+			}
+		}
+		else if (mode_working == M_EIS) {
+			// TODO
+		}
+	}
+	
+
+
+
+	else if ((experiment == E_FINISHED) | (experiment == E_CANCELLED)) {
+		
+		next_state = ENDING;
+	}
+}
+
+
+// TODO: comprobamos si se ha habilitado MAS de un FS. En caso de que haya solamente uno, no debemos entrar en este estado.
+void FS_ch() {
+
+	if (mode_working == M_POT) {
+		if (status_I_we1 == I_SATURA) {
+			// Cambiamos FS WE1 a un FS mayor
+			// Reseteamos FLAG_SATURA_WE1 => flag_satura_we1 = DEFAULT;
+		}
+		else if (status_I_we1 == I_BELOW_THRESHOLD) {
+			// Cambiamos FS WE1 a una FS menor
+			// Reseteamos status_I_we1 => status_I_we1 = DEFAULT;
+
+		}
+
+		status_I_we1 = I_DEFAULT;		// Reseteamos el flag
+
+	}
+	else if (mode_working == M_BIPOT) {
+		if (status_I_we1 == I_SATURA) {
+			// Cambiamos FS WE1 a un FS mayor
+			// Reseteamos la status_I_we1 => status_I_we1 = DEFAULT;
+		}
+		else if (status_I_we1 == I_BELOW_THRESHOLD) {
+			// Cambiamos FS WE1 a un FS menor
+			// Reseteamos la status_I_we1 => status_I_we1 = DEFAULT;
+		}
+		if (status_I_we2 == I_SATURA) {
+			// Cambiamos FS WE2 a un FS mayor
+			// Reseteamos la status_I_we2 => status_I_we2 = DEFAULT;
+		}
+		else if (status_I_we2 == I_BELOW_THRESHOLD) {
+			// Cambiamos FS WE2 a un FS menor
+			// Reseteamos la status_I_we2 => status_I_we2 = DEFAULT;
+		}
+		status_I_we1 = I_DEFAULT;		// Reseteamos los flags
+		status_I_we2 = I_DEFAULT;
+
+	}
+
+	else if (mode_working == M_GALV) {
+		if (status_I_we1 == I_SATURA) {
+			// Cambiamos FS WE1 a un FS mayor
+			// Reseteamos FLAG_SATURA_WE1 => flag_satura_we1 = DEFAULT;
+		}
+		else if (status_I_we1 == I_BELOW_THRESHOLD) {
+			// Cambiamos FS WE1 a una FS menor
+			// Reseteamos status_I_we1 => status_I_we1 = DEFAULT;
+
+		}
+
+		status_I_we1 = I_DEFAULT;		// Reseteamos el flag
+	}
+
+	else if (mode_working == M_EIS) {
+		// TODO
+	}
+
+	next_state = MEASURING;
+
+
+
+}
+
+
+// TODO: Hay una opción para dejar el electródo conectado a un determinado potencial al finalizar el experimento. TENER EN CUENTA.
+void Ending() {
+
+	// Desconectar electródos
+	// Resetear los demás periféricos a default
+	// Enviar mensajes de finalización al software
+	if (state_equipment != S_ERROR) {
+		// borramos todos los flags al salir para dejarlos por defecto => default y NO_SATURA
+		mode_working = M_NONE;
+		df_mode = M_NONE;
+		status_I_we1 = I_DEFAULT;
+		status_I_we2 = I_DEFAULT;
+		//communication_mode = C_NONE;
+		pretreatment = P_NONE;
+		lut1A_state = L_EMPTY;
+		lut1B_state = L_EMPTY;
+		lut2A_state = L_EMPTY;
+		lut2B_state = L_EMPTY;
+		experiment = E_NONE;
+		next_state = IDLE;
+	}
+	else if (state_equipment == S_ERROR) {
+
+		next_state = ERR;
+	}
+
+}
+
+void Error() {
+	// En esta rutina podríamos gestionar los errores de alguna
+	// manera o poner al equipo en estado de seguridad si detecta algún fallo.
+	// Toda la gestión de los fallos está por definir.
+
+}
+
+
+void calibration() {
+	// TODO :  queda por definir como va a funcionar el equipo durante la calibración
+
+
+}
+
+
 
 
 
@@ -603,6 +979,24 @@ int main(void)
 	
 	/* enable the IRQ of USART peripheral */
 	NVIC_EnableIRQ(USART6_IRQn);
+	
+	/* TIM SECTION ---------------------------------------- */
+	/* enable clock for TIM6 */
+	_HAL_RCC_TIM6_CLK_ENABLE();
+	
+	tim6Handle.Instance = TIM6;
+	
+	tim6Handle.Init.CounterMode = TIM_OPM_ENABLE;
+	tim6Handle.Init.Period = 5000;
+	tim6Handle.Init.Prescaler = 65535;
+	tim6Handle.Init.AutoReloadPreload = TIM_ENABLE_AUTO_RELOAD;
+	
+	/* fill out the application callbacks */
+	tim6Handle.ue_cb = app_update_event_callback;
+	
+	/* enable the IRQ of TIM6 peripheral */
+	NVIC_EnableIRQ(TIM6_DAC_IRQn);
+
 	
 		
 	/* I/Os SECTION ---------------------------------------- */
@@ -753,15 +1147,15 @@ int main(void)
 	/* Generamos valores para el DAC */
 	generateDACValues(LUTcomplete, LUTdac, n);
 		
-		
-
+	/* Arrancamos la FSM */	
+	start();
 		
 #if 1
 	while(1)
 	{
-		sendLUTSPIandADC_CV(n);
-		//sendSineSPI();
-		//sendLUTSPI(n);
+
+			state_table[next_state]();
+		
 
 	}
 
@@ -812,8 +1206,14 @@ void USART6_IRQHandler(void)
   * @param  None
   * @retval None
   */
-void TIM6_IRQHandler(){
+void TIM6_DAC_IRQHandler(void){
 
+	hal_tim67_int_disable(&tim6Handle); 						// Deshabilitamos int
+	hal_tim67_disable(&tim6Handle);								// Deshabilitamos contador
+	hal_tim67_handle_interrupt(&tim6Handle);
+
+
+	
 }
 
 /**
@@ -853,14 +1253,72 @@ void app_rx_cmp_callback(void *size)
 	
 	// TODO: aquí podemos volver a habilitar la interrupción RXNE, para
 	// que vuelva a estár disponible la recepcion de datos.
-	while(uartHandle.rx_state != HAL_UART_STATE_READY);
-	hal_uart_rx(&uartHandle, UART_rxBuff, 6);
+	//while(uartHandle.rx_state != HAL_UART_STATE_READY);
+	//hal_uart_rx(&uartHandle, UART_rxBuff, 6);
+}
+
+
+/* TIM67 callbacks */
+/* callback para gestionar el sistema cuando se producen update events */
+void app_update_event_callback(TIM_TypeDef *i, hal_tim67_state_t s){
+
+	
+	// Si TIM6 (WE1)...
+	if(i == TIM6){
+
+		
+		// comprobamos si el tiempo se ha acabado
+		cont--;		// Test code
+		
+		// Si estamos en pretreatment y ha finalizado el tiempo de pretratamiento...
+		if(pretreatment == P_RUNNING){  	// TODO: pretreatment == P_RUNNING && flag_tiempo == TIEMPO_TERMINADO
+			
+			if(cont == 0){				// Hemos leído el último sample del experimento...
+				pretreatment = P_FINISHED;
+			}
+			else{
+
+				hal_tim67_clear_flag(&tim6Handle);							// Borramos la flag de int pendiente
+				hal_tim67_int_enable(&tim6Handle);
+				hal_tim67_enable(&tim6Handle);	
+				
+				// Testing
+				led_toggle(GPIOJ, LED_GREEN);
+			}
+				
+		}
+
+		else if(experiment == E_RUNNING){		// Si estamos corriendo el experimento y ha finalizado el tiempo total de la prueba...
+			
+			if(cont == 0){			// Hemos leído el último sample del experimento...
+				experiment = E_FINISHED;
+			}
+			else{
+
+				hal_tim67_clear_flag(&tim6Handle);							// Borramos la flag de int pendiente
+				hal_tim67_int_enable(&tim6Handle);
+				hal_tim67_enable(&tim6Handle);
+				
+				// Testing
+				led_toggle(GPIOJ, LED_GREEN);
+			}
+
+		}
+	
+	}
+
+	
+	
+	// Si TIM7 (WE2)...
+	if(i == TIM7){
+		// TODO
+	
+	}
 }
 
 
 
 
 
-
-
 //================================================
+

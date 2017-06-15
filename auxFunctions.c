@@ -1,6 +1,77 @@
 
 #include "hal_gpio_driver.h"
 #include "led.h"
+#include "hal_usart_driver.h"
+#include "hal_spi_driver.h"
+#include "hal_EQ_techniques.h"
+
+
+
+
+/**
+* @brief  This function parses the command and takes action
+* @param  *cmd :
+* @retval None
+*/
+void 	parse_cmd(uint8_t *cmd)
+{
+
+	/* TESTING COMMAND RECEPTION */
+	uint32_t c;
+	uint8_t ack[] = "ACK";
+	
+	// CONECT command 
+	if (cmd[0] == 'C' && cmd[1] == 'O' && cmd[2] == 'N' && cmd[3] == 'E' && cmd[4] == 'C' && cmd[5] == 'T'){
+
+	
+			led_turn_on(GPIOJ, LED_GREEN);
+			
+			// delay
+			//for (c = 0; c <= 2000; c++){}
+			
+			//led_turn_off(GPIOJ, LED_GREEN);
+				
+			// Disparamos el evento de la FSM	
+			communication_mode = C_BT;
+
+			// Envio del ACK
+			while(uartHandle.tx_state != HAL_UART_STATE_READY);
+			hal_uart_tx(&uartHandle, ack, sizeof(ack)-1);
+			
+			while(uartHandle.rx_state != HAL_UART_STATE_READY);
+			hal_uart_rx(&uartHandle, UART_rxBuff, 9);						// Dejamos la recepción prevista para empezar a recibir datos tipo DAT
+				
+		}
+		
+	// DAT command 
+	else if(cmd[0] == 'D' && cmd[1] == 'A' && cmd[2] == 'T'){			// Vamos a recibir datos 
+			
+		
+			
+		// TODO
+		// Seleccionar el modo de funcionamiento
+		df_mode = M_POT;
+		
+		// Miramos que experimento 
+			
+		
+		
+		// Envio del ACK
+		while(uartHandle.tx_state != HAL_UART_STATE_READY);
+		hal_uart_tx(&uartHandle, ack, sizeof(ack)-1);
+		
+		while(uartHandle.rx_state != HAL_UART_STATE_READY);		// Dejamos la recepción prevista por si es necesario cancelar desde PC
+		hal_uart_rx(&uartHandle, UART_rxBuff, 6);
+		
+	}
+		
+	
+	
+}
+
+
+
+
 
 /**
 	* @brief  Reads the W1 ADC value

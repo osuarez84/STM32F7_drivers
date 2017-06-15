@@ -13,9 +13,50 @@
 #define		PI			3.14159
 
 // TODO : WORK IN PROGRESS
+typedef enum {
+	WE_1,
+	WE_2
+}workingE;
+
+typedef enum{
+
+	/* FS para corriente */
+	FS_1,
+	FS_2,
+	FS_3,
+	FS_4,
+	FS_5
+
+}FS_state;
 
 /************************************************/
-/*					Structures for handling Data				*/
+/*		Structures for handling output Data				*/
+/************************************************/
+typedef struct {
+	char init_1;
+	char init_2;
+	char init_3;
+	
+	workingE w;
+	uint8_t nCiclos;					// nos dice el ciclo en el que estamos, para distinguir los datos entre ciclos
+														// Se utiliza en multistep y CV
+	uint8_t valor_y1_l;
+	uint8_t valor_y1_h;
+	
+	uint8_t valor_y2_l;
+	uint8_t valor_y2_h;
+	
+	uint8_t valor_x_l;
+	uint8_t valor_x_h;
+	
+	FS_state fs;
+	
+	
+}DF_OUTPUT;
+
+
+/************************************************/
+/*		Structures for handling input Data				*/
 /************************************************/
 /* Definición estructuras datos recibidas por el USB */
 typedef struct {

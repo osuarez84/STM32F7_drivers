@@ -556,7 +556,7 @@ void hal_spi_irq_handler(spi_handle_t *hspi){
 	/* check whether RXNEIE bit is enabled in the control register */
 	tmp2 = (hspi->Instance->CR2 & SPI_REG_CR2_RXNEIE_ENABLE);
 	
-	if ((tmp1 != RESET) && (tmp2 != RESET) ){
+	if ((tmp1 != RESET_S) && (tmp2 != RESET_S) ){
 		
 		/* RXNE floag is set handle the RX of data bytes */
 		hal_spi_handle_rx_interrupt(hspi);
@@ -569,7 +569,7 @@ void hal_spi_irq_handler(spi_handle_t *hspi){
 	tmp1 = (hspi->Instance->SR & SPI_REG_SR_TXE_FLAG);
 	tmp2 = (hspi->Instance->CR2 & SPI_REG_CR2_TXEIE_ENABLE);
 	
-	if ( (tmp1 != RESET) && (tmp2 != RESET) ){
+	if ( (tmp1 != RESET_S) && (tmp2 != RESET_S) ){
 		/* TXE flag is set handle the TX of data bytes */
 		hal_spi_handle_tx_interrupt(hspi);
 		return;

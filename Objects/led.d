@@ -13,3 +13,4 @@
 .\objects\led.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 .\objects\led.o: auxFunctions.h
 .\objects\led.o: led.h
+.\objects\led.o: hal_timer6_driver.h
