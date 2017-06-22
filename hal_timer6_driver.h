@@ -68,6 +68,13 @@ typedef enum{
 }hal_tim67_state_t;
 
 
+typedef enum{
+	
+	NONE = 0,
+	UPDATE_EVENT
+	
+}INT_EVENT_t;
+
 typedef struct{
 	
 	uint32_t Period;				// 0x0000 - 0xFFFF
@@ -80,8 +87,6 @@ typedef struct{
 
 }tim67_init_t;
 
-/* Application callbacks typedef */
-typedef void (UE_CB_t) (TIM_TypeDef *i, hal_tim67_state_t s);
 
 
 typedef struct __tim67_handle_t{
@@ -92,7 +97,7 @@ typedef struct __tim67_handle_t{
 	
 	hal_tim67_state_t		state;				/* TIM operation state */
 	
-	UE_CB_t							*ue_cb;				/* Callback for handle the UE interrupt */
+	INT_EVENT_t					int_event;				/* Callback for handle the UE interrupt */
 	
 }tim67_handle_t;
 

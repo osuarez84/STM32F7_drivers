@@ -25,7 +25,7 @@ uint16_t master_write_data[]={ 	0x8000,0xa78d,0xcb3c,0xe78d,0xf9bb,0xffff,0xf9bb
 uint8_t addrcmd[2];
 
 uint16_t dataADC;
-uint32_t cont = 2000000;
+uint32_t cont = 5;
 																
 // UART messages
 uint8_t message1[] = "DAT1234567891F";
@@ -36,23 +36,49 @@ uint8_t UART_rxBuff[100];
 uint8_t UART_txBuff[100];
 
 																
-/* LUTs for generating waveforms*/
-float LUT1[10001];
-float LUT2[10001];
-float LUT3[10001];
-float LUTcomplete[31000];																
-uint16_t LUTdac[31000];				
+/* LUTs for generating testing waveforms*/
+//float LUT1[10001];
+//float LUT2[10001];
+//float LUT3[10001];
+//float LUTcomplete[31000];																
+//uint16_t LUTdac[31000];				
+												
+/* LUTs periódicas para el refresco continuo */												
+float LUTWE1A[20000];
+float LUTWE1B[20000];
+float LUTWE2A[20000];
+float LUTWE2B[20000];
 
+float LUTeCond[10000];
+float LUTeDep[10000];
+float LUTeEq[10000];
+
+uint8_t cont_bipot = 0;
 
 /* Variables para guardar datos experimentos */
-DF_CVTypeDef DF_CV;
-DF_LSVTypeDef DF_LSV;
-DF_SCVTypeDef DF_SCV;
-DF_DPVTypeDef DF_DPV;			
-DF_NPVTypeDef DF_NPV;
-DF_DNPVTypeDef DF_DNPV;
-DF_SWVTypeDef DF_SWV;
-DF_ACTypeDef DF_ACV;
+DF_CVTypeDef DF_CV_we1;
+DF_LSVTypeDef DF_LSV_we1;
+DF_SCVTypeDef DF_SCV_we1;
+DF_DPVTypeDef DF_DPV_we1;			
+DF_NPVTypeDef DF_NPV_we1;
+DF_DNPVTypeDef DF_DNPV_we1;
+DF_SWVTypeDef DF_SWV_we1;
+DF_ACTypeDef DF_ACV_we1;
+
+DF_CVTypeDef DF_CV_we2;
+DF_LSVTypeDef DF_LSV_we2;
+DF_SCVTypeDef DF_SCV_we2;
+DF_DPVTypeDef DF_DPV_we2;			
+DF_NPVTypeDef DF_NPV_we2;
+DF_DNPVTypeDef DF_DNPV_we2;
+DF_SWVTypeDef DF_SWV_we2;
+DF_ACTypeDef DF_ACV_we2;
+
+pretreat_t pretreat_we1;
+pretreat_t pretreat_we2;
+exp_config_t exp_config_we1;
+exp_config_t exp_config_we2;
+
 													
 															
 /* Variables para el seguimiento de los estados
@@ -62,16 +88,132 @@ status_I_measure status_I_we1;
 status_I_measure status_I_we2;
 mode_com communication_mode;
 state_experiment experiment;
-lut_state lut1A_state;
-lut_state lut1B_state;
-lut_state lut2A_state;
-lut_state lut2B_state;
+lut_state lutwe1A_state;
+lut_state lutwe1B_state;
+lut_state lutwe2A_state;
+lut_state lutwe2B_state;
 mode df_mode;
 mode mode_working;
 state_pretreatment pretreatment;
 general_state state_equipment;																
 																
-																
+
+/* Testing functions *************************************************************/
+
+void sendDFUART(){
+		
+	
+	while(uartHandle.tx_state != HAL_UART_STATE_READY);
+	hal_uart_tx(&uartHandle, message1, sizeof(message1)-1);
+	
+
+}
+
+
+
+void sendSineSPI(){
+	
+	uint32_t count, c;
+	
+	
+	for (count = 0; count <= 20; count++){
+
+			hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 0);				// CS to LOW
+			addrcmd[0] = (uint8_t) master_write_data[count];
+			addrcmd[1] = (uint8_t) (master_write_data[count] >> 8);
+			hal_spi_master_tx(&SpiHandle, addrcmd, 2);
+			while(SpiHandle.State != HAL_SPI_STATE_READY);
+			for(c = 0; c < 3000; c++){}													// MUST : Esperamos 0.1 ms entre cada envío para cumplir Timing del CLK (medido con Saleae)
+			hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 1);				// CS to HIGH
+			for(c = 0; c < 30; c++){}														// MUST : Generamos un CS HIGH de 4.5us para cumplir los requisitos de Timing del CS (medido con Saleae)
+
+	}
+}
+
+void sendLUTSPI(uint32_t n){
+	
+	uint32_t count, c;
+	
+	
+	for (count = 0; count <= n; count++){
+
+			hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 0);				// CS to LOW
+			//addrcmd[0] = (uint8_t) LUTdac[count];
+			//addrcmd[1] = (uint8_t) (LUTdac[count] >> 8);
+			hal_spi_master_tx(&SpiHandle, addrcmd, 2);
+			while(SpiHandle.State != HAL_SPI_STATE_READY);
+			for(c = 0; c < 3000; c++){}													// MUST : Esperamos 0.1 ms entre cada envío para cumplir Timing del CLK (medido con Saleae)
+			hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 1);				// CS to HIGH 
+			for(c = 0; c < 30; c++){}														// MUST : Generamos un CS HIGH de 4.5us para cumplir los requisitos de Timing del CS (medido con Saleae)
+	}
+
+}
+
+/* Función de ejemplo para testear lectura ADC para una CV. Los tiempos de los bucles
+están calculados de fomar empírica y aproximada. */
+void sendLUTSPIandADC_CV(uint32_t n){
+	
+	uint32_t count, c;
+	
+	
+	for (count = 0; count <= n; count++){
+	
+			uint32_t n = 0;
+		
+			hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 0);				// CS to LOW
+//			addrcmd[0] = (uint8_t) LUTdac[count];
+//			addrcmd[1] = (uint8_t) (LUTdac[count] >> 8);
+			hal_spi_master_tx(&SpiHandle, addrcmd, 2);
+			while(SpiHandle.State != HAL_SPI_STATE_READY);
+			for(c = 0; c < 3000; c++){}													// MUST : Esperamos 0.1 ms entre cada envío para cumplir Timing del CLK (medido con Saleae)
+			hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 1);				// CS to HIGH 
+			for(c = 0; c < 30; c++){}														// MUST : Generamos un CS HIGH de 4.5us para cumplir los requisitos de Timing del CS (medido con Saleae)
+			dataADC = read_ADC_W1();
+
+
+			
+			/* Send data using BT */
+			UART_txBuff[0] = (uint8_t) dataADC;
+			UART_txBuff[1] = (uint8_t) (dataADC >> 8);
+			while(uartHandle.tx_state != HAL_UART_STATE_READY);
+			hal_uart_tx(&uartHandle, UART_txBuff, 2);		
+	}
+
+}
+
+
+
+
+
+
+
+
+/**
+	* @brief  Initialize the LEDs 
+	* @param  None
+	* @retval None
+	*/
+void led_init(void)
+{
+	
+	gpio_pin_conf_t led_pin_conf;
+	
+	/* Enable the clock for the GPIOJ port */
+	_HAL_RCC_GPIOJ_CLK_ENABLE();
+	
+	led_pin_conf.pin = LED_GREEN;
+	led_pin_conf.mode = GPIO_PIN_OUTPUT_MODE;
+	led_pin_conf.op_type = GPIO_PIN_OP_TYPE_PUSHPULL;
+	led_pin_conf.speed = GPIO_PIN_SPEED_MEDIUM;
+	led_pin_conf.pull = GPIO_PIN_NO_PULL_PUSH;
+	hal_gpio_init(GPIOJ, &led_pin_conf);
+	
+	led_pin_conf.pin = LED_RED;
+	hal_gpio_init(GPIOJ, &led_pin_conf);
+}
+
+
+
 /**
 	* @brief  Initialize the SPI2 pin
 	* @param  None
@@ -269,83 +411,6 @@ void gpio_init(void){
 
 
 /**
-	* @brief  Initialize the LEDs 
-	* @param  None
-	* @retval None
-	*/
-void led_init(void)
-{
-	
-	gpio_pin_conf_t led_pin_conf;
-	
-	/* Enable the clock for the GPIOJ port */
-	_HAL_RCC_GPIOJ_CLK_ENABLE();
-	
-	led_pin_conf.pin = LED_GREEN;
-	led_pin_conf.mode = GPIO_PIN_OUTPUT_MODE;
-	led_pin_conf.op_type = GPIO_PIN_OP_TYPE_PUSHPULL;
-	led_pin_conf.speed = GPIO_PIN_SPEED_MEDIUM;
-	led_pin_conf.pull = GPIO_PIN_NO_PULL_PUSH;
-	hal_gpio_init(GPIOJ, &led_pin_conf);
-	
-	led_pin_conf.pin = LED_RED;
-	hal_gpio_init(GPIOJ, &led_pin_conf);
-}
-
-
-/**
-	* @brief  Turns ON the led which is connected on the given pin  
-	* @param  *GPIOx : Base address of the GPIO Port
-	* @param  Pin : pin number of the LED
-	* @retval None
-	*/
-void led_turn_on(GPIO_TypeDef *GPIOx, uint16_t pin)
-{
-	hal_gpio_write_to_pin(GPIOx,pin, 1);
-	
-}
-
-/**
-	* @brief  Turns OFF the led which is connected on the given pin  
-	* @param  *GPIOx : Base address of the GPIO Port
-	* @param  Pin : pin number of the LED
-	* @retval None
-	*/
-void led_turn_off(GPIO_TypeDef *GPIOx, uint16_t pin)
-{
-	hal_gpio_write_to_pin(GPIOx,pin, 0);
-	
-}
-
-/**
-	* @brief  Toggels the led which is connected on the given pin  
-	* @param  *GPIOx : Base address of the GPIO Port
-	* @param  Pin : pin number of the LED
-	* @retval None
-	*/
-void led_toggle(GPIO_TypeDef *GPIOx, uint16_t pin)
-{
-	if(hal_gpio_read_from_pin(GPIOx,pin))		// read value from pin...
-	{
-		 hal_gpio_write_to_pin(GPIOx,pin, 0);
-	}else
-	{
-		 hal_gpio_write_to_pin(GPIOx,pin, 1);
-		
-	}
-	
-#if 0
-	//Logic 2
-	hal_gpio_write_to_pin(GPIOx,pin, ~(hal_gpio_read_from_pin(GPIOx,pin)));		// Compact way to use the hal_gpio_write_to_pin
-#endif 
-}
-
-
-
-
-
-
-/**
 * @brief  This function initializes the SystemClock as HSE
 * @param  None
 * @retval None
@@ -374,101 +439,6 @@ void initClock(){
 
 
 
-/* Testing functions *************************************************************/
-
-void sendDFUART(){
-		
-	
-	while(uartHandle.tx_state != HAL_UART_STATE_READY);
-	hal_uart_tx(&uartHandle, message1, sizeof(message1)-1);
-	
-
-}
-
-
-void sendSineSPI(){
-	
-	uint32_t count, c;
-	
-	
-	for (count = 0; count <= 20; count++){
-
-			hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 0);				// CS to LOW
-			addrcmd[0] = (uint8_t) master_write_data[count];
-			addrcmd[1] = (uint8_t) (master_write_data[count] >> 8);
-			hal_spi_master_tx(&SpiHandle, addrcmd, 2);
-			while(SpiHandle.State != HAL_SPI_STATE_READY);
-			for(c = 0; c < 3000; c++){}													// MUST : Esperamos 0.1 ms entre cada envío para cumplir Timing del CLK (medido con Saleae)
-			hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 1);				// CS to HIGH
-			for(c = 0; c < 30; c++){}														// MUST : Generamos un CS HIGH de 4.5us para cumplir los requisitos de Timing del CS (medido con Saleae)
-
-	}
-	
-		
-
-
-}
-
-void sendLUTSPI(uint32_t n){
-	
-	uint32_t count, c;
-	
-	
-	for (count = 0; count <= n; count++){
-
-			hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 0);				// CS to LOW
-			addrcmd[0] = (uint8_t) LUTdac[count];
-			addrcmd[1] = (uint8_t) (LUTdac[count] >> 8);
-			hal_spi_master_tx(&SpiHandle, addrcmd, 2);
-			while(SpiHandle.State != HAL_SPI_STATE_READY);
-			for(c = 0; c < 3000; c++){}													// MUST : Esperamos 0.1 ms entre cada envío para cumplir Timing del CLK (medido con Saleae)
-			hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 1);				// CS to HIGH 
-			for(c = 0; c < 30; c++){}														// MUST : Generamos un CS HIGH de 4.5us para cumplir los requisitos de Timing del CS (medido con Saleae)
-	}
-	
-	
-
-
-}
-
-/* Función de ejemplo para testear lectura ADC para una CV. Los tiempos de los bucles
-están calculados de fomar empírica y aproximada. */
-void sendLUTSPIandADC_CV(uint32_t n){
-	
-	uint32_t count, c;
-	
-	
-	for (count = 0; count <= n; count++){
-	
-			uint32_t n = 0;
-		
-			hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 0);				// CS to LOW
-			addrcmd[0] = (uint8_t) LUTdac[count];
-			addrcmd[1] = (uint8_t) (LUTdac[count] >> 8);
-			hal_spi_master_tx(&SpiHandle, addrcmd, 2);
-			while(SpiHandle.State != HAL_SPI_STATE_READY);
-			for(c = 0; c < 3000; c++){}													// MUST : Esperamos 0.1 ms entre cada envío para cumplir Timing del CLK (medido con Saleae)
-			hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 1);				// CS to HIGH 
-			for(c = 0; c < 30; c++){}														// MUST : Generamos un CS HIGH de 4.5us para cumplir los requisitos de Timing del CS (medido con Saleae)
-			dataADC = read_ADC_W1();
-
-
-			
-			/* Send data using BT */
-			UART_txBuff[0] = (uint8_t) dataADC;
-			UART_txBuff[1] = (uint8_t) (dataADC >> 8);
-			while(uartHandle.tx_state != HAL_UART_STATE_READY);
-			hal_uart_tx(&uartHandle, UART_txBuff, 2);
-
-
-			
-			
-	}
-	
-	
-
-
-}
 
 
 /* *************************************************************/
@@ -500,12 +470,14 @@ void start() {
 	status_I_we2 = I_DEFAULT;
 	communication_mode = C_NONE;
 	pretreatment = P_NONE;
-	lut1A_state = L_EMPTY;
-	lut1B_state = L_EMPTY;
-	lut2A_state = L_EMPTY;
-	lut2B_state = L_EMPTY;
+	lutwe1A_state = L_EMPTY;
+	lutwe1B_state = L_EMPTY;
+	lutwe2A_state = L_EMPTY;
+	lutwe2B_state = L_EMPTY;
 	experiment = E_NONE;
-
+	
+	cont_bipot = 2;
+	
 	next_state = CONECT;
 
 }
@@ -514,14 +486,17 @@ void conection() {
 
 	if (communication_mode == C_BT) {
 		// Recibimos los datos de conexión
+		// Deshabilitamos el USB
 		// Enviamos el ACK al PC
+		// Configuramos y lanzamos el heartbeat
 		next_state = IDLE;
 
 	}
 	else if (communication_mode == C_USB) {
-
 		// Recibimos los datos de conexión
+		// Deshabilitamos el BT
 		// Enviamos el ACK al PC
+		// Configuramos y lanzamos el hearbeat
 		next_state = IDLE;
 	}
 
@@ -533,6 +508,7 @@ void Idle() {
 		next_state = BIPOT;
 	}
 	else if (df_mode == M_POT) {
+
 		next_state = POT;
 	}
 	else if (df_mode == M_GALV) {
@@ -541,18 +517,63 @@ void Idle() {
 	else if (df_mode == M_EIS) {
 		next_state = EIS;
 	}
+	else if(communication_mode == C_NONE){
+		next_state = CONECT;
+	}
 
 
 }
 
 void bipot() {
-	mode_working = M_BIPOT;
-	next_state = PREP_E;
+	
+	cont_bipot--;
+	
+	// ¿Hemos recibido las dos tramas de datos del bipot...?
+	if(cont_bipot == 0){							// Si...			
+		
+		// Cargamos la estructura para el electródo WE2...		
+		load_data(UART_rxBuff, &DF_CV_we2, &DF_LSV_we2, &DF_SCV_we2, &DF_DPV_we2, &DF_NPV_we2,\
+											&DF_DNPV_we2, &DF_SWV_we2, &DF_ACV_we2, &pretreat_we2,\
+											&exp_config_we2);
+	
+		// Generamos LUTWE2A y LUTWE2B
+		generate_data(&DF_CV_we2, &DF_LSV_we2, &DF_SCV_we2, &DF_DPV_we2, &DF_NPV_we2, &DF_DNPV_we2,\
+											&DF_SWV_we2, &DF_ACV_we2, &exp_config_we2, LUTWE2A, LUTWE2B);
+		
+		
+		cont_bipot = 2;									// Reseteamos contador para la siguiente vez...
+		mode_working = M_BIPOT;
+		next_state = PREP_E;
+	}
+	else{															// No...
+		// Cargamos la estructura para el electródo WE1...
+		load_data(UART_rxBuff, &DF_CV_we1, &DF_LSV_we1, &DF_SCV_we1, &DF_DPV_we1, &DF_NPV_we1, \
+											&DF_DNPV_we1, &DF_SWV_we1, &DF_ACV_we1, &pretreat_we1,\
+											&exp_config_we1);
+	
+		// Generamos LUTWE1A y LUTWE1B
+		generate_data(&DF_CV_we1, &DF_LSV_we1, &DF_SCV_we1, &DF_DPV_we1, &DF_NPV_we1, &DF_DNPV_we1, \
+											&DF_SWV_we1, &DF_ACV_we1, &exp_config_we1, LUTWE1A, LUTWE1B);
+		
+		// Volvemos al estado de espera de nuevo...
+		df_mode = M_NONE;				
+		next_state = IDLE;
+	}
 
 }
 
 void pot() {
 	mode_working = M_POT;
+	
+	// Cargamos los datos del experimento
+	load_data(UART_rxBuff, &DF_CV_we1, &DF_LSV_we1, &DF_SCV_we1, &DF_DPV_we1, &DF_NPV_we1, &DF_DNPV_we1,\
+											&DF_SWV_we1, &DF_ACV_we1, &pretreat_we1,\
+											&exp_config_we1);
+	
+	// Generamos LUTWE1A y LUTWE1B
+	generate_data(&DF_CV_we1, &DF_LSV_we1, &DF_SCV_we1, &DF_DPV_we1, &DF_NPV_we1, &DF_DNPV_we1, \
+											&DF_SWV_we1, &DF_ACV_we1, &exp_config_we1, LUTWE1A, LUTWE1B);
+	
 	next_state = PREP_E;
 }
 
@@ -580,9 +601,13 @@ void PrepE() {
 	if (mode_working == M_BIPOT) {
 		// Configuramos FS
 		// Configuramos filtros
-		// Generamos primer refresco LUT1 y LUT2
+		// Generamos primer refresco LUT1 y LUT2		
 		// lut1A_state = REFRESHED y lut2A_state
-
+		lutwe1A_state = L_REFRESHED;
+		lutwe1B_state = L_REFRESHED;
+		lutwe2A_state = L_REFRESHED;
+		lutwe2A_state = L_REFRESHED;
+		
 		// Habilitamos electródos
 
 		/* Hay que preparar dos LUTs, una hará de buffer y se irá cargando mientras se envía la primera */
@@ -593,12 +618,15 @@ void PrepE() {
 	else if (mode_working == M_POT) {
 		// Configuramos FS auto o no
 		// Configuramos filtros
-		//Generamos primer refresco de LUT
+		// Generamos primer refresco de LUT
 		// lut1A_state = REFRESHED;
-
+		lutwe1A_state = L_REFRESHED;
+		lutwe1B_state = L_REFRESHED;
+		
 		// Habilitamos electródos
 
 		// Aplicamos el pretratamiento que proceda
+		
 
 
 	}
@@ -632,14 +660,17 @@ void Pretreatment() {
 		
 		}
 		
-		else if ((mode_working == M_POT) || (mode_working == M_GALV)){
+		else if (mode_working == M_POT){
 			
-			// Configuramos TIM6 para WE1
-			hal_tim67_int_enable(&tim6Handle);
-			hal_tim67_init(&tim6Handle);
+			// Configuramos TIM6 para DAC WE1
+			//hal_tim67_int_enable(&tim6Handle);
+			//hal_tim67_init(&tim6Handle);
 
-			//hal_tim67_clear_flag(&tim6Handle);
-
+		
+		}
+		else if (mode_working == M_GALV){
+			// TODO
+			// Configurar TIM6 para DAC WE1
 		
 		}
 
@@ -655,6 +686,12 @@ void Pretreatment() {
 	
 	else if(pretreatment == P_RUNNING){
 		// Esperamos a que termine el pretreatment
+		
+		
+		
+		#if DEBUG												// Si en pruebas nos saltamos el pretreatment
+			pretreatment = 	P_FINISHED;									 
+		#endif
 	
 	}
 	
@@ -669,9 +706,11 @@ void Pretreatment() {
 
 		}
 		else if (mode_working == M_POT) {
-			// Enviamos LUT1A a DAC WE1
+			// Generamos LUT1A y LUT1B según la técnica
 
 			// Comenzamos siguiente refresco LUT1B
+			
+			
 
 		}
 		else if (mode_working == M_GALV) {
@@ -725,13 +764,13 @@ void Measuring() {
 
 
 			/* Comprobamos si debemos de refrescar alguna LUT */
-			if (lut1A_state == L_FINISHED) {
+			if (lutwe1A_state == L_FINISHED) {
 				// Refrescamos la LUT
-				lut1A_state = L_REFRESHED;
+				lutwe1A_state = L_REFRESHED;
 			}
-			else if (lut1B_state == L_FINISHED) {
+			else if (lutwe1B_state == L_FINISHED) {
 				// Refrescamos la LUT
-				lut1A_state = L_REFRESHED;
+				lutwe1A_state = L_REFRESHED;
 			}
 
 
@@ -742,21 +781,21 @@ void Measuring() {
 
 		}
 		else if (mode_working == M_BIPOT) {
-			if (lut1A_state == L_FINISHED) {
+			if (lutwe1A_state == L_FINISHED) {
 				// Refrescamos la LUT
-				lut1A_state = L_REFRESHED;
+				lutwe1A_state = L_REFRESHED;
 			}
-			else if (lut1B_state == L_FINISHED) {
+			else if (lutwe1B_state == L_FINISHED) {
 				// Refrescamos la LUT
-				lut2A_state = L_REFRESHED;
+				lutwe2A_state = L_REFRESHED;
 			}
-			if (lut1B_state == L_FINISHED) {
+			if (lutwe1B_state == L_FINISHED) {
 				// Refrescamos la LUT
-				lut1B_state = L_REFRESHED;
+				lutwe1B_state = L_REFRESHED;
 			}
-			else if (lut2B_state == L_FINISHED) {
+			else if (lutwe2B_state == L_FINISHED) {
 				// Refrescamos la LUT
-				lut2B_state = L_REFRESHED;
+				lutwe2B_state = L_REFRESHED;
 			}
 
 			if ((status_I_we1 != I_DEFAULT) | (status_I_we2 != I_DEFAULT)) {
@@ -765,17 +804,17 @@ void Measuring() {
 		}
 		else if (mode_working == M_GALV) {
 			/* Comprobamos si debemos de refrescar alguna LUT */
-			if (lut1A_state == L_FINISHED) {
+			if (lutwe1A_state == L_FINISHED) {
 				// Refrescamos la LUT
-				lut1A_state = L_REFRESHED;
+				lutwe1A_state = L_REFRESHED;
 			}
-			else if (lut1B_state == L_FINISHED) {
+			else if (lutwe1B_state == L_FINISHED) {
 				// Refrescamos la LUT
-				lut2A_state = L_REFRESHED;
+				lutwe2A_state = L_REFRESHED;
 			}
-			if (lut1B_state == L_FINISHED) {
+			if (lutwe1B_state == L_FINISHED) {
 				// Refrescamos la LUT
-				lut1B_state = L_REFRESHED;
+				lutwe1B_state = L_REFRESHED;
 			}
 
 			/* Comprobamos si debemos cambiar el FS */
@@ -876,10 +915,10 @@ void Ending() {
 		status_I_we2 = I_DEFAULT;
 		//communication_mode = C_NONE;
 		pretreatment = P_NONE;
-		lut1A_state = L_EMPTY;
-		lut1B_state = L_EMPTY;
-		lut2A_state = L_EMPTY;
-		lut2B_state = L_EMPTY;
+		lutwe1A_state = L_EMPTY;
+		lutwe1B_state = L_EMPTY;
+		lutwe2A_state = L_EMPTY;
+		lutwe2B_state = L_EMPTY;
 		experiment = E_NONE;
 		next_state = IDLE;
 	}
@@ -912,7 +951,7 @@ int main(void)
 {
 	uint32_t n;
 	int32_t c;
-	uint32_t count = 0;
+
 	
 	/* Inicializamos el HSE como clock del sistema (25 MHz) */
 	initClock();
@@ -987,12 +1026,12 @@ int main(void)
 	tim6Handle.Instance = TIM6;
 	
 	tim6Handle.Init.CounterMode = TIM_OPM_ENABLE;
-	tim6Handle.Init.Period = 5000;
+	tim6Handle.Init.Period = 500;
 	tim6Handle.Init.Prescaler = 65535;
 	tim6Handle.Init.AutoReloadPreload = TIM_ENABLE_AUTO_RELOAD;
 	
 	/* fill out the application callbacks */
-	tim6Handle.ue_cb = app_update_event_callback;
+	tim6Handle.int_event = NONE;
 	
 	/* enable the IRQ of TIM6 peripheral */
 	NVIC_EnableIRQ(TIM6_DAC_IRQn);
@@ -1029,15 +1068,12 @@ int main(void)
 	hal_gpio_write_to_pin(GPIOA, W1_ON_OFF, 0);
 	
 	/* Bluetooth */
-	// No utilizamos el reset aquí
-	
-	
-	
-	
-	
-	
+	// Reseteamos el BT al arrancar
+	hal_gpio_write_to_pin(GPIOC, BT_RESET_PIN, 0);
 	//Delay para esperar a que arranque el BT
-	for(c = 0; c < 5000000; c++){}
+	for(c = 0; c < 5000000; c++){}	
+	hal_gpio_write_to_pin(GPIOC, BT_RESET_PIN, 1);
+		
 		
 		
 		
@@ -1047,66 +1083,66 @@ int main(void)
 		
 	/* TEST UART RECEIVING */
 	//while(uartHandle.rx_state != HAL_UART_STATE_READY);
-	hal_uart_rx(&uartHandle, UART_rxBuff, 6);		// Recibimos la ADDR
+	hal_uart_rx(&uartHandle, UART_rxBuff, 6);		
 		
 
 	/* Test SPI Master sending */
 	/* Load CV data */
-	DF_CV.Measurement.start = 1.4;
-	DF_CV.Measurement.vtx1 = 2;
-	DF_CV.Measurement.vtx2 = 1.1;
-	DF_CV.Measurement.step = 0.1;
-	DF_CV.Measurement.sr = 1;
-	DF_CV.Measurement.scans = 1;
+	//DF_CV.Measurement.start = 1.4;
+	//DF_CV.Measurement.vtx1 = 2;
+	//DF_CV.Measurement.vtx2 = 1.1;
+	//DF_CV.Measurement.step = 0.1;
+	//DF_CV.Measurement.sr = 1;
+	//DF_CV.Measurement.scans = 1;
 		
 	/* Load LSV data */
-	DF_LSV.Measurement.start = 0.3;
-	DF_LSV.Measurement.stop = 4.3;
-	DF_LSV.Measurement.step = 0.21;
+	//DF_LSV.Measurement.start = 0.3;
+	//DF_LSV.Measurement.stop = 4.3;
+	//DF_LSV.Measurement.step = 0.21;
 	
 	/* Load SCV data */
-	DF_SCV.Measurement.start = 0.3;
-	DF_SCV.Measurement.stop = 4;
-	DF_SCV.Measurement.step = 0.46;
+	//DF_SCV.Measurement.start = 0.3;
+	//DF_SCV.Measurement.stop = 4;
+	//DF_SCV.Measurement.step = 0.46;
 		
 	/* Load DPV data */
-	DF_DPV.Measurement.start = 0.38;
-	DF_DPV.Measurement.stop = 1;
-	DF_DPV.Measurement.step = 0.04;
-	DF_DPV.Measurement.ePulse = 0.1;
-	DF_DPV.Measurement.tPulse = 0.0012;
-	DF_DPV.Measurement.sr = 8;
+	//DF_DPV.Measurement.start = 0.38;
+	//DF_DPV.Measurement.stop = 1;
+	//DF_DPV.Measurement.step = 0.04;
+	//DF_DPV.Measurement.ePulse = 0.1;
+	//DF_DPV.Measurement.tPulse = 0.0012;
+	//DF_DPV.Measurement.sr = 8;
 	
 	/* Load NPV data */
-	DF_NPV.Measurement.start = 1.96;
-	DF_NPV.Measurement.start = 4.66;
-	DF_NPV.Measurement.step = 0.1;
-	DF_NPV.Measurement.tPulse = 0.002;
-	DF_NPV.Measurement.sr = 6;
+	//DF_NPV.Measurement.start = 1.96;
+	//DF_NPV.Measurement.start = 4.66;
+	//DF_NPV.Measurement.step = 0.1;
+	//DF_NPV.Measurement.tPulse = 0.002;
+	//DF_NPV.Measurement.sr = 6;
 	
 	/* Load DNPV data */
-	DF_DNPV.Measurement.start = 1.26;
-	DF_DNPV.Measurement.stop = 2.88;
-	DF_DNPV.Measurement.step = 0.24;
-	DF_DNPV.Measurement.ePulse = 0.13;
-	DF_DNPV.Measurement.tPulse1 = 0.002;
-	DF_DNPV.Measurement.tPulse2 = 0.002;
-	DF_DNPV.Measurement.sr = 25;
+	//DF_DNPV.Measurement.start = 1.26;
+	//DF_DNPV.Measurement.stop = 2.88;
+	//DF_DNPV.Measurement.step = 0.24;
+	//DF_DNPV.Measurement.ePulse = 0.13;
+	//DF_DNPV.Measurement.tPulse1 = 0.002;
+	//DF_DNPV.Measurement.tPulse2 = 0.002;
+	//DF_DNPV.Measurement.sr = 25;
 	
 	/* Load SWV data */
-	DF_SWV.Measurement.start = 3.33;
-	DF_SWV.Measurement.stop = 4.60;
-	DF_SWV.Measurement.step = 0.13;
-	DF_SWV.Measurement.amplitude = 0.12;
-	DF_SWV.Measurement.freq = 13;
+	//DF_SWV.Measurement.start = 3.33;
+	//DF_SWV.Measurement.stop = 4.60;
+	//DF_SWV.Measurement.step = 0.13;
+	//DF_SWV.Measurement.amplitude = 0.12;
+	//DF_SWV.Measurement.freq = 13;
 	
 	/* Load ACV data */
-	DF_ACV.Measurement.start = 1.21;
-	DF_ACV.Measurement.stop = 2;
-	DF_ACV.Measurement.step = 0.17;
-	DF_ACV.Measurement.ACamplitude = 0.04;
-	DF_ACV.Measurement.sr = 13;
-	DF_ACV.Measurement.freq = 2000;
+	//DF_ACV.Measurement.start = 1.21;
+	//DF_ACV.Measurement.stop = 2;
+	//DF_ACV.Measurement.step = 0.17;
+	//DF_ACV.Measurement.ACamplitude = 0.04;
+	//DF_ACV.Measurement.sr = 13;
+	//DF_ACV.Measurement.freq = 2000;
 	
 	
 	
@@ -1123,7 +1159,7 @@ int main(void)
 
 	
 	/* DPV */
-	n = generateDPVsignal(&DF_DPV, LUTcomplete);
+	//n = generateDPVsignal(&DF_DPV_we1, LUTcomplete);
 
 	
 	/* NPV */
@@ -1145,7 +1181,9 @@ int main(void)
 	
 	
 	/* Generamos valores para el DAC */
-	generateDACValues(LUTcomplete, LUTdac, n);
+	// TODO : revisar función; para funcionamiento bipolar hay que cambiar ecuación
+	// mirar ecuación del software.
+	//generateDACValues(LUTcomplete, LUTdac, n);
 		
 	/* Arrancamos la FSM */	
 	start();
@@ -1208,13 +1246,55 @@ void USART6_IRQHandler(void)
   */
 void TIM6_DAC_IRQHandler(void){
 
-	hal_tim67_int_disable(&tim6Handle); 						// Deshabilitamos int
+	hal_tim67_int_disable(&tim6Handle); 					// Deshabilitamos int
 	hal_tim67_disable(&tim6Handle);								// Deshabilitamos contador
 	hal_tim67_handle_interrupt(&tim6Handle);
+	
 
+	/* Si evento UPDATE EVENT */
+	if(tim6Handle.int_event == UPDATE_EVENT){
+		// Si estamos en pretreatment y ha finalizado el tiempo de pretratamiento...
+		if(pretreatment == P_RUNNING){  	// TODO: pretreatment == P_RUNNING && flag_tiempo == TIEMPO_TERMINADO
+				
+			if(cont == 0){				// Hemos leído el último sample del experimento...
+				pretreatment = P_FINISHED;
+			}
+			else{
 
+				hal_tim67_clear_flag(&tim6Handle);							// Borramos la flag de int pendiente
+				hal_tim67_int_enable(&tim6Handle);
+				hal_tim67_enable(&tim6Handle);	
+					
+				// Testing
+				led_toggle(GPIOJ, LED_GREEN);
+			}
+					
+		}
+
+		else if(experiment == E_RUNNING){		// Si estamos corriendo el experimento y ha finalizado el tiempo total de la prueba...
+				
+			if(cont == 0){			// Hemos leído el último sample del experimento...
+				experiment = E_FINISHED;
+			}
+			else{
+
+				hal_tim67_clear_flag(&tim6Handle);							// Borramos la flag de int pendiente
+				hal_tim67_int_enable(&tim6Handle);
+				hal_tim67_enable(&tim6Handle);
+					
+				// Testing
+				led_toggle(GPIOJ, LED_GREEN);
+			}
+
+		}
+	}
+	
+	tim6Handle.int_event = NONE;
 	
 }
+
+	
+
 
 /**
   * @brief  This function handles TIM7 interrupt request.
@@ -1240,7 +1320,7 @@ void app_tx_cmp_callback(void *size)
 {
 	uint32_t c;
 	led_turn_on(GPIOJ,LED_RED);
-	for (c = 0; c <= 2000; c++){}
+	for (c = 0; c <= 200000; c++){}
 	led_turn_off(GPIOJ, LED_RED);
 	
 }
@@ -1249,7 +1329,7 @@ void app_tx_cmp_callback(void *size)
 void app_rx_cmp_callback(void *size)
 {
 	//we got a command,  parse it 
-	parse_cmd(UART_rxBuff);
+	//parse_cmd(UART_rxBuff, &DF_CV, &DF_LSV, &DF_SCV, &DF_DPV, &DF_NPV, &DF_DNPV, &DF_SWV, &DF_ACV, LUT1, LUT2, LUT3, LUTcomplete);
 	
 	// TODO: aquí podemos volver a habilitar la interrupción RXNE, para
 	// que vuelva a estár disponible la recepcion de datos.
@@ -1258,63 +1338,6 @@ void app_rx_cmp_callback(void *size)
 }
 
 
-/* TIM67 callbacks */
-/* callback para gestionar el sistema cuando se producen update events */
-void app_update_event_callback(TIM_TypeDef *i, hal_tim67_state_t s){
-
-	
-	// Si TIM6 (WE1)...
-	if(i == TIM6){
-
-		
-		// comprobamos si el tiempo se ha acabado
-		cont--;		// Test code
-		
-		// Si estamos en pretreatment y ha finalizado el tiempo de pretratamiento...
-		if(pretreatment == P_RUNNING){  	// TODO: pretreatment == P_RUNNING && flag_tiempo == TIEMPO_TERMINADO
-			
-			if(cont == 0){				// Hemos leído el último sample del experimento...
-				pretreatment = P_FINISHED;
-			}
-			else{
-
-				hal_tim67_clear_flag(&tim6Handle);							// Borramos la flag de int pendiente
-				hal_tim67_int_enable(&tim6Handle);
-				hal_tim67_enable(&tim6Handle);	
-				
-				// Testing
-				led_toggle(GPIOJ, LED_GREEN);
-			}
-				
-		}
-
-		else if(experiment == E_RUNNING){		// Si estamos corriendo el experimento y ha finalizado el tiempo total de la prueba...
-			
-			if(cont == 0){			// Hemos leído el último sample del experimento...
-				experiment = E_FINISHED;
-			}
-			else{
-
-				hal_tim67_clear_flag(&tim6Handle);							// Borramos la flag de int pendiente
-				hal_tim67_int_enable(&tim6Handle);
-				hal_tim67_enable(&tim6Handle);
-				
-				// Testing
-				led_toggle(GPIOJ, LED_GREEN);
-			}
-
-		}
-	
-	}
-
-	
-	
-	// Si TIM7 (WE2)...
-	if(i == TIM7){
-		// TODO
-	
-	}
-}
 
 
 

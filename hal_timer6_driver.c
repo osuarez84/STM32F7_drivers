@@ -42,23 +42,9 @@ static void hal_tim67_configure_prescaler(TIM_TypeDef* TIMx, uint32_t prescaler)
 
 }
 
-void hal_tim67_enable(tim67_handle_t* handle){
-
-	handle->Instance->CR1 |= TIM_REG_CR1_CEN;
-
-}
-
-void hal_tim67_disable(tim67_handle_t* handle){
-
-	handle->Instance->CR1 &= ~TIM_REG_CR1_CEN;
-}
 
 
-void hal_tim67_clear_flag(tim67_handle_t* handle){
 
-	handle->Instance->SR &= ~TIM_REG_SR_UI_FLAG;			// Reseteamos la flag de interrupción
-
-}
 
 // ***************************
 // *    APIs 
@@ -115,12 +101,25 @@ void hal_tim67_handle_interrupt(tim67_handle_t* tim_h){
 	/* Update Event occurred */
 	if((tmp1) && (tmp2)){
 		// Utilizamos una callback function en la app para discernir los diferentes casos del update event
-		if(tim_h->ue_cb){
-			tim_h->ue_cb(tim_h->Instance, tim_h->state);
+		tim_h->int_event = UPDATE_EVENT;
 		}
-	}
 	
 }
 
+void hal_tim67_enable(tim67_handle_t* handle){
+
+	handle->Instance->CR1 |= TIM_REG_CR1_CEN;
+
+}
+
+void hal_tim67_disable(tim67_handle_t* handle){
+
+	handle->Instance->CR1 &= ~TIM_REG_CR1_CEN;
+}
 
 
+void hal_tim67_clear_flag(tim67_handle_t* handle){
+
+	handle->Instance->SR &= ~TIM_REG_SR_UI_FLAG;			// Reseteamos la flag de interrupción
+
+}

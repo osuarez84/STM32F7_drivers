@@ -588,3 +588,275 @@ uint32_t generateACVsignal(DF_ACTypeDef* df, float* LUT1, float* LUTcomplete) {
 
 	return contRow;
 }
+
+
+
+/* FUNCION EN PRUEBAS PARA GENERAR LUT PERIODICA */
+void generateDPVwaveform(DF_DPVTypeDef* df, float* LUT){
+
+	uint32_t i,j;
+	
+	uint32_t fSampling = 10000;		// TODO: este valor dependerá del filtro seleccionado.
+																// Hemos seleccionado aquí la frec para un filtro de butterworth del equipo de CEMITEC.	
+																// La idea es que esta frecuencia sea de aprox 20x la frec de corte del filtro.
+																// Hay que enviar el valor del filtro seleccionado a esta función como argumento.
+	
+	float tSampling = 1 / fSampling;
+	float tInt = df->Measurement.step / df->Measurement.sr;
+	
+	uint32_t nSamples1 = ceil((tInt - df->Measurement.tPulse) / tSampling);
+	uint32_t nSamples2 = ceil((df->Measurement.tPulse / tSampling));
+	
+	
+	// Calculamos nº de steps
+	uint16_t nSteps = ceil(abs(df->Measurement.stop - df->Measurement.start) / df->Measurement.step);
+	
+	
+	if (df->Measurement.stop > df->Measurement.start){			// Si steps suben....
+		
+		// Primera parte de la onda...
+		for(j = 0; j < nSamples1; j++){
+			LUT[j] = df->Measurement.start + (df->Measurement.step * (df->Measurement.realStep));
+		
+		}
+		
+		// Segunda parte de la onda...
+		for(j = 0; j < nSamples2; j++){
+			LUT[j + nSamples1] = (df->Measurement.start + df->Measurement.ePulse) + (df->Measurement.step * df->Measurement.realStep);
+		
+		}
+		df->Measurement.realStep++;				// Nos sirve para llevar cuenta de en qué step estamos generando la forma de onda. Comienza en cero.
+	}
+	
+	else {																									// Si steps bajan...
+	
+		// Primera parte de la onda...
+		for(j = 0; j < nSamples1; j++){
+			LUT[j] = df->Measurement.start - (df->Measurement.step * (df->Measurement.realStep));
+		
+		}
+		
+		// Segunda parte de la onda...
+		for(j = 0; j < nSamples2; j++){
+			LUT[j + nSamples1] = (df->Measurement.start + df->Measurement.ePulse) - (df->Measurement.step * df->Measurement.realStep);
+		
+		}
+		df->Measurement.realStep++;
+	}
+	
+}
+	
+	
+	
+	
+void load_data(uint8_t* buff, DF_CVTypeDef* df_cv, DF_LSVTypeDef* df_lsv, DF_SCVTypeDef* df_scv, \
+	DF_DPVTypeDef* df_dpv, DF_NPVTypeDef* df_npv, DF_DNPVTypeDef* df_dnpv, DF_SWVTypeDef* df_swv, DF_ACTypeDef* df_acv, pretreat_t* p,\
+	exp_config_t* e){
+	
+	/* Recogemos datos pretratamiento */
+	p->tCond = (int)(((( ((buff[10] << 8) | (buff[11] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	p->eCond = (int)(((( ((buff[12] << 8) | (buff[13] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	p->tDep = (int)(((( ((buff[14] << 8) | (buff[15] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	p->eDep = (int)(((( ((buff[16] << 8) | (buff[17] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	p->tEq = (int)(((( ((buff[18] << 8) | (buff[19] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	p->eEq = (int)(((( ((buff[22] << 8) | (buff[23] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+		
+	/* Recogemos otros datos del experimento */
+	e->bipot = buff[3];
+	e->cell_on = buff[9];
+	e->exp = buff[5];
+	
+	
+	/* en función de la técnica guardamos los datos del experimento en la estructura correspondiente */
+	switch(e->exp){
+		case 0:													// CV
+			load_CV_data(df_cv, buff);
+			break;
+		
+		case 1:													// LSV
+			load_LSV_data(df_lsv, buff);
+			break;
+		
+		case 2:													// SCV
+			load_SCV_data(df_scv, buff);
+			break;
+		
+		case 3:													// DPV
+			load_DPV_data(df_dpv, buff);
+			break;
+			
+		case 4:													// NPV
+			load_NPV_data(df_npv, buff);
+			break;
+		
+		case 5:													// DNPV
+			load_DNPV_data(df_dnpv, buff);
+			break;
+		
+		case 6:													// SWV
+			load_SWV_data(df_swv, buff);
+			break;
+		
+		case 7:													// ACV
+			load_ACV_data(df_acv, buff);
+			break;
+	
+	
+	
+	}
+
+}
+	
+
+void generate_data(DF_CVTypeDef* df_cv, DF_LSVTypeDef* df_lsv, DF_SCVTypeDef* df_scv, \
+	DF_DPVTypeDef* df_dpv, DF_NPVTypeDef* df_npv, DF_DNPVTypeDef* df_dnpv, DF_SWVTypeDef* df_swv, DF_ACTypeDef* df_acv,\
+	exp_config_t* e, float* lut1, float* lut2){
+
+	/* En función de la técnica guardamos los datos del experimento en la estructura correspondiente */
+	switch(e->exp){
+		case 0:													// CV
+			// TODO
+			break;
+
+		case 1:													// LSV
+			// TODO
+			break;
+		
+		case 2:													// SCV
+			// TODO
+			break;
+		
+		case 3:													// DPV
+			generateDPVwaveform(df_dpv, lut1);
+			generateDPVwaveform(df_dpv, lut2);
+			break;
+			
+		case 4:													// NPV
+			// TODO
+			break;
+		
+		case 5:													// DNPV
+			// TODO
+			break;
+		
+		case 6:													// SWV
+			// TODO
+			break;
+		
+		case 7:													// ACV
+			// TODO
+			break;
+
+
+
+	}
+}
+
+
+
+/* 	FUNCIONES PARA PRECARGA DE DATOS EN ESTRUCTURAS PARA GENERAR EL EXPERIMENTO */
+void load_CV_data(DF_CVTypeDef* df, uint8_t* cmd){
+								
+	/* Experiment values */
+	df->Measurement.start = (int)(((( ((cmd[22] << 8) | (cmd[23] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->Measurement.vtx1 = (int)(((( ((cmd[24] << 8) | (cmd[25] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->Measurement.vtx2 = (int)(((( ((cmd[26] << 8) | (cmd[27] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->Measurement.step = (int)(((( ((cmd[28] << 8) | (cmd[29] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->Measurement.sr = (int)(((( ((cmd[30] << 8) | (cmd[31] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->Measurement.scans = ((cmd[32] << 8) | (cmd[33] & 0xFF));
+
+					
+}
+
+
+void load_LSV_data(DF_LSVTypeDef* df, uint8_t* cmd){
+
+	/* Experiment values */
+	df->Measurement.start = (int)(((( ((cmd[22] << 8) | (cmd[23] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->Measurement.stop = (int)(((( ((cmd[24] << 8) | (cmd[25] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->Measurement.step = (int)(((( ((cmd[26] << 8) | (cmd[27] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->Measurement.sr = (int)(((( ((cmd[28] << 8) | (cmd[29] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	
+
+}
+
+
+
+void load_SCV_data(DF_SCVTypeDef* df, uint8_t* cmd){
+
+	/* Experiment values */
+	df->Measurement.start = (int)(((( ((cmd[22] << 8) | (cmd[23] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->Measurement.stop = (int)(((( ((cmd[24] << 8) | (cmd[25] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->Measurement.step = (int)(((( ((cmd[26] << 8) | (cmd[27] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->Measurement.tHold = (int)(((( ((cmd[28] << 8) | (cmd[29] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->Measurement.sr = (int)(((( ((cmd[30] << 8) | (cmd[31] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->Measurement.scans = ((cmd[32] << 8) | (cmd[33] & 0xFF));	
+
+}
+
+void load_DPV_data(DF_DPVTypeDef* df, uint8_t* cmd){
+					
+	/* Experiment values */
+	df->Measurement.start = (int)(((( ((cmd[22] << 8) | (cmd[23] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->Measurement.stop = (int)(((( ((cmd[24] << 8) | (cmd[25] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->Measurement.step = (int)(((( ((cmd[26] << 8) | (cmd[27] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->Measurement.ePulse = (int)(((( ((cmd[28] << 8) | (cmd[29] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->Measurement.tPulse = (int)(((( ((cmd[30] << 8) | (cmd[31] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->Measurement.sr = (int)(((( ((cmd[32] << 8) | (cmd[33] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+		
+	df->Measurement.realStep = 0;
+
+}
+
+void load_NPV_data(DF_NPVTypeDef* df, uint8_t* cmd){
+				
+	/* Experiment values */
+	df->Measurement.start = (int)(((( ((cmd[22] << 8) | (cmd[23] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->Measurement.stop = (int)(((( ((cmd[24] << 8) | (cmd[25] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->Measurement.step = (int)(((( ((cmd[26] << 8) | (cmd[27] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->Measurement.tPulse = (int)(((( ((cmd[28] << 8) | (cmd[29] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->Measurement.sr = (int)(((( ((cmd[30] << 8) | (cmd[31] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+
+}
+
+
+void load_DNPV_data(DF_DNPVTypeDef* df, uint8_t* cmd){
+
+	/* Experiment values */
+	df->Measurement.start = (int)(((( ((cmd[22] << 8) | (cmd[23] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->Measurement.stop = (int)(((( ((cmd[24] << 8) | (cmd[25] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->Measurement.step = (int)(((( ((cmd[26] << 8) | (cmd[27] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->Measurement.ePulse = (int)(((( ((cmd[28] << 8) | (cmd[29] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->Measurement.tPulse1 = (int)(((( ((cmd[30] << 8) | (cmd[31] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->Measurement.tPulse2 = (int)(((( ((cmd[32] << 8) | (cmd[33] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+
+}
+
+
+void load_SWV_data(DF_SWVTypeDef* df, uint8_t* cmd){
+
+	/* Experiment values */
+	df->Measurement.start = (int)(((( ((cmd[22] << 8) | (cmd[23] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->Measurement.stop = (int)(((( ((cmd[24] << 8) | (cmd[25] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->Measurement.step = (int)(((( ((cmd[26] << 8) | (cmd[27] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->Measurement.amplitude = (int)(((( ((cmd[28] << 8) | (cmd[29] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->Measurement.freq = (int)(((( ((cmd[30] << 8) | (cmd[31] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+
+
+}
+
+void load_ACV_data(DF_ACTypeDef* df, uint8_t* cmd){
+					
+	/* Experiment values */
+	df->Measurement.start = (int)(((( ((cmd[22] << 8) | (cmd[23] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->Measurement.stop = (int)(((( ((cmd[24] << 8) | (cmd[25] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->Measurement.step = (int)(((( ((cmd[26] << 8) | (cmd[27] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->Measurement.ACamplitude = (int)(((( ((cmd[28] << 8) | (cmd[29] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->Measurement.freq = (int)(((( ((cmd[30] << 8) | (cmd[31] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->Measurement.sr = (int)(((( ((cmd[32] << 8) | (cmd[33] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+
+
+}
+
+
+

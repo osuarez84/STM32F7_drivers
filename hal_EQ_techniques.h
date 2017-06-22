@@ -59,6 +59,27 @@ typedef struct {
 /*		Structures for handling input Data				*/
 /************************************************/
 /* Definición estructuras datos recibidas por el USB */
+
+typedef struct{
+	float tCond;
+	float eCond;
+	float tDep;
+	float eDep;
+	float tEq;
+	float eEq;	
+}pretreat_t;
+
+
+typedef struct{
+	uint8_t bipot;
+	uint8_t exp;
+	uint16_t rango;
+	uint8_t high_gain;
+	uint8_t cell_on;
+	uint16_t cell;
+}exp_config_t;
+
+
 typedef struct {
 	char init_1;
 	char init_2;
@@ -72,91 +93,92 @@ typedef struct {
 	uint16_t rango;
 	uint8_t high_gain;
 	uint8_t cell_on;
-	float tCond;
-	float eCond;
-	float tDep;
-	float eDep;
-	float tEq;
-	float eEq;
+	double tCond;
+	double eCond;
+	double tDep;
+	double eDep;
+	double tEq;
+	double eEq;
 	uint16_t cell;
 }DF_PRETREATMENT_PAR;
 
 /* Estructuras para VOLTAMETRIAS */
 // CV
 typedef struct {
-	float start;
-	float vtx1;
-	float vtx2;
-	float step;
-	float sr;
+	double start;
+	double vtx1;
+	double vtx2;
+	double step;
+	double sr;
 	uint16_t scans;
 } DF_MEASUREMENT_PAR_CV;
 
 // LSV
 typedef struct {
-	float start;
-	float stop;
-	float step;
-	float sr;
+	double start;
+	double stop;
+	double step;
+	double sr;
 } DF_MEASUREMENT_PAR_LSV;
 
 // SCV
 typedef struct {
-	float start;
-	float stop;
-	float step;
-	float sr;
-	float tHold;
+	double start;
+	double stop;
+	double step;
+	double sr;
+	double tHold;
 	uint16_t scans;
 } DF_MEASUREMENT_PAR_SCV;
 
 // DPV
 typedef struct {
-	float start;
-	float stop;
-	float step;
-	float ePulse;
-	float tPulse;
-	float sr;
+	double start;
+	double stop;
+	double step;
+	double ePulse;
+	double tPulse;
+	double sr;
+	uint32_t realStep;
 }DF_MEASUREMENT_PAR_DPV;
 
 // NPV
 typedef struct {
-	float start;
-	float stop;
-	float step;
-	float tPulse;
-	float sr;
+	double start;
+	double stop;
+	double step;
+	double tPulse;
+	double sr;
 }DF_MEASUREMENT_PAR_NPV;
 
 // DNPV
 typedef struct {
-	float start;
-	float stop;
-	float step;
-	float ePulse;
-	float tPulse1;
-	float tPulse2;
-	float sr;
+	double start;
+	double stop;
+	double step;
+	double ePulse;
+	double tPulse1;
+	double tPulse2;
+	double sr;
 }DF_MEASUREMENT_PAR_DNPV;
 
 // SWV
 typedef struct {
-	float start;
-	float stop;
-	float step;
-	float amplitude;
-	float freq;
+	double start;
+	double stop;
+	double step;
+	double amplitude;
+	double freq;
 }DF_MEASUREMENT_PAR_SWV;
 
 // ACV | SHACV | FTACV
 typedef struct {
-	float start;
-	float stop;
-	float step;
-	float ACamplitude;
-	float sr;
-	float freq;
+	double start;
+	double stop;
+	double step;
+	double ACamplitude;
+	double sr;
+	double freq;
 }DF_MEASUREMENT_PAR_AC;
 
 
@@ -218,11 +240,27 @@ typedef struct {
 	DF_MEASUREMENT_PAR_AC Measurement;
 }DF_ACTypeDef;
 
+/* Data frames de AMPEROMETRIAS */
+// TODO
+
+/* Data frames de POTENCIOMETRIAS */
+// TODO
+
+/* Data frames de EIS */
+// TODO
+
+
+
 /************************************************/
 /*					APIs						*/
 /************************************************/
 void generateDACValues(float* lut, uint16_t* data, uint32_t n);
-
+void load_data(uint8_t* buff, DF_CVTypeDef* df_cv, DF_LSVTypeDef* df_lsv, DF_SCVTypeDef* df_scv, \
+	DF_DPVTypeDef* df_dpv, DF_NPVTypeDef* df_npv, DF_DNPVTypeDef* df_dnpv, DF_SWVTypeDef* df_swv, DF_ACTypeDef* df_acv, pretreat_t* p,\
+	exp_config_t* e);
+void generate_data(DF_CVTypeDef* df_cv, DF_LSVTypeDef* df_lsv, DF_SCVTypeDef* df_scv, \
+	DF_DPVTypeDef* df_dpv, DF_NPVTypeDef* df_npv, DF_DNPVTypeDef* df_dnpv, DF_SWVTypeDef* df_swv, DF_ACTypeDef* df_acv,\
+	exp_config_t* e, float* lut1, float* lut2);
 
 /* Pretreatment */
 // TODO
@@ -237,6 +275,22 @@ uint32_t generateNPVsignal(DF_NPVTypeDef* df, float* LUTcomplete);
 uint32_t generateDNPVsignal(DF_DNPVTypeDef* df, float* LUTcomplete);
 uint32_t generateSWVsignal(DF_SWVTypeDef* df, float* LUT1, float* LUT2, float* LUTcomplete);
 uint32_t generateACVsignal(DF_ACTypeDef* df, float* LUT1, float* LUTcomplete) ;
+
+
+void generateDPVwaveform(DF_DPVTypeDef* df, float* LUT);  // función en pruebas!!
+
+
+void load_CV_data(DF_CVTypeDef* df, uint8_t* cmd);
+void load_LSV_data(DF_LSVTypeDef* df, uint8_t* cmd);
+void load_SCV_data(DF_SCVTypeDef* df, uint8_t* cmd);
+void load_DPV_data(DF_DPVTypeDef* df, uint8_t* cmd);
+void load_NPV_data(DF_NPVTypeDef* df, uint8_t* cmd);
+void load_DNPV_data(DF_DNPVTypeDef* df, uint8_t* cmd);
+void load_SWV_data(DF_SWVTypeDef* df, uint8_t* cmd);
+void load_ACV_data(DF_ACTypeDef* df, uint8_t* cmd);
+
+
+
 // TODO
 
 /* Amperometries */

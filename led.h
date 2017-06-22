@@ -13,6 +13,21 @@ extern uint8_t UART_txBuff[];
 extern spi_handle_t SpiHandle;
 extern uart_handle_t uartHandle;
 
+
+typedef enum  {
+	CV = 0,
+	LSV,
+	SCV,
+	DPV,
+	NPV,
+	DPNV,
+	SWV,
+	ACV
+	// TODO
+}exp_t;
+
+
+
 /* Macros used for configuring gpios for I/O s */
 #define 	GPIOA_PIN_6			6
 #define 	GPIOA_PIN_4			4
@@ -42,7 +57,7 @@ extern uart_handle_t uartHandle;
 #define		FILT_W1_ON_OFF		GPIOJ_PIN_1		
 #define		AUX_ON_OFF				GPIOA_PIN_6		
 #define		W1_ON_OFF					GPIOA_PIN_4		
-#define 	BT_RESET_PIN				GPIOC_PIN_2				// Actualmente no se utiliza
+#define 	BT_RESET_PIN			GPIOC_PIN_2				// Actualmente no se utiliza
 /* --------------------------------------------------------------- */
 
 /* Macros used for configuring gpios for LEDs */
@@ -175,10 +190,10 @@ extern status_I_measure status_I_we1;
 extern status_I_measure status_I_we2;
 extern mode_com communication_mode;
 extern state_experiment experiment;
-extern lut_state lut1A_state;
-extern lut_state lut1B_state;
-extern lut_state lut2A_state;
-extern lut_state lut2B_state;
+extern lut_state lutwe1A_state;
+extern lut_state lutwe1B_state;
+extern lut_state lutwe2A_state;
+extern lut_state lutwe2B_state;
 extern mode df_mode;
 extern mode mode_working;
 extern state_pretreatment pretreatment;
@@ -206,45 +221,9 @@ void calibration(void);
 
 
 
-/**
-* @brief  Initialize the LEDs 
-* @param  None
-* @retval None
-*/
-void led_init(void);
-
-/**
-* @brief  Turns ON the led which is connected on the given pin  
-* @param  *GPIOx : Base address of the GPIO Port
-* @param  Pin : pin number of the LED
-* @retval None
-*/
-void led_turn_on(GPIO_TypeDef *GPIOx, uint16_t pin);
-
-/**
-* @brief  Turns OFF the led which is connected on the given pin  
-* @param  *GPIOx : Base address of the GPIO Port
-* @param  Pin : pin number of the LED
-* @retval None
-*/
-void led_turn_off(GPIO_TypeDef *GPIOx, uint16_t pin);
-
-/**
-* @brief  Toggels the led which is connected on the given pin  
-* @param  *GPIOx : Base address of the GPIO Port
-* @param  Pin : pin number of the LED
-* @retval None
-*/
-void led_toggle(GPIO_TypeDef *GPIOx, uint16_t pin);
-
-
-
-
 /* USART callback function */
 void app_tx_cmp_callback(void *size);
 void app_rx_cmp_callback(void *size);
-
-void app_update_event_callback(TIM_TypeDef *i, hal_tim67_state_t s);
 
 
 void sendDFUART(void);
