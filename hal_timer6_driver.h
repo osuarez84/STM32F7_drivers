@@ -70,8 +70,8 @@ typedef enum{
 
 typedef enum{
 	
-	NONE = 0,
-	UPDATE_EVENT
+	NONE_EVENT = 0x00,
+	UPDATE_EVENT = 0x01
 	
 }INT_EVENT_t;
 

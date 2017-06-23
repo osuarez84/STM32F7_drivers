@@ -29,6 +29,8 @@ uint32_t cont = 5;
 																
 // UART messages
 uint8_t message1[] = "DAT1234567891F";
+																
+uint8_t ack[] = "ACK";
 
 
 /* UART buffers */
@@ -44,14 +46,14 @@ uint8_t UART_txBuff[100];
 //uint16_t LUTdac[31000];				
 												
 /* LUTs periódicas para el refresco continuo */												
-float LUTWE1A[20000];
-float LUTWE1B[20000];
-float LUTWE2A[20000];
-float LUTWE2B[20000];
+uint16_t LUTWE1A[20000] = {0};
+uint16_t LUTWE1B[20000] = {0};
+uint16_t LUTWE2A[20000] = {0};
+uint16_t LUTWE2B[20000] = {0};
 
-float LUTeCond[10000];
-float LUTeDep[10000];
-float LUTeEq[10000];
+uint16_t LUTeCond[20000] = {0};
+uint16_t LUTeDep[20000] = {0};
+uint16_t LUTeEq[20000] = {0};
 
 uint8_t cont_bipot = 0;
 
@@ -158,7 +160,6 @@ void sendLUTSPIandADC_CV(uint32_t n){
 	
 	for (count = 0; count <= n; count++){
 	
-			uint32_t n = 0;
 		
 			hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 0);				// CS to LOW
 //			addrcmd[0] = (uint8_t) LUTdac[count];
@@ -489,6 +490,9 @@ void conection() {
 		// Deshabilitamos el USB
 		// Enviamos el ACK al PC
 		// Configuramos y lanzamos el heartbeat
+		
+
+		
 		next_state = IDLE;
 
 	}
@@ -509,6 +513,7 @@ void Idle() {
 	}
 	else if (df_mode == M_POT) {
 
+		
 		next_state = POT;
 	}
 	else if (df_mode == M_GALV) {
@@ -532,12 +537,12 @@ void bipot() {
 	if(cont_bipot == 0){							// Si...			
 		
 		// Cargamos la estructura para el electródo WE2...		
-		load_data(UART_rxBuff, &DF_CV_we2, &DF_LSV_we2, &DF_SCV_we2, &DF_DPV_we2, &DF_NPV_we2,\
+//		load_data(UART_rxBuff, &DF_CV_we2, &DF_LSV_we2, &DF_SCV_we2, &DF_DPV_we2, &DF_NPV_we2,\
 											&DF_DNPV_we2, &DF_SWV_we2, &DF_ACV_we2, &pretreat_we2,\
 											&exp_config_we2);
 	
 		// Generamos LUTWE2A y LUTWE2B
-		generate_data(&DF_CV_we2, &DF_LSV_we2, &DF_SCV_we2, &DF_DPV_we2, &DF_NPV_we2, &DF_DNPV_we2,\
+//		generate_data(&DF_CV_we2, &DF_LSV_we2, &DF_SCV_we2, &DF_DPV_we2, &DF_NPV_we2, &DF_DNPV_we2,\
 											&DF_SWV_we2, &DF_ACV_we2, &exp_config_we2, LUTWE2A, LUTWE2B);
 		
 		
@@ -547,12 +552,12 @@ void bipot() {
 	}
 	else{															// No...
 		// Cargamos la estructura para el electródo WE1...
-		load_data(UART_rxBuff, &DF_CV_we1, &DF_LSV_we1, &DF_SCV_we1, &DF_DPV_we1, &DF_NPV_we1, \
+//		load_data(UART_rxBuff, &DF_CV_we1, &DF_LSV_we1, &DF_SCV_we1, &DF_DPV_we1, &DF_NPV_we1, \
 											&DF_DNPV_we1, &DF_SWV_we1, &DF_ACV_we1, &pretreat_we1,\
 											&exp_config_we1);
 	
 		// Generamos LUTWE1A y LUTWE1B
-		generate_data(&DF_CV_we1, &DF_LSV_we1, &DF_SCV_we1, &DF_DPV_we1, &DF_NPV_we1, &DF_DNPV_we1, \
+//		generate_data(&DF_CV_we1, &DF_LSV_we1, &DF_SCV_we1, &DF_DPV_we1, &DF_NPV_we1, &DF_DNPV_we1, \
 											&DF_SWV_we1, &DF_ACV_we1, &exp_config_we1, LUTWE1A, LUTWE1B);
 		
 		// Volvemos al estado de espera de nuevo...
@@ -573,6 +578,8 @@ void pot() {
 	// Generamos LUTWE1A y LUTWE1B
 	generate_data(&DF_CV_we1, &DF_LSV_we1, &DF_SCV_we1, &DF_DPV_we1, &DF_NPV_we1, &DF_DNPV_we1, \
 											&DF_SWV_we1, &DF_ACV_we1, &exp_config_we1, LUTWE1A, LUTWE1B);
+	
+
 	
 	next_state = PREP_E;
 }
@@ -603,10 +610,10 @@ void PrepE() {
 		// Configuramos filtros
 		// Generamos primer refresco LUT1 y LUT2		
 		// lut1A_state = REFRESHED y lut2A_state
-		lutwe1A_state = L_REFRESHED;
-		lutwe1B_state = L_REFRESHED;
-		lutwe2A_state = L_REFRESHED;
-		lutwe2A_state = L_REFRESHED;
+//		lutwe1A_state = L_REFRESHED;
+//		lutwe1B_state = L_REFRESHED;
+//		lutwe2A_state = L_REFRESHED;
+//		lutwe2A_state = L_REFRESHED;
 		
 		// Habilitamos electródos
 
@@ -949,7 +956,7 @@ void calibration() {
 
 int main(void)
 {
-	uint32_t n;
+
 	int32_t c;
 
 	
@@ -1031,7 +1038,7 @@ int main(void)
 	tim6Handle.Init.AutoReloadPreload = TIM_ENABLE_AUTO_RELOAD;
 	
 	/* fill out the application callbacks */
-	tim6Handle.int_event = NONE;
+	tim6Handle.int_event = NONE_EVENT;
 	
 	/* enable the IRQ of TIM6 peripheral */
 	NVIC_EnableIRQ(TIM6_DAC_IRQn);
@@ -1075,115 +1082,13 @@ int main(void)
 	hal_gpio_write_to_pin(GPIOC, BT_RESET_PIN, 1);
 		
 		
-		
-		
-	/* TEST UART SENDING */
-	//while(uartHandle.tx_state != HAL_UART_STATE_READY);
-	//hal_uart_tx(&uartHandle, message1, sizeof(message1)-1);
-		
+	
 	/* TEST UART RECEIVING */
+	// Quedamos a la espera de recibir CONECT
 	//while(uartHandle.rx_state != HAL_UART_STATE_READY);
 	hal_uart_rx(&uartHandle, UART_rxBuff, 6);		
 		
 
-	/* Test SPI Master sending */
-	/* Load CV data */
-	//DF_CV.Measurement.start = 1.4;
-	//DF_CV.Measurement.vtx1 = 2;
-	//DF_CV.Measurement.vtx2 = 1.1;
-	//DF_CV.Measurement.step = 0.1;
-	//DF_CV.Measurement.sr = 1;
-	//DF_CV.Measurement.scans = 1;
-		
-	/* Load LSV data */
-	//DF_LSV.Measurement.start = 0.3;
-	//DF_LSV.Measurement.stop = 4.3;
-	//DF_LSV.Measurement.step = 0.21;
-	
-	/* Load SCV data */
-	//DF_SCV.Measurement.start = 0.3;
-	//DF_SCV.Measurement.stop = 4;
-	//DF_SCV.Measurement.step = 0.46;
-		
-	/* Load DPV data */
-	//DF_DPV.Measurement.start = 0.38;
-	//DF_DPV.Measurement.stop = 1;
-	//DF_DPV.Measurement.step = 0.04;
-	//DF_DPV.Measurement.ePulse = 0.1;
-	//DF_DPV.Measurement.tPulse = 0.0012;
-	//DF_DPV.Measurement.sr = 8;
-	
-	/* Load NPV data */
-	//DF_NPV.Measurement.start = 1.96;
-	//DF_NPV.Measurement.start = 4.66;
-	//DF_NPV.Measurement.step = 0.1;
-	//DF_NPV.Measurement.tPulse = 0.002;
-	//DF_NPV.Measurement.sr = 6;
-	
-	/* Load DNPV data */
-	//DF_DNPV.Measurement.start = 1.26;
-	//DF_DNPV.Measurement.stop = 2.88;
-	//DF_DNPV.Measurement.step = 0.24;
-	//DF_DNPV.Measurement.ePulse = 0.13;
-	//DF_DNPV.Measurement.tPulse1 = 0.002;
-	//DF_DNPV.Measurement.tPulse2 = 0.002;
-	//DF_DNPV.Measurement.sr = 25;
-	
-	/* Load SWV data */
-	//DF_SWV.Measurement.start = 3.33;
-	//DF_SWV.Measurement.stop = 4.60;
-	//DF_SWV.Measurement.step = 0.13;
-	//DF_SWV.Measurement.amplitude = 0.12;
-	//DF_SWV.Measurement.freq = 13;
-	
-	/* Load ACV data */
-	//DF_ACV.Measurement.start = 1.21;
-	//DF_ACV.Measurement.stop = 2;
-	//DF_ACV.Measurement.step = 0.17;
-	//DF_ACV.Measurement.ACamplitude = 0.04;
-	//DF_ACV.Measurement.sr = 13;
-	//DF_ACV.Measurement.freq = 2000;
-	
-	
-	
-	/* Generamos LUT */
-	/* Descomentar aquella que quiera probarse */
-	/* CV */
-	//n = generateCVsignal(&DF_CV, LUT1, LUT2, LUT3, LUTcomplete);
-	
-	/* LSV */
-	//n = generateLSVsignal(&DF_LSV, LUTcomplete);
-	
-	/* SCV */
-	//n = generateSCVsignal(&DF_SCV, LUT1, LUT2, LUT3, LUTcomplete);
-
-	
-	/* DPV */
-	//n = generateDPVsignal(&DF_DPV_we1, LUTcomplete);
-
-	
-	/* NPV */
-	//n = generateNPVsignal(&DF_NPV, LUTcomplete);
-
-	
-	/* DNPV */
-	//n = generateDNPVsignal(&DF_DNPV, LUTcomplete);
-
-	
-	/* SWV */
-	//n = generateSWVsignal(&DF_SWV, LUT1, LUT2, LUTcomplete);
-
-	
-	/* ACV */
-	//n = generateACVsignal(&DF_ACV, LUT1, LUTcomplete);
-	
-	
-	
-	
-	/* Generamos valores para el DAC */
-	// TODO : revisar función; para funcionamiento bipolar hay que cambiar ecuación
-	// mirar ecuación del software.
-	//generateDACValues(LUTcomplete, LUTdac, n);
 		
 	/* Arrancamos la FSM */	
 	start();
@@ -1289,7 +1194,7 @@ void TIM6_DAC_IRQHandler(void){
 		}
 	}
 	
-	tim6Handle.int_event = NONE;
+	tim6Handle.int_event = NONE_EVENT;
 	
 }
 
@@ -1329,12 +1234,8 @@ void app_tx_cmp_callback(void *size)
 void app_rx_cmp_callback(void *size)
 {
 	//we got a command,  parse it 
-	//parse_cmd(UART_rxBuff, &DF_CV, &DF_LSV, &DF_SCV, &DF_DPV, &DF_NPV, &DF_DNPV, &DF_SWV, &DF_ACV, LUT1, LUT2, LUT3, LUTcomplete);
+	parse_cmd(UART_rxBuff);
 	
-	// TODO: aquí podemos volver a habilitar la interrupción RXNE, para
-	// que vuelva a estár disponible la recepcion de datos.
-	//while(uartHandle.rx_state != HAL_UART_STATE_READY);
-	//hal_uart_rx(&uartHandle, UART_rxBuff, 6);
 }
 
 

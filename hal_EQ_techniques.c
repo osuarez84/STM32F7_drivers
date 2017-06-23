@@ -121,9 +121,9 @@ void generateDACValues(float* lut, uint16_t* data, uint32_t n) {
 */
 uint32_t generateCVsignal(DF_CVTypeDef* df, float* LUT1, float* LUT2, float* LUT3, float* LUTcomplete) {
 
-	uint32_t nSamples1 = generateRamp(df->Measurement.start, df->Measurement.vtx1, df->Measurement.step, LUT1);
-	uint32_t nSamples2 = generateRamp(df->Measurement.vtx1, df->Measurement.vtx2, df->Measurement.step, LUT2);
-	uint32_t nSamples3 = generateRamp(df->Measurement.vtx2, df->Measurement.vtx1, df->Measurement.step, LUT3);
+	uint32_t nSamples1 = generateRamp(df->start, df->vtx1, df->step, LUT1);
+	uint32_t nSamples2 = generateRamp(df->vtx1, df->vtx2, df->step, LUT2);
+	uint32_t nSamples3 = generateRamp(df->vtx2, df->vtx1, df->step, LUT3);
 
 	uint32_t lengthLUT = concatenateLUTs(LUT1, LUT2, LUT3, LUTcomplete, nSamples1, nSamples2, nSamples3);
 
@@ -138,10 +138,10 @@ uint32_t generateCVsignal(DF_CVTypeDef* df, float* LUT1, float* LUT2, float* LUT
 */
 uint32_t generateLSVsignal(DF_LSVTypeDef* df, float* LUTcomplete) {
 	
-	uint32_t lengthLUT = generateRamp(df->Measurement.start, df->Measurement.stop, df->Measurement.step, LUTcomplete);
+	uint32_t lengthLUT = generateRamp(df->start, df->stop, df->step, LUTcomplete);
 
 	/* Escribimos el Estop en el último valor de la LUT */
-	LUTcomplete[lengthLUT-1] = df->Measurement.stop;
+	LUTcomplete[lengthLUT-1] = df->stop;
 
 	return lengthLUT;
 }
@@ -159,15 +159,15 @@ uint32_t generateLSVsignal(DF_LSVTypeDef* df, float* LUTcomplete) {
 uint32_t generateSCVsignal(DF_SCVTypeDef* df, float* LUT1, float* LUT2, float* LUT3, float* LUTcomplete) {
 
 	uint32_t lengthLUT;
-	uint32_t nSamples1 = generateRamp(df->Measurement.start, df->Measurement.stop, df->Measurement.step, LUT1);
-	uint32_t nSamples2 = generateRamp(df->Measurement.stop, df->Measurement.start, df->Measurement.step, LUT2);
+	uint32_t nSamples1 = generateRamp(df->start, df->stop, df->step, LUT1);
+	uint32_t nSamples2 = generateRamp(df->stop, df->start, df->step, LUT2);
 
 	/* Enviamos el último punto del período completo, que es el start */
 	// Usamos la misma función concatenateLUTs, pero como en este caso son dos tramos hacemos
 	// este truco y enviamos el último punto en la tercera LUT. Así no necesitamos definir
 	// otra función.
 	uint32_t nSamples3 = 1;
-	LUT3[0] = df->Measurement.start;
+	LUT3[0] = df->start;
 
 	lengthLUT = concatenateLUTs(LUT1, LUT2, LUT3, LUTcomplete, nSamples1, nSamples2, nSamples3);
 
@@ -190,36 +190,36 @@ uint32_t generateDPVsignal(DF_DPVTypeDef* df, float* LUTcomplete) {
 	uint16_t nSamplesPulse = 10;
 
 	/* Tiempo de disparo de cada sample */
-	float tTimer = df->Measurement.tPulse / nSamplesPulse;
+	float tTimer = df->tPulse / nSamplesPulse;
 
 	/* Calculamos t interval (t dc + t pulse) */
-	float tInt = df->Measurement.step / df->Measurement.sr;
+	float tInt = df->step / df->sr;
 
 	/* Calculamos nº de samples en la zona DC */
-	float nSamplesDC = ceil((tInt - df->Measurement.tPulse) / tTimer);
+	float nSamplesDC = ceil((tInt - df->tPulse) / tTimer);
 
 	/* Calculamos el nº de steps */
 	// TODO
-	uint32_t nSteps = abs((df->Measurement.stop - df->Measurement.start) / df->Measurement.step);
+	uint32_t nSteps = abs((df->stop - df->start) / df->step);
 
 	uint32_t contRow = 0;	// Lleva el seguimiento de la posición de la LUT 
 
 
 	/* Generamos el patrón de señal */
-	if (df->Measurement.stop > df->Measurement.start) {		// Si steps suben...
+	if (df->stop > df->start) {		// Si steps suben...
 
 		for (i = 0; i < nSteps; i++) {
 			for (j = 0; j < nSamplesDC; j++) {				// Generamos parte DC..
 				
-				LUTcomplete[j + contRow] = df->Measurement.start + (df->Measurement.step * (i));
+				LUTcomplete[j + contRow] = df->start + (df->step * (i));
 
 			}
 			contRow += j;
 
 			for (j = 0; j < nSamplesPulse; j++) {			// Generamos pulso...
 
-				LUTcomplete[j + contRow] = (df->Measurement.start + df->Measurement.ePulse) + \
-					(df->Measurement.step * i);
+				LUTcomplete[j + contRow] = (df->start + df->ePulse) + \
+					(df->step * i);
 			}
 
 			contRow += j;
@@ -233,15 +233,15 @@ uint32_t generateDPVsignal(DF_DPVTypeDef* df, float* LUTcomplete) {
 		for (i = 0; i < nSteps; i++) {
 			for (j = 0; j < nSamplesDC; j++) {				// Generamos parte DC..
 
-				LUTcomplete[j + contRow] = df->Measurement.start - (df->Measurement.step * (i));
+				LUTcomplete[j + contRow] = df->start - (df->step * (i));
 
 			}
 			contRow += j;
 
 			for (j = 0; j < nSamplesPulse; j++) {			// Generamos pulso...
 
-				LUTcomplete[j + contRow] = (df->Measurement.start + df->Measurement.ePulse) - \
-					(df->Measurement.step * i);
+				LUTcomplete[j + contRow] = (df->start + df->ePulse) - \
+					(df->step * i);
 			}
 
 			contRow += j;
@@ -268,33 +268,33 @@ uint32_t generateNPVsignal(DF_NPVTypeDef* df, float* LUTcomplete) {
 	uint16_t nSamplesPulse = 10;
 
 	/* Tiempo de disparo de cada sample */
-	float tTimer = df->Measurement.tPulse / nSamplesPulse;
+	float tTimer = df->tPulse / nSamplesPulse;
 
 	/* Calculamos t interval (t dc + t pulse) */
-	float tInt = df->Measurement.step / df->Measurement.sr;
+	float tInt = df->step / df->sr;
 
 	/* Calculamos nº de samples en la zona DC */
-	float nSamplesDC = ceil((tInt - df->Measurement.tPulse) / tTimer);
+	float nSamplesDC = ceil((tInt - df->tPulse) / tTimer);
 
 	/* Calculamos el nº de steps */
-	uint32_t nSteps = abs((df->Measurement.stop - df->Measurement.start) / df->Measurement.step);
+	uint32_t nSteps = abs((df->stop - df->start) / df->step);
 
 	uint32_t contRow = 0;
 
 	/* Generamos el patrón de señal */
-	if (df->Measurement.stop > df->Measurement.start) {			// Si step sube...
+	if (df->stop > df->start) {			// Si step sube...
 
 		for (i = 0; i < nSteps; i++) {
 			for (j = 0; j < nSamplesDC; j++) {					// Generamos parte DC...
 
-				LUTcomplete[j + contRow] = df->Measurement.start;
+				LUTcomplete[j + contRow] = df->start;
 			}
 
 			contRow += j;
 
 			for (j = 0; j < nSamplesPulse; j++) {				// Generamos pulso...
 
-				LUTcomplete[j + contRow] = df->Measurement.start + (df->Measurement.step * i);
+				LUTcomplete[j + contRow] = df->start + (df->step * i);
 			}
 			contRow += j;
 		}
@@ -305,13 +305,13 @@ uint32_t generateNPVsignal(DF_NPVTypeDef* df, float* LUTcomplete) {
 		for (i = 0; i < nSteps; i++) {
 			for (j = 0; j < nSamplesDC; j++) {					// Generamos parte DC...
 
-				LUTcomplete[j + contRow] = df->Measurement.start;
+				LUTcomplete[j + contRow] = df->start;
 			}
 			contRow += j;
 
 			for (j = 0; j < nSamplesPulse; j++) {				// Generamos pulso...
 
-				LUTcomplete[j + contRow] = df->Measurement.start - (df->Measurement.step * i);
+				LUTcomplete[j + contRow] = df->start - (df->step * i);
 			}
 			contRow += j;
 		}
@@ -337,45 +337,45 @@ uint32_t generateDNPVsignal(DF_DNPVTypeDef* df, float* LUTcomplete) {
 	uint16_t nSamplesPulse1 = 10;
 
 	/* Tiempo de disparo de cada sample */
-	float tTimer = df->Measurement.tPulse1 / nSamplesPulse1;
+	float tTimer = df->tPulse1 / nSamplesPulse1;
 
 	/* Calculamos t interval (t dc + t pulse) */
-	float tInt = df->Measurement.step / df->Measurement.sr;
+	float tInt = df->step / df->sr;
 
 	/* Calculamos nº de samples en la zona DC */
-	float nSamplesDC = ceil((tInt - (df->Measurement.tPulse1 + df->Measurement.tPulse2 )) / tTimer);
+	float nSamplesDC = ceil((tInt - (df->tPulse1 + df->tPulse2 )) / tTimer);
 
 	/* Nº de samples en pulse1 */
-	float nSamplesP1 = ceil(df->Measurement.tPulse1 / tTimer);
+	float nSamplesP1 = ceil(df->tPulse1 / tTimer);
 
 	/* Nº de samples en pulse2 */
-	float nSamplesP2 = ceil(df->Measurement.tPulse2 / tTimer);
+	float nSamplesP2 = ceil(df->tPulse2 / tTimer);
 
 	/* Calculamos el nº de steps */
-	uint32_t nSteps = abs((df->Measurement.stop - df->Measurement.start) / df->Measurement.step);
+	uint32_t nSteps = abs((df->stop - df->start) / df->step);
 
 	uint32_t contRow = 0;
 
 	/* Generamos el patrón de señal */
-	if (df->Measurement.stop > df->Measurement.start) {		// Si steps suben...
+	if (df->stop > df->start) {		// Si steps suben...
 		for (i = 0; i < nSteps; i++) {
 
 			for (j = 0; j < nSamplesDC; j++) {				// Generamos parte DC...
 
-				LUTcomplete[j + contRow] = df->Measurement.start;
+				LUTcomplete[j + contRow] = df->start;
 			}
 			contRow += j;
 
 			for (j = 0; j < nSamplesP1; j++) {				// Generamos pulse1...
 
-				LUTcomplete[j + contRow] = df->Measurement.start + (df->Measurement.step * i);
+				LUTcomplete[j + contRow] = df->start + (df->step * i);
 			}
 			contRow += j;
 
 			for (j = 0; j < nSamplesP2; j++) {				// Generamos pulse2...
 
-				LUTcomplete[j + contRow] = (df->Measurement.start + df->Measurement.ePulse) + \
-					(df->Measurement.step * i);
+				LUTcomplete[j + contRow] = (df->start + df->ePulse) + \
+					(df->step * i);
 			}
 			contRow += j;
 
@@ -389,20 +389,20 @@ uint32_t generateDNPVsignal(DF_DNPVTypeDef* df, float* LUTcomplete) {
 
 			for (j = 0; j < nSamplesDC; j++) {				// Generamos parte DC...
 
-				LUTcomplete[j + contRow] = df->Measurement.start;
+				LUTcomplete[j + contRow] = df->start;
 			}
 			contRow += j;
 
 			for (j = 0; j < nSamplesP1; j++) {				// Generamos pulse1...
 
-				LUTcomplete[j + contRow] = df->Measurement.start - (df->Measurement.step * i);
+				LUTcomplete[j + contRow] = df->start - (df->step * i);
 			}
 			contRow += j;
 
 			for (j = 0; j < nSamplesP2; j++) {				// Generamos pulse2...
 
-				LUTcomplete[j + contRow] = (df->Measurement.start + df->Measurement.ePulse) - \
-					(df->Measurement.step * i);
+				LUTcomplete[j + contRow] = (df->start + df->ePulse) - \
+					(df->step * i);
 			}
 			contRow += j;
 
@@ -429,48 +429,48 @@ uint32_t generateSWVsignal(DF_SWVTypeDef* df, float* LUT1, float* LUT2, float* L
 	uint32_t contRow = 0;
 
 	/* Sacamos samples totales conociendo frecuencia */
-	float fSampling = 100 * df->Measurement.freq;		// oversampling...
+	float fSampling = 100 * df->freq;		// oversampling...
 
 	/* Tiempo de disparo de cada sample */
-	float tTimer = 1 / df->Measurement.freq;
+	float tTimer = 1 / df->freq;
 
 
 	/* Calculamos el nº de steps */
-	uint32_t nSteps = abs((df->Measurement.start - df->Measurement.stop) / df->Measurement.step);
+	uint32_t nSteps = abs((df->start - df->stop) / df->step);
 
 	/* Hacemos la señal en dos pasos... */
 	/* PASO 1: generamos la onda cuadrada */
-	float nSamples1 = (1 / df->Measurement.freq) / tTimer;
-	float nSamples2 = (1 / df->Measurement.freq) / tTimer;
+	float nSamples1 = (1 / df->freq) / tTimer;
+	float nSamples2 = (1 / df->freq) / tTimer;
 
 	for (i = 0; i < nSamples1; i++) {				// Primer semiperíodo...
 
-		LUT1[i] = df->Measurement.amplitude;
+		LUT1[i] = df->amplitude;
 	}
 
 	for (i = 0; i < nSamples2; i++) {				// Segundo semiperíodo...
 
-		LUT2[i] = - (df->Measurement.amplitude);
+		LUT2[i] = - (df->amplitude);
 	}
 
 
 	/* PASO 2: generamos el DC offset */
 
 
-	if (df->Measurement.start < df->Measurement.stop) {		// Si steps suben...
+	if (df->start < df->stop) {		// Si steps suben...
 
 		for (i = 0; i < nSteps; i++) {
 
 			for (j = 0; j < nSamples1; j++) {			// Generamos primer semiperíodo más parte DC
 
-				LUTcomplete[j + contRow] = (df->Measurement.start + df->Measurement.step * i) + \
+				LUTcomplete[j + contRow] = (df->start + df->step * i) + \
 					LUT1[j];
 			}
 			contRow += j;
 
 			for (j = 0; j < nSamples2; j++) {			// Generamos segundo semiperíodo más parte DC
 
-				LUTcomplete[j + contRow] = (df->Measurement.start + df->Measurement.step * i) + \
+				LUTcomplete[j + contRow] = (df->start + df->step * i) + \
 					LUT2[j];
 			}
 			contRow += j;
@@ -484,14 +484,14 @@ uint32_t generateSWVsignal(DF_SWVTypeDef* df, float* LUT1, float* LUT2, float* L
 
 			for (j = 0; j < nSamples1; j++) {			// Generamos primer semiperíodo más parte DC
 
-				LUTcomplete[j + contRow] = (df->Measurement.start - df->Measurement.step * i) + \
+				LUTcomplete[j + contRow] = (df->start - df->step * i) + \
 					LUT1[j];
 			}
 			contRow += j;
 
 			for (j = 0; j < nSamples2; j++) {			// Generamos segundo semiperíodo más parte DC
 
-				LUTcomplete[j + contRow] = (df->Measurement.start - df->Measurement.step * i) + \
+				LUTcomplete[j + contRow] = (df->start - df->step * i) + \
 					LUT2[j];
 			}
 			contRow += j;
@@ -516,16 +516,16 @@ uint32_t generateACVsignal(DF_ACTypeDef* df, float* LUT1, float* LUTcomplete) {
 	float nSteps;
 
 	/* Sacamos samples totales conociendo la frecuencia */
-	float fSampling = df->Measurement.freq * 100;
+	float fSampling = df->freq * 100;
 	float tTimer = 1 / fSampling;
-	float nSamplesAC = ceil((1 / df->Measurement.freq) / tTimer);
+	float nSamplesAC = ceil((1 / df->freq) / tTimer);
 
 	/* Calculamos el t interval */
-	float tInt = df->Measurement.step / df->Measurement.sr;
+	float tInt = df->step / df->sr;
 
 	/* PASO 1 : generación de la senoide para todo el período */
 	/* Calculamos nº períodos AC que caben en t interval */
-	float nPerAC = tInt / (1 / df->Measurement.freq);
+	float nPerAC = tInt / (1 / df->freq);
 
 	/* Esto nos da el nº de ptos totales del t interval */
 	float nSamplesTint = ceil(nPerAC * nSamplesAC);
@@ -543,7 +543,7 @@ uint32_t generateACVsignal(DF_ACTypeDef* df, float* LUT1, float* LUTcomplete) {
 		if (i < nPerAC) {						// Si no es el último período...
 			for (j = 0; j < nSamplesAC; j++) {
 
-				LUT1[j + contRow] = df->Measurement.ACamplitude * sin((2 * PI / nSamplesAC)*j);
+				LUT1[j + contRow] = df->ACamplitude * sin((2 * PI / nSamplesAC)*j);
 			}
 			contRow += j;
 		}
@@ -553,22 +553,22 @@ uint32_t generateACVsignal(DF_ACTypeDef* df, float* LUT1, float* LUTcomplete) {
 
 			for (j = 0; j < nSamplesRest; j++) {
 
-				LUT1[j + contRow] = df->Measurement.ACamplitude * sin((2 * PI / nSamplesAC)*j);
+				LUT1[j + contRow] = df->ACamplitude * sin((2 * PI / nSamplesAC)*j);
 			}
 		}
 
 	}
 
 	/* Generación del offset + AC para toda la prueba */
-	nSteps = ceil(abs((df->Measurement.start - df->Measurement.stop) / df->Measurement.step));
+	nSteps = ceil(abs((df->start - df->stop) / df->step));
 
 	contRow = 0;
 
-	if (df->Measurement.start < df->Measurement.stop) {			// Si steps suben...
+	if (df->start < df->stop) {			// Si steps suben...
 		for (i = 0; i < nSteps; i++) {
 			for (j = 0; j < nSamplesTint; j++) {
 
-				LUTcomplete[j + contRow] = (df->Measurement.start + (df->Measurement.step*i)) + \
+				LUTcomplete[j + contRow] = (df->start + (df->step*i)) + \
 					LUT1[j];
 			}
 			contRow += j;
@@ -578,7 +578,7 @@ uint32_t generateACVsignal(DF_ACTypeDef* df, float* LUT1, float* LUTcomplete) {
 		for (i = 0; i < nSteps; i++) {
 			for (j = 0; j < nSamplesTint; j++) {
 
-				LUTcomplete[j + contRow] = (df->Measurement.start - (df->Measurement.step*i)) + \
+				LUTcomplete[j + contRow] = (df->start - (df->step*i)) + \
 					LUT1[j];
 			}
 			contRow += j;
@@ -592,7 +592,7 @@ uint32_t generateACVsignal(DF_ACTypeDef* df, float* LUT1, float* LUTcomplete) {
 
 
 /* FUNCION EN PRUEBAS PARA GENERAR LUT PERIODICA */
-void generateDPVwaveform(DF_DPVTypeDef* df, float* LUT){
+void generateDPVwaveform(DF_DPVTypeDef* df, uint16_t* LUT){
 
 	uint32_t i,j;
 	
@@ -601,47 +601,54 @@ void generateDPVwaveform(DF_DPVTypeDef* df, float* LUT){
 																// La idea es que esta frecuencia sea de aprox 20x la frec de corte del filtro.
 																// Hay que enviar el valor del filtro seleccionado a esta función como argumento.
 	
-	float tSampling = 1 / fSampling;
-	float tInt = df->Measurement.step / df->Measurement.sr;
+	float step = (df->step * VREF) / 32768.0;									// V
+	float sr =  df->sr / 1000.0;															// V/seg
+	float tPulse = df->tPulse / 1000.0;												// seg
+	float start = ((df->start - 32768.0) * VREF) / 32768.0;		// V
+	float stop = ((df->stop - 32768.0) * VREF) / 32768.0;			// V
 	
-	uint32_t nSamples1 = ceil((tInt - df->Measurement.tPulse) / tSampling);
-	uint32_t nSamples2 = ceil((df->Measurement.tPulse / tSampling));
+	float tSampling = 1 / (float)fSampling;
+	float tInt = step / sr;
+	
+	uint32_t nSamples1 = ceil((tInt - tPulse) / tSampling);
+	uint32_t nSamples2 = ceil((tPulse / tSampling));
 	
 	
 	// Calculamos nº de steps
-	uint16_t nSteps = ceil(abs(df->Measurement.stop - df->Measurement.start) / df->Measurement.step);
+	uint16_t nSteps = ceil(fabs(stop - start) / step);
 	
 	
-	if (df->Measurement.stop > df->Measurement.start){			// Si steps suben....
+	if (df->stop > df->start){			// Si steps suben....
 		
 		// Primera parte de la onda...
 		for(j = 0; j < nSamples1; j++){
-			LUT[j] = df->Measurement.start + (df->Measurement.step * (df->Measurement.realStep));
+			LUT[j] = df->start + (df->step * (df->realStep));
 		
 		}
 		
 		// Segunda parte de la onda...
 		for(j = 0; j < nSamples2; j++){
-			LUT[j + nSamples1] = (df->Measurement.start + df->Measurement.ePulse) + (df->Measurement.step * df->Measurement.realStep);
+			LUT[j + nSamples1] = (df->start + df->ePulse) + (df->step * df->realStep);
 		
 		}
-		df->Measurement.realStep++;				// Nos sirve para llevar cuenta de en qué step estamos generando la forma de onda. Comienza en cero.
+		df->realStep++;				// Nos sirve para llevar cuenta de en qué step estamos generando la forma de onda. Comienza en cero.
 	}
 	
 	else {																									// Si steps bajan...
 	
 		// Primera parte de la onda...
 		for(j = 0; j < nSamples1; j++){
-			LUT[j] = df->Measurement.start - (df->Measurement.step * (df->Measurement.realStep));
+			LUT[j] = df->start - (df->step * (df->realStep));
 		
 		}
 		
 		// Segunda parte de la onda...
 		for(j = 0; j < nSamples2; j++){
-			LUT[j + nSamples1] = (df->Measurement.start + df->Measurement.ePulse) - (df->Measurement.step * df->Measurement.realStep);
+			LUT[j + nSamples1] = (df->start + df->ePulse) - (df->step * df->realStep);
 		
 		}
-		df->Measurement.realStep++;
+		df->realStep++;
+
 	}
 	
 }
@@ -654,12 +661,12 @@ void load_data(uint8_t* buff, DF_CVTypeDef* df_cv, DF_LSVTypeDef* df_lsv, DF_SCV
 	exp_config_t* e){
 	
 	/* Recogemos datos pretratamiento */
-	p->tCond = (int)(((( ((buff[10] << 8) | (buff[11] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	p->eCond = (int)(((( ((buff[12] << 8) | (buff[13] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	p->tDep = (int)(((( ((buff[14] << 8) | (buff[15] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	p->eDep = (int)(((( ((buff[16] << 8) | (buff[17] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	p->tEq = (int)(((( ((buff[18] << 8) | (buff[19] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	p->eEq = (int)(((( ((buff[22] << 8) | (buff[23] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	p->tCond =  ((buff[10] << 8) | (buff[11] & 0xFF));
+	p->eCond = ((buff[12] << 8) | (buff[13] & 0xFF));
+	p->tDep =  ((buff[14] << 8) | (buff[15] & 0xFF));
+	p->eDep =  ((buff[16] << 8) | (buff[17] & 0xFF));
+	p->tEq = ((buff[18] << 8) | (buff[19] & 0xFF));
+	p->eEq = ((buff[22] << 8) | (buff[23] & 0xFF));
 		
 	/* Recogemos otros datos del experimento */
 	e->bipot = buff[3];
@@ -710,7 +717,7 @@ void load_data(uint8_t* buff, DF_CVTypeDef* df_cv, DF_LSVTypeDef* df_lsv, DF_SCV
 
 void generate_data(DF_CVTypeDef* df_cv, DF_LSVTypeDef* df_lsv, DF_SCVTypeDef* df_scv, \
 	DF_DPVTypeDef* df_dpv, DF_NPVTypeDef* df_npv, DF_DNPVTypeDef* df_dnpv, DF_SWVTypeDef* df_swv, DF_ACTypeDef* df_acv,\
-	exp_config_t* e, float* lut1, float* lut2){
+	exp_config_t* e, uint16_t* lut1, uint16_t* lut2){
 
 	/* En función de la técnica guardamos los datos del experimento en la estructura correspondiente */
 	switch(e->exp){
@@ -758,12 +765,12 @@ void generate_data(DF_CVTypeDef* df_cv, DF_LSVTypeDef* df_lsv, DF_SCVTypeDef* df
 void load_CV_data(DF_CVTypeDef* df, uint8_t* cmd){
 								
 	/* Experiment values */
-	df->Measurement.start = (int)(((( ((cmd[22] << 8) | (cmd[23] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	df->Measurement.vtx1 = (int)(((( ((cmd[24] << 8) | (cmd[25] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	df->Measurement.vtx2 = (int)(((( ((cmd[26] << 8) | (cmd[27] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	df->Measurement.step = (int)(((( ((cmd[28] << 8) | (cmd[29] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	df->Measurement.sr = (int)(((( ((cmd[30] << 8) | (cmd[31] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	df->Measurement.scans = ((cmd[32] << 8) | (cmd[33] & 0xFF));
+	df->start = (int)(((( ((cmd[22] << 8) | (cmd[23] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->vtx1 = (int)(((( ((cmd[24] << 8) | (cmd[25] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->vtx2 = (int)(((( ((cmd[26] << 8) | (cmd[27] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->step = (int)(((( ((cmd[28] << 8) | (cmd[29] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->sr = (int)(((( ((cmd[30] << 8) | (cmd[31] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->scans = ((cmd[32] << 8) | (cmd[33] & 0xFF));
 
 					
 }
@@ -772,10 +779,10 @@ void load_CV_data(DF_CVTypeDef* df, uint8_t* cmd){
 void load_LSV_data(DF_LSVTypeDef* df, uint8_t* cmd){
 
 	/* Experiment values */
-	df->Measurement.start = (int)(((( ((cmd[22] << 8) | (cmd[23] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	df->Measurement.stop = (int)(((( ((cmd[24] << 8) | (cmd[25] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	df->Measurement.step = (int)(((( ((cmd[26] << 8) | (cmd[27] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	df->Measurement.sr = (int)(((( ((cmd[28] << 8) | (cmd[29] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->start = (uint16_t) ((int)(((( ((cmd[22] << 8) | (cmd[23] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
+	df->stop = (uint16_t) ((int)(((( ((cmd[24] << 8) | (cmd[25] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
+	df->step = (uint16_t) ((int)(((( ((cmd[26] << 8) | (cmd[27] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
+	df->sr = (uint16_t) ((int)(((( ((cmd[28] << 8) | (cmd[29] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
 	
 
 }
@@ -785,37 +792,37 @@ void load_LSV_data(DF_LSVTypeDef* df, uint8_t* cmd){
 void load_SCV_data(DF_SCVTypeDef* df, uint8_t* cmd){
 
 	/* Experiment values */
-	df->Measurement.start = (int)(((( ((cmd[22] << 8) | (cmd[23] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	df->Measurement.stop = (int)(((( ((cmd[24] << 8) | (cmd[25] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	df->Measurement.step = (int)(((( ((cmd[26] << 8) | (cmd[27] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	df->Measurement.tHold = (int)(((( ((cmd[28] << 8) | (cmd[29] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	df->Measurement.sr = (int)(((( ((cmd[30] << 8) | (cmd[31] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	df->Measurement.scans = ((cmd[32] << 8) | (cmd[33] & 0xFF));	
+	df->start = (uint16_t)((int)(((( ((cmd[22] << 8) | (cmd[23] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
+	df->stop = (uint16_t)((int)(((( ((cmd[24] << 8) | (cmd[25] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
+	df->step = (uint16_t) ((int)(((( ((cmd[26] << 8) | (cmd[27] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
+	df->tHold = (uint16_t) ((int)(((( ((cmd[28] << 8) | (cmd[29] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
+	df->sr = (uint16_t) ((int)(((( ((cmd[30] << 8) | (cmd[31] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
+	df->scans = ((cmd[32] << 8) | (cmd[33] & 0xFF));	
 
 }
 
 void load_DPV_data(DF_DPVTypeDef* df, uint8_t* cmd){
 					
 	/* Experiment values */
-	df->Measurement.start = (int)(((( ((cmd[22] << 8) | (cmd[23] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	df->Measurement.stop = (int)(((( ((cmd[24] << 8) | (cmd[25] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	df->Measurement.step = (int)(((( ((cmd[26] << 8) | (cmd[27] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	df->Measurement.ePulse = (int)(((( ((cmd[28] << 8) | (cmd[29] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	df->Measurement.tPulse = (int)(((( ((cmd[30] << 8) | (cmd[31] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	df->Measurement.sr = (int)(((( ((cmd[32] << 8) | (cmd[33] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->start = ((cmd[22] << 8) | (cmd[23] & 0xFF));
+	df->stop = ((cmd[24] << 8) | (cmd[25] & 0xFF));
+	df->step = ((cmd[26] << 8) | (cmd[27] & 0xFF));
+	df->ePulse =((cmd[28] << 8) | (cmd[29] & 0xFF));
+	df->tPulse = ((cmd[30] << 8) | (cmd[31] & 0xFF));
+	df->sr = ((cmd[32] << 8) | (cmd[33] & 0xFF));
 		
-	df->Measurement.realStep = 0;
+	df->realStep = 0;
 
 }
 
 void load_NPV_data(DF_NPVTypeDef* df, uint8_t* cmd){
 				
 	/* Experiment values */
-	df->Measurement.start = (int)(((( ((cmd[22] << 8) | (cmd[23] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	df->Measurement.stop = (int)(((( ((cmd[24] << 8) | (cmd[25] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	df->Measurement.step = (int)(((( ((cmd[26] << 8) | (cmd[27] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	df->Measurement.tPulse = (int)(((( ((cmd[28] << 8) | (cmd[29] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	df->Measurement.sr = (int)(((( ((cmd[30] << 8) | (cmd[31] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->start = (uint16_t) ((int)(((( ((cmd[22] << 8) | (cmd[23] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
+	df->stop = (uint16_t) ((int)(((( ((cmd[24] << 8) | (cmd[25] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
+	df->step = (uint16_t) ((int)(((( ((cmd[26] << 8) | (cmd[27] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
+	df->tPulse = (uint16_t) ((int)(((( ((cmd[28] << 8) | (cmd[29] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
+	df->sr = (uint16_t) ((int)(((( ((cmd[30] << 8) | (cmd[31] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
 
 }
 
@@ -823,12 +830,12 @@ void load_NPV_data(DF_NPVTypeDef* df, uint8_t* cmd){
 void load_DNPV_data(DF_DNPVTypeDef* df, uint8_t* cmd){
 
 	/* Experiment values */
-	df->Measurement.start = (int)(((( ((cmd[22] << 8) | (cmd[23] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	df->Measurement.stop = (int)(((( ((cmd[24] << 8) | (cmd[25] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	df->Measurement.step = (int)(((( ((cmd[26] << 8) | (cmd[27] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	df->Measurement.ePulse = (int)(((( ((cmd[28] << 8) | (cmd[29] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	df->Measurement.tPulse1 = (int)(((( ((cmd[30] << 8) | (cmd[31] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	df->Measurement.tPulse2 = (int)(((( ((cmd[32] << 8) | (cmd[33] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->start = (uint16_t) ((int)(((( ((cmd[22] << 8) | (cmd[23] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
+	df->stop = (uint16_t) ((int)(((( ((cmd[24] << 8) | (cmd[25] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
+	df->step = (uint16_t) ((int)(((( ((cmd[26] << 8) | (cmd[27] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
+	df->ePulse = (uint16_t) ((int)(((( ((cmd[28] << 8) | (cmd[29] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
+	df->tPulse1 = (uint16_t) ((int)(((( ((cmd[30] << 8) | (cmd[31] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
+	df->tPulse2 = (uint16_t) ((int)(((( ((cmd[32] << 8) | (cmd[33] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
 
 }
 
@@ -836,27 +843,42 @@ void load_DNPV_data(DF_DNPVTypeDef* df, uint8_t* cmd){
 void load_SWV_data(DF_SWVTypeDef* df, uint8_t* cmd){
 
 	/* Experiment values */
-	df->Measurement.start = (int)(((( ((cmd[22] << 8) | (cmd[23] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	df->Measurement.stop = (int)(((( ((cmd[24] << 8) | (cmd[25] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	df->Measurement.step = (int)(((( ((cmd[26] << 8) | (cmd[27] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	df->Measurement.amplitude = (int)(((( ((cmd[28] << 8) | (cmd[29] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	df->Measurement.freq = (int)(((( ((cmd[30] << 8) | (cmd[31] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->start = (uint16_t) ((int)(((( ((cmd[22] << 8) | (cmd[23] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
+	df->stop = (uint16_t) ((int)(((( ((cmd[24] << 8) | (cmd[25] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
+	df->step = (uint16_t) ((int)(((( ((cmd[26] << 8) | (cmd[27] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
+	df->amplitude = (uint16_t) ((int)(((( ((cmd[28] << 8) | (cmd[29] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
+	df->freq = (uint16_t) ((int)(((( ((cmd[30] << 8) | (cmd[31] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
 
 
 }
 
+/* Función de muestra de cómo estaba hecho anteriormente con doubles */
 void load_ACV_data(DF_ACTypeDef* df, uint8_t* cmd){
 					
 	/* Experiment values */
-	df->Measurement.start = (int)(((( ((cmd[22] << 8) | (cmd[23] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	df->Measurement.stop = (int)(((( ((cmd[24] << 8) | (cmd[25] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	df->Measurement.step = (int)(((( ((cmd[26] << 8) | (cmd[27] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	df->Measurement.ACamplitude = (int)(((( ((cmd[28] << 8) | (cmd[29] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	df->Measurement.freq = (int)(((( ((cmd[30] << 8) | (cmd[31] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	df->Measurement.sr = (int)(((( ((cmd[32] << 8) | (cmd[33] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+	df->start = (uint16_t) ((int)(((( ((cmd[22] << 8) | (cmd[23] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
+	df->stop = (uint16_t) ((int)(((( ((cmd[24] << 8) | (cmd[25] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
+	df->step = (uint16_t) ((int)(((( ((cmd[26] << 8) | (cmd[27] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
+	df->ACamplitude = (uint16_t) ((int)(((( ((cmd[28] << 8) | (cmd[29] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
+	df->freq = (uint16_t) ((int)(((( ((cmd[30] << 8) | (cmd[31] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
+	df->sr = (uint16_t) ((int)(((( ((cmd[32] << 8) | (cmd[33] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
 
 
 }
+
+/* Función de muestra de cómo estaba hecho anteriormente con doubles */
+//void load_ACV_data(DF_ACTypeDef* df, uint8_t* cmd){
+//					
+//	/* Experiment values */
+//	df->Measurement.start = (int)(((( ((cmd[22] << 8) | (cmd[23] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+//	df->Measurement.stop = (int)(((( ((cmd[24] << 8) | (cmd[25] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+//	df->Measurement.step = (int)(((( ((cmd[26] << 8) | (cmd[27] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+//	df->Measurement.ACamplitude = (int)(((( ((cmd[28] << 8) | (cmd[29] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+//	df->Measurement.freq = (int)(((( ((cmd[30] << 8) | (cmd[31] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+//	df->Measurement.sr = (int)(((( ((cmd[32] << 8) | (cmd[33] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+
+
+//}
 
 
 

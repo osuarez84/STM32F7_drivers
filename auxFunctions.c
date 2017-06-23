@@ -22,13 +22,10 @@
 * @param  *cmd :
 * @retval None
 */
-void 	parse_cmd(uint8_t* cmd, DF_CVTypeDef* df_cv, DF_LSVTypeDef* df_lsv, DF_SCVTypeDef* df_scv, \
-	DF_DPVTypeDef* df_dpv, DF_NPVTypeDef* df_npv, DF_DNPVTypeDef* df_dnpv, DF_SWVTypeDef* df_swv, DF_ACTypeDef* df_acv, float* LUT1,
-		float* LUT2, float* LUT3, float* LUTcomplete){
+void 	parse_cmd(uint8_t* cmd){
 
 	/* TESTING COMMAND RECEPTION */
-	uint32_t c;
-	uint8_t ack[] = "ACK";
+	uint8_t ack[] = "ACK";						// Mensaje ACK
 	
 	/* CONECT command */
 	if (cmd[0] == 'C' && cmd[1] == 'O' && cmd[2] == 'N' && cmd[3] == 'E' && cmd[4] == 'C' && cmd[5] == 'T'){
@@ -85,28 +82,50 @@ void 	parse_cmd(uint8_t* cmd, DF_CVTypeDef* df_cv, DF_LSVTypeDef* df_lsv, DF_SCV
 	
 	/* DISCONN command */
 	else if (cmd[0] == 'D' && cmd[1] == 'I' && cmd[2] == 'S' && cmd[3] == 'C' && cmd[4] == 'O' && cmd[5] == 'N' && cmd[6] == 'N'){
+		uint16_t i;
 	
-		/* Pasamos a estado Conect */
-		communication_mode = C_NONE;
-	
-		led_turn_off(GPIOJ, LED_GREEN);					
+		if (next_state == IDLE){
+			/* Pasamos a estado Conect */
+			communication_mode = C_NONE;
+		
+			/* Recepción de CONECT por BT */
+			while(uartHandle.rx_state != HAL_UART_STATE_READY);		// Dejamos la recepción prevista por si es necesario cancelar desde PC
+			hal_uart_rx(&uartHandle, UART_rxBuff, 6);
+			
+			led_turn_off(GPIOJ, LED_GREEN);					
+		}
+		
+		else if(next_state == PRETREATMENT | next_state == MEASURING){
+			pretreatment = P_FINISHED;
+			experiment = E_FINISHED;
+			
+			
+			/* Recepción de CON */
+			while(uartHandle.rx_state != HAL_UART_STATE_READY);		// Dejamos la recepción prevista por si es necesario cancelar desde PC
+			hal_uart_rx(&uartHandle, UART_rxBuff, 39);
+			
+			led_turn_off(GPIOJ, LED_GREEN);
+			for (i = 0; i < 20000; i++){}
+			led_turn_on(GPIOJ, LED_GREEN);
+		
+		
+		}
 	
 	
 		/* Enviamos ACK */
 		while(uartHandle.tx_state != HAL_UART_STATE_READY);
 		hal_uart_tx(&uartHandle, ack, 3);
 				
-	
-		while(uartHandle.rx_state != HAL_UART_STATE_READY);		// Dejamos la recepción prevista por si es necesario cancelar desde PC
-		hal_uart_rx(&uartHandle, UART_rxBuff, 6);
+
 	
 
 	}
 	
-	
+
 	/* Garbage handler */
 	// TODO 
 	// función para descartar basura o mensajes que no me sirvan por el UART6
+	else{}
 	
 }
 
@@ -150,20 +169,20 @@ uint16_t read_ADC_W1(void){
 	* @param  *handle : pointer to an tim67_handle_t structure
 	* @retval None
 	*/
-void heartbeat_enable(tim67_handle_t* handle){
+//void heartbeat_enable(tim67_handle_t* handle){
 
 	
 	
 	
 
-}
+//}
 
-void hearbeat_disable(tim67_handle_t* handle){
-
-
+//void hearbeat_disable(tim67_handle_t* handle){
 
 
-}
+
+
+//}
 
 /* Functions to control user LEDs ---------------------------------------------------------- */
 

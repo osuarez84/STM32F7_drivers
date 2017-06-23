@@ -2,6 +2,7 @@
 #include "hal_gpio_driver.h"
 #include "led.h"
 #include "stm32f7xx.h"
+#include "auxFunctions.h"
 
 
 /******************************************************************************/
