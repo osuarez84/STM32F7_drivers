@@ -39,7 +39,7 @@ void 	parse_cmd(uint8_t* cmd){
 
 			/* Enviamos ACK */
 			while(uartHandle.tx_state != HAL_UART_STATE_READY);
-			hal_uart_tx(&uartHandle, ack, 3);
+			hal_uart_tx(&uartHandle, ack, sizeof(ack)-1);
 			
 			/* Salimos dejando a la espera los siguientes mensajes de CON */
 			while(uartHandle.rx_state != HAL_UART_STATE_READY);
@@ -70,7 +70,7 @@ void 	parse_cmd(uint8_t* cmd){
 		
 		// Envio del ACK
 		while(uartHandle.tx_state != HAL_UART_STATE_READY);
-		hal_uart_tx(&uartHandle, ack, 3);
+		hal_uart_tx(&uartHandle, ack, sizeof(ack)-1);
 		
 		
 		// Dejamos la recepción prevista desde PC para siguiente trama bipot y para CANCEL
@@ -114,7 +114,7 @@ void 	parse_cmd(uint8_t* cmd){
 	
 		/* Enviamos ACK */
 		while(uartHandle.tx_state != HAL_UART_STATE_READY);
-		hal_uart_tx(&uartHandle, ack, 3);
+		hal_uart_tx(&uartHandle, ack, sizeof(ack)-1);
 				
 
 	

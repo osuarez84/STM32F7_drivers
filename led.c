@@ -27,8 +27,6 @@ uint8_t addrcmd[2];
 uint16_t dataADC;
 uint32_t cont = 5;
 																
-// UART messages
-uint8_t message1[] = "DAT1234567891F";
 																
 uint8_t ack[] = "ACK";
 
@@ -51,9 +49,9 @@ uint16_t LUTWE1B[20000] = {0};
 uint16_t LUTWE2A[20000] = {0};
 uint16_t LUTWE2B[20000] = {0};
 
-uint16_t LUTeCond[20000] = {0};
-uint16_t LUTeDep[20000] = {0};
-uint16_t LUTeEq[20000] = {0};
+uint16_t LUTeCond[200] = {0};
+uint16_t LUTeDep[200] = {0};
+uint16_t LUTeEq[200] = {0};
 
 uint8_t cont_bipot = 0;
 
@@ -101,17 +99,6 @@ general_state state_equipment;
 																
 
 /* Testing functions *************************************************************/
-
-void sendDFUART(){
-		
-	
-	while(uartHandle.tx_state != HAL_UART_STATE_READY);
-	hal_uart_tx(&uartHandle, message1, sizeof(message1)-1);
-	
-
-}
-
-
 
 void sendSineSPI(){
 	
@@ -537,12 +524,12 @@ void bipot() {
 	if(cont_bipot == 0){							// Si...			
 		
 		// Cargamos la estructura para el electródo WE2...		
-//		load_data(UART_rxBuff, &DF_CV_we2, &DF_LSV_we2, &DF_SCV_we2, &DF_DPV_we2, &DF_NPV_we2,\
+		load_data(UART_rxBuff, &DF_CV_we2, &DF_LSV_we2, &DF_SCV_we2, &DF_DPV_we2, &DF_NPV_we2,\
 											&DF_DNPV_we2, &DF_SWV_we2, &DF_ACV_we2, &pretreat_we2,\
 											&exp_config_we2);
 	
 		// Generamos LUTWE2A y LUTWE2B
-//		generate_data(&DF_CV_we2, &DF_LSV_we2, &DF_SCV_we2, &DF_DPV_we2, &DF_NPV_we2, &DF_DNPV_we2,\
+		generate_data(&DF_CV_we2, &DF_LSV_we2, &DF_SCV_we2, &DF_DPV_we2, &DF_NPV_we2, &DF_DNPV_we2,\
 											&DF_SWV_we2, &DF_ACV_we2, &exp_config_we2, LUTWE2A, LUTWE2B);
 		
 		
@@ -552,12 +539,12 @@ void bipot() {
 	}
 	else{															// No...
 		// Cargamos la estructura para el electródo WE1...
-//		load_data(UART_rxBuff, &DF_CV_we1, &DF_LSV_we1, &DF_SCV_we1, &DF_DPV_we1, &DF_NPV_we1, \
+		load_data(UART_rxBuff, &DF_CV_we1, &DF_LSV_we1, &DF_SCV_we1, &DF_DPV_we1, &DF_NPV_we1, \
 											&DF_DNPV_we1, &DF_SWV_we1, &DF_ACV_we1, &pretreat_we1,\
 											&exp_config_we1);
 	
 		// Generamos LUTWE1A y LUTWE1B
-//		generate_data(&DF_CV_we1, &DF_LSV_we1, &DF_SCV_we1, &DF_DPV_we1, &DF_NPV_we1, &DF_DNPV_we1, \
+		generate_data(&DF_CV_we1, &DF_LSV_we1, &DF_SCV_we1, &DF_DPV_we1, &DF_NPV_we1, &DF_DNPV_we1, \
 											&DF_SWV_we1, &DF_ACV_we1, &exp_config_we1, LUTWE1A, LUTWE1B);
 		
 		// Volvemos al estado de espera de nuevo...
@@ -610,10 +597,10 @@ void PrepE() {
 		// Configuramos filtros
 		// Generamos primer refresco LUT1 y LUT2		
 		// lut1A_state = REFRESHED y lut2A_state
-//		lutwe1A_state = L_REFRESHED;
-//		lutwe1B_state = L_REFRESHED;
-//		lutwe2A_state = L_REFRESHED;
-//		lutwe2A_state = L_REFRESHED;
+		lutwe1A_state = L_REFRESHED;
+		lutwe1B_state = L_REFRESHED;
+		lutwe2A_state = L_REFRESHED;
+		lutwe2A_state = L_REFRESHED;
 		
 		// Habilitamos electródos
 
@@ -757,6 +744,29 @@ void Measuring() {
 	if(experiment == E_NONE){
 		// Inicializame toda la temporización para recoger muestras en el ADC
 		// Inicializame toda la temporización para lanzar las muestras al DAC
+		
+		if(mode_working == M_POT){
+			// Arrancamos temporización DAC WE1 
+		
+		}
+		
+		else if(mode_working == M_BIPOT){
+			// Arrancamos temporización DAC WE1
+			// Arrancamos temporización DAC WE2
+			
+		}
+		
+		else if(mode_working == M_GALV){
+		// TODO
+		
+		}
+		
+		else if(mode_working == M_EIS){
+		// TODO
+		
+		
+		}
+
 		
 		experiment = E_RUNNING;	
 	
@@ -1083,7 +1093,6 @@ int main(void)
 		
 		
 	
-	/* TEST UART RECEIVING */
 	// Quedamos a la espera de recibir CONECT
 	//while(uartHandle.rx_state != HAL_UART_STATE_READY);
 	hal_uart_rx(&uartHandle, UART_rxBuff, 6);		
