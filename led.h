@@ -5,6 +5,11 @@
 #include "hal_spi_driver.h"
 #include "hal_timer6_driver.h"
 
+#define NMEDIDAS	4			// Variable para el número de medidas a tomar en el experimento.
+													// Aquí se define como cte, pero debe calcularse en función
+													// del número de puntos que va a tener la zona donde midamos.
+
+
 /* Global variables */
 
 extern uint8_t UART_rxBuff[];
@@ -183,6 +188,11 @@ typedef enum {
 	E_FINISHED = 0x03,
 	E_ERROR = 0x04
 }state_experiment;
+
+enum yesno{
+	NO = 0x00,
+	YES = 0x01
+};
 
 /* FSM global variables */
 extern stateType next_state;

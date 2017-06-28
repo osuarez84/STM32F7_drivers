@@ -51,6 +51,11 @@ typedef struct {
 	
 	FS_state fs;
 	
+	uint8_t dummy1;
+	uint8_t dummy2;
+	uint8_t dummy3;
+	char dummy4;
+	
 	
 }DF_OUTPUT;
 
@@ -110,7 +115,7 @@ typedef struct {
 	uint16_t scans;
 } DF_SCVTypeDef;
 
-// DPV
+// DPV												// Estructura en testeo
 typedef struct {
 	uint16_t start;
 	uint16_t stop;
@@ -118,7 +123,12 @@ typedef struct {
 	uint16_t ePulse;
 	uint16_t tPulse;
 	uint16_t sr;
-	uint32_t realStep;					// Parametro en testeo
+	uint32_t realStep;					// Parámetro en testeo
+	uint32_t contSamplesLUT;		// Parámetro en testeo
+	uint32_t nSamplesLUT;				// Parámetro en testeo
+	uint32_t nSteps;						// Parámetro en testeo
+	uint32_t nSamples1;
+	uint32_t nSamples2;
 } DF_DPVTypeDef;
 
 // NPV
@@ -182,7 +192,7 @@ void load_data(uint8_t* buff, DF_CVTypeDef* df_cv, DF_LSVTypeDef* df_lsv, DF_SCV
 	exp_config_t* e);
 void generate_data(DF_CVTypeDef* df_cv, DF_LSVTypeDef* df_lsv, DF_SCVTypeDef* df_scv, \
 	DF_DPVTypeDef* df_dpv, DF_NPVTypeDef* df_npv, DF_DNPVTypeDef* df_dnpv, DF_SWVTypeDef* df_swv, DF_ACTypeDef* df_acv,\
-	exp_config_t* e, uint16_t* lut1, uint16_t* lut2);
+	exp_config_t* e, uint16_t* lut, uint32_t* nSamplesExp, uint32_t* nSamplesLUT);
 
 /* Pretreatment */
 // TODO
@@ -199,7 +209,7 @@ uint32_t generateSWVsignal(DF_SWVTypeDef* df, float* LUT1, float* LUT2, float* L
 uint32_t generateACVsignal(DF_ACTypeDef* df, float* LUT1, float* LUTcomplete);
 
 
-void generateDPVwaveform(DF_DPVTypeDef* df, uint16_t* LUT);  // función en pruebas!!
+void generateDPVwaveform(DF_DPVTypeDef* df, uint16_t* LUT, uint32_t* nSExp, uint32_t* nSLUT);  // función en pruebas!!
 
 
 void load_CV_data(DF_CVTypeDef* df, uint8_t* cmd);

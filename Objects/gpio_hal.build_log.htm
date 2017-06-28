@@ -28,9 +28,12 @@ Project File Date:  05/03/2017
 *** Using Compiler 'V5.06 update 1 (build 61)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'Target 1'
 compiling led.c...
+led.c(192): warning:  #767-D: conversion from pointer to smaller integer
+  			UART_txBuff[0] = (uint8_t) dataADC;
+led.c: 1 warning, 0 errors
 linking...
-Program Size: Code=10166 RO-data=562 RW-data=160 ZI-data=163400  
-".\Objects\gpio_hal.axf" - 0 Error(s), 0 Warning(s).
+Program Size: Code=11498 RO-data=562 RW-data=200 ZI-data=165472  
+".\Objects\gpio_hal.axf" - 0 Error(s), 1 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -57,11 +60,11 @@ Package Vendor: Keil
 
    * Component: Keil::Device:Startup:1.2.0
       Source file:   MDK\Device\Source\ARM\STM32F7xx_OPT.s
-      Source file:   MDK\Device\Source\ARM\STM32F7xx_OTP.s
       Include file:  Drivers\CMSIS\Device\ST\STM32F7xx\Include\stm32f7xx.h
+      Source file:   MDK\Device\Source\ARM\STM32F7xx_OTP.s
       Source file:   Drivers\CMSIS\Device\ST\STM32F7xx\Source\Templates\arm\startup_stm32f769xx.s
       Source file:   Drivers\CMSIS\Device\ST\STM32F7xx\Source\Templates\system_stm32f7xx.c
-Build Time Elapsed:  00:00:07
+Build Time Elapsed:  00:00:10
 </pre>
 </body>
 </html>

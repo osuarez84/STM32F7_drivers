@@ -299,37 +299,27 @@
         <Ww>
           <count>0</count>
           <WinNumber>2</WinNumber>
-          <ItemText>spi_handle-&gt;pTxBuffPtr</ItemText>
+          <ItemText>contSamplesLUTWE1</ItemText>
         </Ww>
         <Ww>
           <count>1</count>
           <WinNumber>2</WinNumber>
-          <ItemText>hspi-&gt;Instance-&gt;DR</ItemText>
+          <ItemText>contSamplesExpWE1</ItemText>
         </Ww>
         <Ww>
           <count>2</count>
           <WinNumber>2</WinNumber>
-          <ItemText>hspi-&gt;pTxBuffPtr</ItemText>
+          <ItemText>nSamplesLUTWE1</ItemText>
         </Ww>
         <Ww>
           <count>3</count>
           <WinNumber>2</WinNumber>
-          <ItemText>hspi-&gt;TxXferCount</ItemText>
+          <ItemText>contMedidasADC</ItemText>
         </Ww>
         <Ww>
           <count>4</count>
           <WinNumber>2</WinNumber>
-          <ItemText>*hspi-&gt;pTxBuffPtr</ItemText>
-        </Ww>
-        <Ww>
-          <count>5</count>
-          <WinNumber>2</WinNumber>
-          <ItemText>count</ItemText>
-        </Ww>
-        <Ww>
-          <count>6</count>
-          <WinNumber>2</WinNumber>
-          <ItemText>tmp1</ItemText>
+          <ItemText>nSamplesExpWE1</ItemText>
         </Ww>
       </WatchWindow2>
       <Tracepoint>
