@@ -127,8 +127,9 @@ typedef struct {
 	uint32_t contSamplesLUT;		// Parámetro en testeo
 	uint32_t nSamplesLUT;				// Parámetro en testeo
 	uint32_t nSteps;						// Parámetro en testeo
-	uint32_t nSamples1;
-	uint32_t nSamples2;
+	uint32_t nSamples1;						// Parámetro en testeo
+	uint32_t nSamples2;						// Parámetro en testeo
+	uint32_t tSampling;						// Parámetro en testeo					
 } DF_DPVTypeDef;
 
 // NPV

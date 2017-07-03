@@ -194,6 +194,11 @@ enum yesno{
 	YES = 0x01
 };
 
+typedef enum{
+	NOT_READY = 0x00,
+	READY = 0x01
+}state_pc;
+
 /* FSM global variables */
 extern stateType next_state;
 extern status_I_measure status_I_we1;
@@ -208,7 +213,7 @@ extern mode df_mode;
 extern mode mode_working;
 extern state_pretreatment pretreatment;
 extern general_state state_equipment;	
-
+extern state_pc pc_ready_to_receive;
 
 
 

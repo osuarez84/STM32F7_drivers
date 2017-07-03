@@ -38,18 +38,19 @@ void 	parse_cmd(uint8_t* cmd){
 			communication_mode = C_BT;
 
 			/* Enviamos ACK */
-			while(uartHandle.tx_state != HAL_UART_STATE_READY);
-			hal_uart_tx(&uartHandle, ack, sizeof(ack)-1);
+			//while(uartHandle.tx_state != HAL_UART_STATE_READY);
+			//hal_uart_tx(&uartHandle, ack, sizeof(ack)-1);
 			
 			/* Salimos dejando a la espera los siguientes mensajes de CON */
-			while(uartHandle.rx_state != HAL_UART_STATE_READY);
-			hal_uart_rx(&uartHandle, UART_rxBuff, 39);						// Dejamos la recepción prevista para empezar a recibir datos tipo CON o DISCONECT
+			//while(uartHandle.rx_state != HAL_UART_STATE_READY);
+			//hal_uart_rx(&uartHandle, UART_rxBuff, 39);						// Dejamos la recepción prevista para empezar a recibir datos tipo CON o DISCONECT
 				
 	}
 		
 	/* CON command */
 	else if(cmd[0] == 'C' && cmd[1] == 'O' && cmd[2] == 'N'){			// Vamos a recibir datos 
-			
+		
+		uint32_t i;
 		
 		// ¿Modo de funcionamiento...?
 		switch(cmd[3]){
@@ -69,59 +70,76 @@ void 	parse_cmd(uint8_t* cmd){
 		
 		
 		// Envio del ACK
-		while(uartHandle.tx_state != HAL_UART_STATE_READY);
-		hal_uart_tx(&uartHandle, ack, sizeof(ack)-1);
+		//while(uartHandle.tx_state != HAL_UART_STATE_READY);
+		//hal_uart_tx(&uartHandle, ack, sizeof(ack)-1);
 		
 		
-		// Dejamos la recepción prevista desde PC para siguiente trama bipot y para CANCEL
-		while(uartHandle.rx_state != HAL_UART_STATE_READY);		
-		hal_uart_rx(&uartHandle, UART_rxBuff, 39);
+		// Dejamos la recepción prevista desde PC para siguiente ACK
+		//while(uartHandle.rx_state != HAL_UART_STATE_READY);		
+		//hal_uart_rx(&uartHandle, UART_rxBuff, 3);
+
+		
 		
 	}
 		
 	
 	/* DISCONN command */
 	else if (cmd[0] == 'D' && cmd[1] == 'I' && cmd[2] == 'S' && cmd[3] == 'C' && cmd[4] == 'O' && cmd[5] == 'N' && cmd[6] == 'N'){
-		uint16_t i;
+
 	
 		if (next_state == IDLE){
 			/* Pasamos a estado Conect */
 			communication_mode = C_NONE;
 		
 			/* Recepción de CONECT por BT */
-			while(uartHandle.rx_state != HAL_UART_STATE_READY);		// Dejamos la recepción prevista por si es necesario cancelar desde PC
-			hal_uart_rx(&uartHandle, UART_rxBuff, 6);
+			//while(uartHandle.rx_state != HAL_UART_STATE_READY);		// Dejamos la recepción prevista por si es necesario cancelar desde PC
+			//hal_uart_rx(&uartHandle, UART_rxBuff, 6);
 			
 			led_turn_off(GPIOJ, LED_GREEN);					
 		}
 		
-		else if(next_state == PRETREATMENT | next_state == MEASURING){
-			pretreatment = P_FINISHED;
-			experiment = E_FINISHED;
-			
-			
-			/* Recepción de CON */
-			while(uartHandle.rx_state != HAL_UART_STATE_READY);		// Dejamos la recepción prevista por si es necesario cancelar desde PC
-			hal_uart_rx(&uartHandle, UART_rxBuff, 39);
-			
-			led_turn_off(GPIOJ, LED_GREEN);
-			for (i = 0; i < 20000; i++){}
-			led_turn_on(GPIOJ, LED_GREEN);
-		
-		
-		}
-	
-	
 		/* Enviamos ACK */
-		while(uartHandle.tx_state != HAL_UART_STATE_READY);
-		hal_uart_tx(&uartHandle, ack, sizeof(ack)-1);
+		//while(uartHandle.tx_state != HAL_UART_STATE_READY);
+		//hal_uart_tx(&uartHandle, ack, sizeof(ack)-1);
 				
 
 	
 
 	}
-	
 
+	/* ACK, PC ready to receive data! */
+	else if(cmd[0] == 'A' && cmd[1] == 'C' && cmd[2] == 'K'){
+
+		pc_ready_to_receive = READY;
+		//while(uartHandle.rx_state != HAL_UART_STATE_READY);		
+		//hal_uart_rx(&uartHandle, UART_rxBuff, 39);
+
+	}
+	
+	
+	
+	/* STOP, the experiment is cancelled */
+	else if(cmd[0] == 'S' && cmd[1] == 'T' && cmd[2] == 'O' && cmd[3] == 'P'){
+		
+		uint16_t i;
+		
+		// TODO : pretreatment = P_CANCELLED;
+		experiment = E_CANCELLED;
+	
+		led_turn_off(GPIOJ, LED_GREEN);
+		for (i = 0; i < 20000; i++){}
+		led_turn_on(GPIOJ, LED_GREEN);
+			
+		// Dejamos la recepción de mensajes habilitada
+		//while(uartHandle.rx_state != HAL_UART_STATE_READY);		
+		//hal_uart_rx(&uartHandle, UART_rxBuff, 39);
+			
+
+	}
+	
+	
+	
+	
 	/* Garbage handler */
 	// TODO 
 	// función para descartar basura o mensajes que no me sirvan por el UART6
