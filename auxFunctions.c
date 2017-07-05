@@ -30,56 +30,37 @@ void 	parse_cmd(uint8_t* cmd){
 	/* CONECT command */
 	if (cmd[0] == 'C' && cmd[1] == 'O' && cmd[2] == 'N' && cmd[3] == 'E' && cmd[4] == 'C' && cmd[5] == 'T'){
 
-	
+		if(next_state == CONECT){
 			led_turn_on(GPIOJ, LED_GREEN);
 						
 			/* Disparamos evento FSM */
 			// for testing pourposes using bluetooth
 			communication_mode = C_BT;
-
-			/* Enviamos ACK */
-			//while(uartHandle.tx_state != HAL_UART_STATE_READY);
-			//hal_uart_tx(&uartHandle, ack, sizeof(ack)-1);
-			
-			/* Salimos dejando a la espera los siguientes mensajes de CON */
-			//while(uartHandle.rx_state != HAL_UART_STATE_READY);
-			//hal_uart_rx(&uartHandle, UART_rxBuff, 39);						// Dejamos la recepción prevista para empezar a recibir datos tipo CON o DISCONECT
+		}
 				
 	}
 		
 	/* CON command */
 	else if(cmd[0] == 'C' && cmd[1] == 'O' && cmd[2] == 'N'){			// Vamos a recibir datos 
 		
-		uint32_t i;
-		
-		// ¿Modo de funcionamiento...?
-		switch(cmd[3]){
-			case 0 : 							// pot
-				df_mode = M_POT;
-				break;
-			case 1 :							// bipot
-				df_mode = M_BIPOT;
-				break;
-			case 3:								// galv
-				df_mode = M_GALV;
-				break;
-			case 4:								// EIS
-				df_mode = M_EIS;
-				break;
+		if(next_state == IDLE){
+			// ¿Modo de funcionamiento...?
+			switch(cmd[3]){
+				case 0 : 							// pot
+					df_mode = M_POT;
+					break;
+				case 1 :							// bipot
+					df_mode = M_BIPOT;
+					break;
+				case 3:								// galv
+					df_mode = M_GALV;
+					break;
+				case 4:								// EIS
+					df_mode = M_EIS;
+					break;
+			}
 		}
-		
-		
-		// Envio del ACK
-		//while(uartHandle.tx_state != HAL_UART_STATE_READY);
-		//hal_uart_tx(&uartHandle, ack, sizeof(ack)-1);
-		
-		
-		// Dejamos la recepción prevista desde PC para siguiente ACK
-		//while(uartHandle.rx_state != HAL_UART_STATE_READY);		
-		//hal_uart_rx(&uartHandle, UART_rxBuff, 3);
-
-		
-		
+	
 	}
 		
 	
@@ -91,28 +72,18 @@ void 	parse_cmd(uint8_t* cmd){
 			/* Pasamos a estado Conect */
 			communication_mode = C_NONE;
 		
-			/* Recepción de CONECT por BT */
-			//while(uartHandle.rx_state != HAL_UART_STATE_READY);		// Dejamos la recepción prevista por si es necesario cancelar desde PC
-			//hal_uart_rx(&uartHandle, UART_rxBuff, 6);
-			
 			led_turn_off(GPIOJ, LED_GREEN);					
 		}
 		
-		/* Enviamos ACK */
-		//while(uartHandle.tx_state != HAL_UART_STATE_READY);
-		//hal_uart_tx(&uartHandle, ack, sizeof(ack)-1);
-				
-
-	
-
 	}
 
+	
 	/* ACK, PC ready to receive data! */
 	else if(cmd[0] == 'A' && cmd[1] == 'C' && cmd[2] == 'K'){
 
-		pc_ready_to_receive = READY;
-		//while(uartHandle.rx_state != HAL_UART_STATE_READY);		
-		//hal_uart_rx(&uartHandle, UART_rxBuff, 39);
+		if(next_state == PREP_E){
+			pc_ready_to_receive = READY;
+		}
 
 	}
 	
@@ -121,19 +92,17 @@ void 	parse_cmd(uint8_t* cmd){
 	/* STOP, the experiment is cancelled */
 	else if(cmd[0] == 'S' && cmd[1] == 'T' && cmd[2] == 'O' && cmd[3] == 'P'){
 		
-		uint16_t i;
+		if(next_state == PRETREATMENT | next_state == MEASURING){
+			uint16_t i;
+			
+			// TODO : pretreatment = P_CANCELLED;
+			experiment = E_CANCELLED;
 		
-		// TODO : pretreatment = P_CANCELLED;
-		experiment = E_CANCELLED;
-	
-		led_turn_off(GPIOJ, LED_GREEN);
-		for (i = 0; i < 20000; i++){}
-		led_turn_on(GPIOJ, LED_GREEN);
-			
-		// Dejamos la recepción de mensajes habilitada
-		//while(uartHandle.rx_state != HAL_UART_STATE_READY);		
-		//hal_uart_rx(&uartHandle, UART_rxBuff, 39);
-			
+			led_turn_off(GPIOJ, LED_GREEN);
+			for (i = 0; i < 20000; i++){}
+			led_turn_on(GPIOJ, LED_GREEN);
+		}
+		
 
 	}
 	

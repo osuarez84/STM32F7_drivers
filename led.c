@@ -632,7 +632,6 @@ void pot() {
 		// Dejamos la recepción prevista para recoger el ACK de READY
 		while(uartHandle.rx_state != HAL_UART_STATE_READY){};		
 		hal_uart_rx(&uartHandle, UART_rxBuff, 3);
-
 		
 		// Envio del ACK
 		while(uartHandle.tx_state != HAL_UART_STATE_READY){};
@@ -1307,9 +1306,14 @@ int main(void)
 	NVIC_EnableIRQ(TIM6_DAC_IRQn);
 	
 	
-	// Priorizamos el USART6 (BT) sobre las interrupciones de las temporizaciones
-	//NVIC_SetPriority(USART6_IRQn, 0);
-	//NVIC_SetPriority(TIM6_DAC_IRQn, 1);
+	// Establecemos prioridades de las interrupciones:
+	//	=> la comunicación tiene prioridad sobre los datos que se envían al DAC
+	//	y los que se envían al ADC
+	NVIC_SetPriorityGrouping(4);
+
+	NVIC_SetPriority(USART6_IRQn, 0);
+	NVIC_SetPriority(TIM6_DAC_IRQn, 1);
+	NVIC_SetPriority(SPI2_IRQn, 1);
 	
 		
 	/* I/Os SECTION ---------------------------------------- */
@@ -1397,8 +1401,12 @@ void EXTI0_IRQHandler(void){
   * @retval None
   */
 void SPI2_IRQHandler(void){
+
+	
 	/* call the driver api to process this interrupt */
   hal_spi_irq_handler(&SpiHandle);
+	
+
 }
 
 /**
@@ -1408,7 +1416,11 @@ void SPI2_IRQHandler(void){
   */
 void USART6_IRQHandler(void)
 {
+
+	
   hal_uart_handle_interrupt(&uartHandle);
+	
+
 }
 
 /**
@@ -1418,10 +1430,6 @@ void USART6_IRQHandler(void)
   */
 void TIM6_DAC_IRQHandler(void){
 
-	
-	// Deshabilitamos todas las interrupciones
-	//__set_BASEPRI(6 << (8 - __NVIC_PRIO_BITS));
-	
 	
 	/* TIM6 => contador para WE1 */
 	hal_tim67_int_disable(&tim6Handle); 					// Deshabilitamos interrupción
@@ -1435,7 +1443,7 @@ void TIM6_DAC_IRQHandler(void){
 	
 		// TODO : copiar el pretratamiento de la estructura hecha en el else if del experiment (más abajo)
 		// Si estamos en pretreatment y ha finalizado el tiempo de pretratamiento...
-		if(pretreatment == P_RUNNING){  	
+		if(next_state == PRETREATMENT && pretreatment == P_RUNNING){  	
 				
 			if(cont == 0){				// Hemos leído el último sample del experimento...
 				pretreatment = P_FINISHED;
@@ -1452,7 +1460,7 @@ void TIM6_DAC_IRQHandler(void){
 					
 		}
 
-		else if(experiment == E_RUNNING){		// Si estamos corriendo el experimento...
+		else if(next_state == MEASURING && experiment == E_RUNNING){		// Si estamos corriendo el experimento...
 				
 
 			/* enviamos al DAC otro sample */
@@ -1490,8 +1498,6 @@ void TIM6_DAC_IRQHandler(void){
 	tim6Handle.int_event = NONE_EVENT;
 	
 	
-	// Volvemos a habilitar todas las interrupciones
-	//__set_BASEPRI(0U);
 }
 
 	
@@ -1519,10 +1525,7 @@ void TIM7_IRQHandler(){
 /*This callback will be called by the driver when driver finishes the transmission of data */
 void app_tx_cmp_callback(void *size)
 {
-	uint32_t c;
-	led_turn_on(GPIOJ,LED_RED);
-	for (c = 0; c <= 200000; c++){}
-	led_turn_off(GPIOJ, LED_RED);
+
 	
 }
 
