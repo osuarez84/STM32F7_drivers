@@ -11,6 +11,11 @@
 
 
 /* PRIVATE VARIABLES --------------------------------------------- */
+
+// Variables de testeo
+uint16_t contPtos = 0;
+
+
 /* Devices handlers */
 spi_handle_t SpiHandle;
 uart_handle_t uartHandle;
@@ -25,7 +30,7 @@ uint16_t master_write_data[]={ 	0x8000,0xa78d,0xcb3c,0xe78d,0xf9bb,0xffff,0xf9bb
 uint8_t DACvalue[2];
 
 uint16_t dataADC[1000];
-uint32_t cont = 5;
+
 																
 uint8_t data_out[14] = {0};															
 uint8_t ack[] = "ACK";
@@ -56,6 +61,7 @@ uint16_t LUTeEq[200] = {0};
 
 
 uint8_t cont_bipot = 0;			// Contador para controlar la recepción de datos en modo bipot
+uint32_t contPretreatment = 0;
 
 /* Estructuras para guardar datos experimentos */
 DF_CVTypeDef DF_CV_we1;
@@ -80,6 +86,7 @@ pretreat_t pretreat_we1;
 pretreat_t pretreat_we2;
 exp_config_t exp_config_we1;
 exp_config_t exp_config_we2;
+pret_state_t pret;
 
 /* Variables para guardar el número de samples tanto de
 cada LUT/período como del experimento completo. Esto
@@ -510,6 +517,7 @@ void conection() {
 		// Recibimos los datos de conexión
 		// Deshabilitamos el USB
 		
+		led_turn_on(GPIOJ, LED_GREEN);
 
 		/* Salimos dejando a la espera los siguientes mensajes de CON */
 		while(uartHandle.rx_state != HAL_UART_STATE_READY){};
@@ -519,7 +527,7 @@ void conection() {
 		while(uartHandle.tx_state != HAL_UART_STATE_READY){};
 		hal_uart_tx(&uartHandle, ack, sizeof(ack)-1);
 		
-		
+
 		
 		// Configuramos y lanzamos el heartbeat
 		
@@ -555,7 +563,8 @@ void Idle() {
 	}
 	else if(communication_mode == C_NONE){
 		
-				
+		led_turn_off(GPIOJ, LED_GREEN);			
+		
 		/* Dejamos recepción prevista desde PC para trama CONECT de nuevo */
 		while(uartHandle.rx_state != HAL_UART_STATE_READY){};		
 		hal_uart_rx(&uartHandle, UART_rxBuff, 6);
@@ -563,6 +572,7 @@ void Idle() {
 		/* Enviamos ACK */
 		while(uartHandle.tx_state != HAL_UART_STATE_READY){};
 		hal_uart_tx(&uartHandle, ack, sizeof(ack)-1);
+		
 
 		
 		next_state = CONECT;
@@ -723,6 +733,7 @@ void PrepE() {
 		while(uartHandle.rx_state != HAL_UART_STATE_READY){};		
 		hal_uart_rx(&uartHandle, UART_rxBuff, 39);
 		
+		pret = t_cond;
 		next_state = PRETREATMENT;
 
 		
@@ -736,6 +747,12 @@ void PrepE() {
 }
 
 
+/* NOTA: la generación del pretratamiento se ha planteado de manera distinta a la
+de la generación de las señales para el experimento. En este caso, se mantiene un
+tiempo de triggering para el timer de aprox. 1ms y utilizamos un contador que se carga
+con el valor al que tiene que lleagar para completar el tiempo de cada pretratamiento.
+Esto genera errores debido a imprecisiones en el tiempo de triggering, pero es la unica
+solución si tenemos que trabajar con tiempos de pret. prácticamente ilimitados.*/
 void Pretreatment() {
 	
 	if (pretreatment == P_NONE){
@@ -748,9 +765,67 @@ void Pretreatment() {
 		
 		else if (mode_working == M_POT){
 			
-			// Configuramos TIM6 para DAC WE1
-			//hal_tim67_int_enable(&tim6Handle);
-			//hal_tim67_init(&tim6Handle);
+			// Generamos señales de pretratamiento
+			
+			if(pret == t_cond){
+				// Configuramos TIM6 para DAC WE1
+				// Con los 25MHz del oscilador y con 1ms de disparo
+				// para el timer por cada punto, necesitamos esta configuración :
+				tim6Handle.Init.Period = 49;			
+				tim6Handle.Init.Prescaler = 512;
+				
+				// Calculamos hasta donde debe de contar el contador según el tiempo que cuente el timer...
+				// sabiendo que en cada disparo el timer cuenta aprox 1ms (0.001).
+				contPretreatment = ceil((pretreat_we1.tCond / 1000.0) / 0.001);					// tiempo_pretratamiento / tiempo de trigger del timer
+				
+				
+				hal_tim67_int_enable(&tim6Handle);
+				hal_tim67_init(&tim6Handle);
+				
+				// Sacamos el valor por el DAC
+				hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 0);				// CS to LOW
+				DACvalue[0] = (uint8_t) pretreat_we1.tCond;
+				DACvalue[1] = (uint8_t) (pretreat_we1.tCond >> 8);
+				hal_spi_master_tx(&SpiHandle, DACvalue, 2);
+				while(SpiHandle.State != HAL_SPI_STATE_READY);
+				hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 1);				// CS to HIGH	
+			}
+			
+			else if(pret == t_dep){
+				contPretreatment = ceil((pretreat_we1.tDep / 1000.0) / 0.001);
+				
+				tim6Handle.Init.Period = 49;			
+				tim6Handle.Init.Prescaler = 512;
+				hal_tim67_int_enable(&tim6Handle);
+				hal_tim67_init(&tim6Handle);
+				
+				// Sacamos el valor por el DAC
+				hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 0);				// CS to LOW
+				DACvalue[0] = (uint8_t) pretreat_we1.tDep;
+				DACvalue[1] = (uint8_t) (pretreat_we1.tDep >> 8);
+				hal_spi_master_tx(&SpiHandle, DACvalue, 2);
+				while(SpiHandle.State != HAL_SPI_STATE_READY);
+				hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 1);				// CS to HIGH	
+			
+			}
+			
+			else if(pret == t_eq){
+				contPretreatment = ceil((pretreat_we1.tEq / 1000.0) / 0.001);
+				
+				tim6Handle.Init.Period = 49;			
+				tim6Handle.Init.Prescaler = 512;
+				hal_tim67_int_enable(&tim6Handle);
+				hal_tim67_init(&tim6Handle);
+				
+				// Sacamos el valor por el DAC
+				hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 0);				// CS to LOW
+				DACvalue[0] = (uint8_t) pretreat_we1.tEq;
+				DACvalue[1] = (uint8_t) (pretreat_we1.tEq >> 8);
+				hal_spi_master_tx(&SpiHandle, DACvalue, 2);
+				while(SpiHandle.State != HAL_SPI_STATE_READY);
+				hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 1);				// CS to HIGH	
+			
+			}
 
 		
 		}
@@ -772,43 +847,76 @@ void Pretreatment() {
 	
 	else if(pretreatment == P_RUNNING){
 		// Esperamos a que termine el pretreatment
+
 		
 		
 		
-		#if DEBUG												// Si en pruebas nos saltamos el pretreatment
-			pretreatment = 	P_FINISHED;									 
-		#endif
+		//#if DEBUG												// Si en pruebas nos saltamos el pretreatment
+		//	pretreatment = 	P_FINISHED;									 
+		//#endif
 	
 	}
 	
-	else if (pretreatment == P_FINISHED) {
-		// Esperamos a que el pretratamiento termine
-		if (mode_working == M_BIPOT) {
-			// Enviamos LUT1A a DAC WE1
-			// Enviamos LUT2A a DAC WE2
+	else if (pretreatment == P_FINISHED | pretreatment == P_CANCELLED) {
+		
+		if(pretreatment == P_FINISHED){
+			// Esperamos a que el pretratamiento termine
+			if (mode_working == M_BIPOT) {
+				// Enviamos LUT1A a DAC WE1
+				// Enviamos LUT2A a DAC WE2
 
-			// Comenzamos siguiente refresco LUT1B
-			// Comenzamos siguiente refresco LUT2B
+				// Comenzamos siguiente refresco LUT1B
+				// Comenzamos siguiente refresco LUT2B
 
+			}
+			else if (mode_working == M_POT) {
+				// Generamos LUT1A y LUT1B según la técnica
+
+				// Comenzamos siguiente refresco LUT1B
+				
+				// Inicializamos contador pretratamiento 
+				contPretreatment = 0;
+				
+				
+
+			}
+			else if (mode_working == M_GALV) {
+				// Enviamos LUT1A a DAC WE1
+
+				// Comenzamos siguiente refresco LUT1B
+			}
+			else if (mode_working == M_EIS) {
+				// TODO
+
+			}
 		}
-		else if (mode_working == M_POT) {
-			// Generamos LUT1A y LUT1B según la técnica
-
-			// Comenzamos siguiente refresco LUT1B
+		
+		
+		else if(pretreatment == P_CANCELLED){
+			// Saltamos al siguiente estado sin comprobar nada
+		
+		}
+		
+		// Enviamos finalización de pretratamiento
+		data_out[0] = 'E';
+		data_out[1] = 'N';
+		data_out[2] = 'D';
+		data_out[3] = 'P';
+		data_out[4] = 'R';
+		data_out[5] = 'E';
+		data_out[6] = 'T';
+		data_out[7] = 0;
+		data_out[8] = 0;
+		data_out[9] = 0;
+		data_out[10] = 0;
+		data_out[11] = 0;
+		data_out[12] = 0;
+		data_out[13] = 'F';
 			
+		// Montamos trama datos finalización exp
+		while(uartHandle.tx_state != HAL_UART_STATE_READY){};
+		hal_uart_tx(&uartHandle, data_out, sizeof(data_out));
 			
-
-		}
-		else if (mode_working == M_GALV) {
-			// Enviamos LUT1A a DAC WE1
-
-			// Comenzamos siguiente refresco LUT1B
-		}
-		else if (mode_working == M_EIS) {
-			// TODO
-
-		}
-
 		next_state = MEASURING;
 	}
 
@@ -825,9 +933,15 @@ void Measuring() {
 		
 		
 		if(mode_working == M_POT){
+			
+			
 			// Arrancamos temporización DAC WE1 
 			
-			// Configuramos TIM6 para DAC WE1
+			// Para un filtro de fSampling = 10000Hz que utilizamos en el testeo
+			// calculamos el período que hay que cargar en el timer para obtener 
+			tim6Handle.Init.Prescaler = 512;
+			tim6Handle.Init.Period = ceil((1 / 10000.0) / ((tim6Handle.Init.Prescaler + 1) * (1 / 25000000.0)) );
+			
 			hal_tim67_int_enable(&tim6Handle);
 			hal_tim67_init(&tim6Handle);
 		
@@ -871,9 +985,15 @@ void Measuring() {
 					DACvalue[1] = (uint8_t) (LUTWE1A[contSamplesLUTWE1] >> 8);
 					hal_spi_master_tx(&SpiHandle, DACvalue, 2);
 					while(SpiHandle.State != HAL_SPI_STATE_READY);
-					hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 1);				// CS to HIGH										
-					
+					hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 1);				// CS to HIGH					
+
 					contSamplesLUTWE1++;
+					
+					// Habilitamos de nuevo el timer para el siguiente sample
+					hal_tim67_int_enable(&tim6Handle);				// Habilitamos interrupción TIM6
+					hal_tim67_enable(&tim6Handle);						// Habilitamos el timer					
+					
+
 					
 					// ¿Hay que cambiar de LUT...?
 					if(contSamplesLUTWE1 == nSamplesLUTWE1){
@@ -895,6 +1015,13 @@ void Measuring() {
 					hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 1);				// CS to HIGH		
 
 					contSamplesLUTWE1++;
+					
+					// Habilitamos de nuevo el timer para el siguiente sample
+					hal_tim67_int_enable(&tim6Handle);				// Habilitamos interrupción TIM6
+					hal_tim67_enable(&tim6Handle);						// Habilitamos el timer	
+					
+					
+
 					
 					// ¿Hay que cambiar de LUT...?
 					if(contSamplesLUTWE1 == nSamplesLUTWE1){
@@ -923,6 +1050,7 @@ void Measuring() {
 
 					
 					// Montamos el paquete de datos
+					// Esto dependerá de cada tipo de técnica
 					data_out[0] = 'D';
 					data_out[1] = 'A';
 					data_out[2] = 'T';
@@ -945,6 +1073,7 @@ void Measuring() {
 					//enviar = YES;
 					medidasADC = NO;
 					contMedidasADC = 0;
+					contPtos++;
 				}
 			}
 			
@@ -1187,10 +1316,14 @@ void Ending() {
 		lutwe2A_state = L_EMPTY;
 		lutwe2B_state = L_EMPTY;
 		experiment = E_NONE;
+
 		
 		pc_ready_to_receive = NOT_READY;
 		
 		next_state = IDLE;
+		
+		// Test variables
+		contPtos = 0;		// Nº de data frames enviados durante experimento WE1
 	}
 	else if (state_equipment == S_ERROR) {
 
@@ -1295,7 +1428,7 @@ int main(void)
 	tim6Handle.Instance = TIM6;
 	
 	tim6Handle.Init.CounterMode = TIM_OPM_ENABLE;
-	tim6Handle.Init.Period = 5;
+	//tim6Handle.Init.Period = 5;
 	tim6Handle.Init.Prescaler = 512;
 	tim6Handle.Init.AutoReloadPreload = TIM_ENABLE_AUTO_RELOAD;
 	
@@ -1441,12 +1574,25 @@ void TIM6_DAC_IRQHandler(void){
 	/* Si evento UPDATE EVENT */
 	if(tim6Handle.int_event == UPDATE_EVENT){
 	
-		// TODO : copiar el pretratamiento de la estructura hecha en el else if del experiment (más abajo)
-		// Si estamos en pretreatment y ha finalizado el tiempo de pretratamiento...
-		if(next_state == PRETREATMENT && pretreatment == P_RUNNING){  	
-				
-			if(cont == 0){				// Hemos leído el último sample del experimento...
-				pretreatment = P_FINISHED;
+
+		
+		if(next_state == PRETREATMENT){  	// Si estamos en pretreatment....
+			
+			contPretreatment--;
+			
+			if(contPretreatment == 0){				// Hemos agotado el tiempo del pretratamiento...
+				if(pret == t_cond){							// Si estamos en t cond pasamos a t dep
+					pret = t_dep;
+					pretreatment = P_NONE;					
+				}
+				else if(pret == t_dep){					// Si estamos en t dep pasamos a t eq
+					pret = t_eq;	
+					pretreatment = P_NONE;
+				}
+				else if(pret == t_eq){					// Si estamos en t eq el pretratamiento ha finalizado 
+					hal_tim67_clear_flag(&tim6Handle);				// Borramos la flag de int pendiente
+					pretreatment = P_FINISHED;
+				}
 			}
 			else{
 
@@ -1454,13 +1600,13 @@ void TIM6_DAC_IRQHandler(void){
 				hal_tim67_int_enable(&tim6Handle);
 				hal_tim67_enable(&tim6Handle);	
 					
-				// Testing
-				led_toggle(GPIOJ, LED_GREEN);
 			}
+			
+
 					
 		}
 
-		else if(next_state == MEASURING && experiment == E_RUNNING){		// Si estamos corriendo el experimento...
+		else if(next_state == MEASURING){		// Si estamos corriendo el experimento...
 				
 
 			/* enviamos al DAC otro sample */
@@ -1484,11 +1630,9 @@ void TIM6_DAC_IRQHandler(void){
 			else{
 
 				hal_tim67_clear_flag(&tim6Handle);				// Borramos la flag de int pendiente
-				hal_tim67_int_enable(&tim6Handle);				// Habilitamos interrupción TIM6
-				hal_tim67_enable(&tim6Handle);						// Habilitamos el timer
+//				hal_tim67_int_enable(&tim6Handle);				// Habilitamos interrupción TIM6
+//				hal_tim67_enable(&tim6Handle);						// Habilitamos el timer
 					
-				// Testing
-				led_toggle(GPIOJ, LED_GREEN);
 			}
 
 		}

@@ -604,14 +604,23 @@ void generateDPVwaveform(DF_DPVTypeDef* df, uint16_t* LUT, uint32_t* nSExp, uint
 																	// La idea es que esta frecuencia sea de aprox 20x la frec de corte del filtro.
 																	// Hay que enviar el valor del filtro seleccionado a esta función como argumento.
 		
-		float step = (df->step * VREF) / 32768.0;									// V
-		float sr =  df->sr / 1000.0;															// V/seg
-		float tPulse = df->tPulse / 1000.0;												// seg
-		float start = ((df->start - 32768.0) * VREF) / 32768.0;		// V
-		float stop = ((df->stop - 32768.0) * VREF) / 32768.0;			// V
+		// Recupero todos los decimales para los cálculos...
+		float step =  df->Init.step / 1000.0;		// V  ( ((df->step / 1000.0) * VREF) / 32768.0)
+		float sr =  df->Init.sr / 1000.0;															// V/seg
+		
+		float tPulse = df->Init.tPulse / 1000.0;												// seg
+		float stop = ((int16_t)(df->Init.stop)) / 1000.0;			// V
+		float start = ((int16_t)(df->Init.start)) / 1000.0; //((df->start - 32768.0) * VREF) / 32768.0;		// V
+		float ePulse = ((int16_t)(df->Init.ePulse)) / 1000.0;		
 		
 		float tSampling = 1 / (float)fSampling;
 		float tInt = step / sr;
+		
+		// Transformo a valores DAC para generación de forma de onda...
+		df->start = (((start * 32768.0) / VREF) + 32768.0);
+		df->stop = (((stop * 32768.0) / VREF) + 327680.0);
+		df->ePulse = ((ePulse * 32768.0) / VREF);
+		df->step = ((step * 32768.0) / VREF);
 		
 		// Número de samples para cada tramo de la señal en cada período
 		df->nSamples1 = ceil((tInt - tPulse) / tSampling);
@@ -642,7 +651,7 @@ void generateDPVwaveform(DF_DPVTypeDef* df, uint16_t* LUT, uint32_t* nSExp, uint
 			LUT[j + df->nSamples1] = (df->start + df->ePulse) + (df->step * df->realStep);
 		
 		}
-		df->realStep++;				// Nos sirve para llevar cuenta de en qué step estamos generando la forma de onda. Comienza en cero.
+		//df->realStep++;				// Nos sirve para llevar cuenta de en qué step estamos generando la forma de onda. Comienza en cero.
 	}
 	
 	else {																									// Si steps bajan...
@@ -658,7 +667,7 @@ void generateDPVwaveform(DF_DPVTypeDef* df, uint16_t* LUT, uint32_t* nSExp, uint
 			LUT[j + df->nSamples1] = (df->start + df->ePulse) - (df->step * df->realStep);
 		
 		}
-		df->realStep++;
+		//df->realStep++;
 
 	}
 	
@@ -667,7 +676,7 @@ void generateDPVwaveform(DF_DPVTypeDef* df, uint16_t* LUT, uint32_t* nSExp, uint
 }
 	
 	
-	
+
 	
 void load_data(uint8_t* buff, DF_CVTypeDef* df_cv, DF_LSVTypeDef* df_lsv, DF_SCVTypeDef* df_scv, \
 	DF_DPVTypeDef* df_dpv, DF_NPVTypeDef* df_npv, DF_DNPVTypeDef* df_dnpv, DF_SWVTypeDef* df_swv, DF_ACTypeDef* df_acv, pretreat_t* p,\
@@ -816,12 +825,12 @@ void load_SCV_data(DF_SCVTypeDef* df, uint8_t* cmd){
 void load_DPV_data(DF_DPVTypeDef* df, uint8_t* cmd){
 					
 	/* Experiment values */
-	df->start = ((cmd[22] << 8) | (cmd[23] & 0xFF));
-	df->stop = ((cmd[24] << 8) | (cmd[25] & 0xFF));
-	df->step = ((cmd[26] << 8) | (cmd[27] & 0xFF));
-	df->ePulse =((cmd[28] << 8) | (cmd[29] & 0xFF));
-	df->tPulse = ((cmd[30] << 8) | (cmd[31] & 0xFF));
-	df->sr = ((cmd[32] << 8) | (cmd[33] & 0xFF));
+	df->Init.start = ((cmd[22] << 8) | (cmd[23] & 0xFF));
+	df->Init.stop = ((cmd[24] << 8) | (cmd[25] & 0xFF));
+	df->Init.step = ((cmd[26] << 8) | (cmd[27] & 0xFF));
+	df->Init.ePulse =((cmd[28] << 8) | (cmd[29] & 0xFF));
+	df->Init.tPulse = ((cmd[30] << 8) | (cmd[31] & 0xFF));
+	df->Init.sr = ((cmd[32] << 8) | (cmd[33] & 0xFF));
 		
 	df->realStep = 0;
 

@@ -116,7 +116,18 @@ typedef struct {
 } DF_SCVTypeDef;
 
 // DPV												// Estructura en testeo
+typedef struct{
+	uint16_t start;
+	uint16_t stop;
+	uint16_t step;
+	uint16_t ePulse;
+	uint16_t tPulse;
+	uint16_t sr;
+
+}DF_DPV_Init_t;
+
 typedef struct {
+	DF_DPV_Init_t Init;
 	uint16_t start;
 	uint16_t stop;
 	uint16_t step;

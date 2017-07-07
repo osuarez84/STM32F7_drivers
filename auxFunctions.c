@@ -24,14 +24,10 @@
 */
 void 	parse_cmd(uint8_t* cmd){
 
-	/* TESTING COMMAND RECEPTION */
-	uint8_t ack[] = "ACK";						// Mensaje ACK
-	
 	/* CONECT command */
 	if (cmd[0] == 'C' && cmd[1] == 'O' && cmd[2] == 'N' && cmd[3] == 'E' && cmd[4] == 'C' && cmd[5] == 'T'){
 
 		if(next_state == CONECT){
-			led_turn_on(GPIOJ, LED_GREEN);
 						
 			/* Disparamos evento FSM */
 			// for testing pourposes using bluetooth
@@ -71,8 +67,7 @@ void 	parse_cmd(uint8_t* cmd){
 		if (next_state == IDLE){
 			/* Pasamos a estado Conect */
 			communication_mode = C_NONE;
-		
-			led_turn_off(GPIOJ, LED_GREEN);					
+						
 		}
 		
 	}
@@ -93,14 +88,11 @@ void 	parse_cmd(uint8_t* cmd){
 	else if(cmd[0] == 'S' && cmd[1] == 'T' && cmd[2] == 'O' && cmd[3] == 'P'){
 		
 		if(next_state == PRETREATMENT | next_state == MEASURING){
-			uint16_t i;
 			
-			// TODO : pretreatment = P_CANCELLED;
+			pretreatment = P_CANCELLED;
 			experiment = E_CANCELLED;
 		
-			led_turn_off(GPIOJ, LED_GREEN);
-			for (i = 0; i < 20000; i++){}
-			led_turn_on(GPIOJ, LED_GREEN);
+
 		}
 		
 
@@ -112,7 +104,36 @@ void 	parse_cmd(uint8_t* cmd){
 	/* Garbage handler */
 	// TODO 
 	// función para descartar basura o mensajes que no me sirvan por el UART6
-	else{}
+	else{
+//		if(next_state == CONECT){
+//			/* Seguimos esperando CONECT */
+//			while(uartHandle.rx_state != HAL_UART_STATE_READY){};
+//			hal_uart_rx(&uartHandle, UART_rxBuff, 6);
+//		
+//		}
+//		
+//		else if(next_state == IDLE){
+//			/* Seguimos esperando CON */
+//			while(uartHandle.rx_state != HAL_UART_STATE_READY){};
+//			hal_uart_rx(&uartHandle, UART_rxBuff, 39);
+//		
+//		}
+//		
+//		else if(next_state == PREP_E){
+//			/* Seguimos esperando ACK */
+//			while(uartHandle.rx_state != HAL_UART_STATE_READY){};
+//			hal_uart_rx(&uartHandle, UART_rxBuff, 3);
+//		
+//		}
+//		
+//		else if(next_state == PRETREATMENT | next_state == MEASURING){
+//			/* Seguimos esperando STOP */
+//			while(uartHandle.rx_state != HAL_UART_STATE_READY){};
+//			hal_uart_rx(&uartHandle, UART_rxBuff, 39);
+//		
+//		}
+//	
+	}
 	
 }
 

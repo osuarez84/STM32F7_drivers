@@ -6,14 +6,17 @@ Section Cross References
 
     led.o(i.Ending) refers to led.o(.data) for state_equipment
     led.o(i.FS_ch) refers to led.o(.data) for mode_working
+    led.o(i.Idle) refers to auxfunctions.o(i.led_turn_off) for led_turn_off
     led.o(i.Idle) refers to hal_usart_driver.o(i.hal_uart_rx) for hal_uart_rx
     led.o(i.Idle) refers to hal_usart_driver.o(i.hal_uart_tx) for hal_uart_tx
     led.o(i.Idle) refers to led.o(.data) for df_mode
     led.o(i.Idle) refers to led.o(.bss) for uartHandle
+    led.o(i.Measuring) refers to ceil.o(i.__hardfp_ceil) for __hardfp_ceil
     led.o(i.Measuring) refers to hal_timer6_driver.o(i.hal_tim67_int_enable) for hal_tim67_int_enable
     led.o(i.Measuring) refers to hal_timer6_driver.o(i.hal_tim67_init) for hal_tim67_init
     led.o(i.Measuring) refers to hal_gpio_driver.o(i.hal_gpio_write_to_pin) for hal_gpio_write_to_pin
     led.o(i.Measuring) refers to hal_spi_driver.o(i.hal_spi_master_tx) for hal_spi_master_tx
+    led.o(i.Measuring) refers to hal_timer6_driver.o(i.hal_tim67_enable) for hal_tim67_enable
     led.o(i.Measuring) refers to auxfunctions.o(i.read_ADC_W1) for read_ADC_W1
     led.o(i.Measuring) refers to rand.o(.emb_text) for rand
     led.o(i.Measuring) refers to hal_usart_driver.o(i.hal_uart_tx) for hal_uart_tx
@@ -28,7 +31,14 @@ Section Cross References
     led.o(i.PrepE) refers to hal_usart_driver.o(i.hal_uart_rx) for hal_uart_rx
     led.o(i.PrepE) refers to led.o(.data) for pc_ready_to_receive
     led.o(i.PrepE) refers to led.o(.bss) for uartHandle
+    led.o(i.Pretreatment) refers to ceil.o(i.__hardfp_ceil) for __hardfp_ceil
+    led.o(i.Pretreatment) refers to hal_timer6_driver.o(i.hal_tim67_int_enable) for hal_tim67_int_enable
+    led.o(i.Pretreatment) refers to hal_timer6_driver.o(i.hal_tim67_init) for hal_tim67_init
+    led.o(i.Pretreatment) refers to hal_gpio_driver.o(i.hal_gpio_write_to_pin) for hal_gpio_write_to_pin
+    led.o(i.Pretreatment) refers to hal_spi_driver.o(i.hal_spi_master_tx) for hal_spi_master_tx
+    led.o(i.Pretreatment) refers to hal_usart_driver.o(i.hal_uart_tx) for hal_uart_tx
     led.o(i.Pretreatment) refers to led.o(.data) for pretreatment
+    led.o(i.Pretreatment) refers to led.o(.bss) for tim6Handle
     led.o(i.SPI2_IRQHandler) refers to hal_spi_driver.o(i.hal_spi_irq_handler) for hal_spi_irq_handler
     led.o(i.SPI2_IRQHandler) refers to led.o(.bss) for SpiHandle
     led.o(i.TIM6_DAC_IRQHandler) refers to hal_timer6_driver.o(i.hal_tim67_int_disable) for hal_tim67_int_disable
@@ -37,7 +47,6 @@ Section Cross References
     led.o(i.TIM6_DAC_IRQHandler) refers to hal_timer6_driver.o(i.hal_tim67_clear_flag) for hal_tim67_clear_flag
     led.o(i.TIM6_DAC_IRQHandler) refers to hal_timer6_driver.o(i.hal_tim67_int_enable) for hal_tim67_int_enable
     led.o(i.TIM6_DAC_IRQHandler) refers to hal_timer6_driver.o(i.hal_tim67_enable) for hal_tim67_enable
-    led.o(i.TIM6_DAC_IRQHandler) refers to auxfunctions.o(i.led_toggle) for led_toggle
     led.o(i.TIM6_DAC_IRQHandler) refers to led.o(.bss) for tim6Handle
     led.o(i.TIM6_DAC_IRQHandler) refers to led.o(.data) for next_state
     led.o(i.USART6_IRQHandler) refers to hal_usart_driver.o(i.hal_uart_handle_interrupt) for hal_uart_handle_interrupt
@@ -48,6 +57,7 @@ Section Cross References
     led.o(i.bipot) refers to hal_eq_techniques.o(i.generate_data) for generate_data
     led.o(i.bipot) refers to led.o(.data) for cont_bipot
     led.o(i.bipot) refers to led.o(.bss) for pretreat_we2
+    led.o(i.conection) refers to auxfunctions.o(i.led_turn_on) for led_turn_on
     led.o(i.conection) refers to hal_usart_driver.o(i.hal_uart_rx) for hal_uart_rx
     led.o(i.conection) refers to hal_usart_driver.o(i.hal_uart_tx) for hal_uart_tx
     led.o(i.conection) refers to led.o(.data) for communication_mode
@@ -180,8 +190,6 @@ Section Cross References
     auxfunctions.o(i.led_toggle) refers to hal_gpio_driver.o(i.hal_gpio_write_to_pin) for hal_gpio_write_to_pin
     auxfunctions.o(i.led_turn_off) refers to hal_gpio_driver.o(i.hal_gpio_write_to_pin) for hal_gpio_write_to_pin
     auxfunctions.o(i.led_turn_on) refers to hal_gpio_driver.o(i.hal_gpio_write_to_pin) for hal_gpio_write_to_pin
-    auxfunctions.o(i.parse_cmd) refers to auxfunctions.o(i.led_turn_on) for led_turn_on
-    auxfunctions.o(i.parse_cmd) refers to auxfunctions.o(i.led_turn_off) for led_turn_off
     auxfunctions.o(i.parse_cmd) refers to led.o(.data) for next_state
     auxfunctions.o(i.read_ADC_W1) refers to hal_gpio_driver.o(i.hal_gpio_write_to_pin) for hal_gpio_write_to_pin
     auxfunctions.o(i.read_ADC_W1) refers to hal_gpio_driver.o(i.hal_gpio_read_from_pin) for hal_gpio_read_from_pin
@@ -409,11 +417,12 @@ Removing Unused input sections from the image.
     Removing auxfunctions.o(.rev16_text), (4 bytes).
     Removing auxfunctions.o(.revsh_text), (4 bytes).
     Removing auxfunctions.o(.rrx_text), (6 bytes).
+    Removing auxfunctions.o(i.led_toggle), (40 bytes).
     Removing system_stm32f7xx.o(.rev16_text), (4 bytes).
     Removing system_stm32f7xx.o(.revsh_text), (4 bytes).
     Removing system_stm32f7xx.o(.rrx_text), (6 bytes).
 
-47 unused section(s) (total 3996 bytes) removed from the image.
+48 unused section(s) (total 4036 bytes) removed from the image.
 
 ==============================================================================
 
@@ -424,57 +433,57 @@ Image Symbol Table
     Symbol Name                              Value     Ov Type        Size  Object(Section)
 
     ../clib/angel/boardlib.s                 0x00000000   Number         0  boardinit3.o ABSOLUTE
+    ../clib/angel/boardlib.s                 0x00000000   Number         0  boardshut.o ABSOLUTE
     ../clib/angel/boardlib.s                 0x00000000   Number         0  boardinit1.o ABSOLUTE
     ../clib/angel/boardlib.s                 0x00000000   Number         0  boardinit2.o ABSOLUTE
-    ../clib/angel/boardlib.s                 0x00000000   Number         0  boardshut.o ABSOLUTE
-    ../clib/angel/handlers.s                 0x00000000   Number         0  __scatter_zi.o ABSOLUTE
     ../clib/angel/handlers.s                 0x00000000   Number         0  __scatter_copy.o ABSOLUTE
-    ../clib/angel/kernel.s                   0x00000000   Number         0  __rtentry2.o ABSOLUTE
+    ../clib/angel/handlers.s                 0x00000000   Number         0  __scatter_zi.o ABSOLUTE
     ../clib/angel/kernel.s                   0x00000000   Number         0  rtexit.o ABSOLUTE
     ../clib/angel/kernel.s                   0x00000000   Number         0  __rtentry4.o ABSOLUTE
     ../clib/angel/kernel.s                   0x00000000   Number         0  rtexit2.o ABSOLUTE
     ../clib/angel/kernel.s                   0x00000000   Number         0  __rtentry.o ABSOLUTE
-    ../clib/angel/rt.s                       0x00000000   Number         0  rt_errno_addr.o ABSOLUTE
+    ../clib/angel/kernel.s                   0x00000000   Number         0  __rtentry2.o ABSOLUTE
     ../clib/angel/rt.s                       0x00000000   Number         0  rt_errno_addr_intlibspace.o ABSOLUTE
+    ../clib/angel/rt.s                       0x00000000   Number         0  rt_errno_addr.o ABSOLUTE
     ../clib/angel/rt.s                       0x00000000   Number         0  rt_raise.o ABSOLUTE
     ../clib/angel/scatter.s                  0x00000000   Number         0  __scatter.o ABSOLUTE
     ../clib/angel/startup.s                  0x00000000   Number         0  __main.o ABSOLUTE
-    ../clib/angel/sys.s                      0x00000000   Number         0  indicate_semi.o ABSOLUTE
-    ../clib/angel/sys.s                      0x00000000   Number         0  use_no_semi.o ABSOLUTE
     ../clib/angel/sys.s                      0x00000000   Number         0  libspace.o ABSOLUTE
+    ../clib/angel/sys.s                      0x00000000   Number         0  indicate_semi.o ABSOLUTE
     ../clib/angel/sys.s                      0x00000000   Number         0  sys_stackheap_outer.o ABSOLUTE
+    ../clib/angel/sys.s                      0x00000000   Number         0  use_no_semi.o ABSOLUTE
+    ../clib/angel/sysapp.c                   0x00000000   Number         0  sys_wrch.o ABSOLUTE
     ../clib/angel/sysapp.c                   0x00000000   Number         0  sys_command.o ABSOLUTE
     ../clib/angel/sysapp.c                   0x00000000   Number         0  sys_exit.o ABSOLUTE
-    ../clib/angel/sysapp.c                   0x00000000   Number         0  sys_wrch.o ABSOLUTE
+    ../clib/armsys.c                         0x00000000   Number         0  _get_argv_nomalloc.o ABSOLUTE
     ../clib/armsys.c                         0x00000000   Number         0  argv_veneer.o ABSOLUTE
     ../clib/armsys.c                         0x00000000   Number         0  no_argv.o ABSOLUTE
-    ../clib/armsys.c                         0x00000000   Number         0  _get_argv_nomalloc.o ABSOLUTE
     ../clib/armsys.c                         0x00000000   Number         0  argv_veneer.o ABSOLUTE
     ../clib/fenv.c                           0x00000000   Number         0  _rserrno.o ABSOLUTE
     ../clib/heapalloc.c                      0x00000000   Number         0  hrguard.o ABSOLUTE
     ../clib/heapaux.c                        0x00000000   Number         0  heapauxi.o ABSOLUTE
-    ../clib/libinit.s                        0x00000000   Number         0  libshutdown2.o ABSOLUTE
-    ../clib/libinit.s                        0x00000000   Number         0  libshutdown.o ABSOLUTE
-    ../clib/libinit.s                        0x00000000   Number         0  libinit.o ABSOLUTE
     ../clib/libinit.s                        0x00000000   Number         0  libinit2.o ABSOLUTE
-    ../clib/signal.c                         0x00000000   Number         0  defsig_general.o ABSOLUTE
+    ../clib/libinit.s                        0x00000000   Number         0  libinit.o ABSOLUTE
+    ../clib/libinit.s                        0x00000000   Number         0  libshutdown.o ABSOLUTE
+    ../clib/libinit.s                        0x00000000   Number         0  libshutdown2.o ABSOLUTE
+    ../clib/signal.c                         0x00000000   Number         0  defsig_rtred_inner.o ABSOLUTE
+    ../clib/signal.c                         0x00000000   Number         0  defsig_fpe_inner.o ABSOLUTE
     ../clib/signal.c                         0x00000000   Number         0  defsig_rtmem_outer.o ABSOLUTE
+    ../clib/signal.c                         0x00000000   Number         0  defsig_exit.o ABSOLUTE
+    ../clib/signal.c                         0x00000000   Number         0  defsig_rtmem_inner.o ABSOLUTE
     ../clib/signal.c                         0x00000000   Number         0  defsig_rtmem_formal.o ABSOLUTE
+    ../clib/signal.c                         0x00000000   Number         0  defsig_general.o ABSOLUTE
+    ../clib/signal.c                         0x00000000   Number         0  defsig_stak_inner.o ABSOLUTE
+    ../clib/signal.c                         0x00000000   Number         0  __raise.o ABSOLUTE
+    ../clib/signal.c                         0x00000000   Number         0  defsig_abrt_inner.o ABSOLUTE
     ../clib/signal.c                         0x00000000   Number         0  defsig_other.o ABSOLUTE
     ../clib/signal.c                         0x00000000   Number         0  defsig_segv_inner.o ABSOLUTE
     ../clib/signal.c                         0x00000000   Number         0  defsig_cppl_inner.o ABSOLUTE
-    ../clib/signal.c                         0x00000000   Number         0  defsig_stak_inner.o ABSOLUTE
-    ../clib/signal.c                         0x00000000   Number         0  defsig_rtred_inner.o ABSOLUTE
-    ../clib/signal.c                         0x00000000   Number         0  defsig_fpe_inner.o ABSOLUTE
-    ../clib/signal.c                         0x00000000   Number         0  defsig_abrt_inner.o ABSOLUTE
-    ../clib/signal.c                         0x00000000   Number         0  __raise.o ABSOLUTE
-    ../clib/signal.c                         0x00000000   Number         0  defsig_exit.o ABSOLUTE
-    ../clib/signal.c                         0x00000000   Number         0  defsig_rtmem_inner.o ABSOLUTE
     ../clib/signal.c                         0x00000000   Number         0  defsig_pvfn_inner.o ABSOLUTE
     ../clib/signal.s                         0x00000000   Number         0  defsig.o ABSOLUTE
-    ../clib/stdlib.c                         0x00000000   Number         0  rand.o ABSOLUTE
-    ../clib/stdlib.c                         0x00000000   Number         0  rand.o ABSOLUTE
     ../clib/stdlib.c                         0x00000000   Number         0  exit.o ABSOLUTE
+    ../clib/stdlib.c                         0x00000000   Number         0  rand.o ABSOLUTE
+    ../clib/stdlib.c                         0x00000000   Number         0  rand.o ABSOLUTE
     ../fplib/fpinit.s                        0x00000000   Number         0  fpinit.o ABSOLUTE
     ../fplib/usenofp.s                       0x00000000   Number         0  usenofp.o ABSOLUTE
     ../mathlib/ceil.c                        0x00000000   Number         0  ceil.o ABSOLUTE
@@ -486,8 +495,8 @@ Image Symbol Table
     ../mathlib/rred.c                        0x00000000   Number         0  rred.o ABSOLUTE
     ../mathlib/sin.c                         0x00000000   Number         0  sin_x.o ABSOLUTE
     ../mathlib/sin.c                         0x00000000   Number         0  sin.o ABSOLUTE
-    ../mathlib/sin_i.c                       0x00000000   Number         0  sin_i.o ABSOLUTE
     ../mathlib/sin_i.c                       0x00000000   Number         0  sin_i_x.o ABSOLUTE
+    ../mathlib/sin_i.c                       0x00000000   Number         0  sin_i.o ABSOLUTE
     RTE\Device\STM32F769NIHx\startup_stm32f769xx.s 0x00000000   Number         0  startup_stm32f769xx.o ABSOLUTE
     RTE\Device\STM32F769NIHx\system_stm32f7xx.c 0x00000000   Number         0  system_stm32f7xx.o ABSOLUTE
     RTE\\Device\\STM32F769NIHx\\system_stm32f7xx.c 0x00000000   Number         0  system_stm32f7xx.o ABSOLUTE
@@ -566,158 +575,157 @@ Image Symbol Table
     .text                                    0x080003bc   Section        0  sys_exit.o(.text)
     i.EXTI0_IRQHandler                       0x080003c8   Section        0  led.o(i.EXTI0_IRQHandler)
     i.Ending                                 0x080003cc   Section        0  led.o(i.Ending)
-    i.Error                                  0x08000450   Section        0  led.o(i.Error)
-    i.FS_ch                                  0x08000454   Section        0  led.o(i.FS_ch)
-    i.Idle                                   0x080004cc   Section        0  led.o(i.Idle)
-    i.Measuring                              0x08000560   Section        0  led.o(i.Measuring)
-    i.PrepE                                  0x08000ac8   Section        0  led.o(i.PrepE)
-    i.Pretreatment                           0x08000b68   Section        0  led.o(i.Pretreatment)
-    i.SPI2_IRQHandler                        0x08000bd8   Section        0  led.o(i.SPI2_IRQHandler)
-    i.SystemCoreClockUpdate                  0x08000be8   Section        0  system_stm32f7xx.o(i.SystemCoreClockUpdate)
-    i.SystemInit                             0x08000ca8   Section        0  system_stm32f7xx.o(i.SystemInit)
-    i.TIM6_DAC_IRQHandler                    0x08000d0c   Section        0  led.o(i.TIM6_DAC_IRQHandler)
-    i.TIM7_IRQHandler                        0x08000e00   Section        0  led.o(i.TIM7_IRQHandler)
-    i.USART6_IRQHandler                      0x08000e04   Section        0  led.o(i.USART6_IRQHandler)
-    i.__NVIC_EnableIRQ                       0x08000e14   Section        0  led.o(i.__NVIC_EnableIRQ)
-    __NVIC_EnableIRQ                         0x08000e15   Thumb Code    26  led.o(i.__NVIC_EnableIRQ)
-    i.__NVIC_SetPriority                     0x08000e30   Section        0  led.o(i.__NVIC_SetPriority)
-    __NVIC_SetPriority                       0x08000e31   Thumb Code    32  led.o(i.__NVIC_SetPriority)
-    i.__hardfp_ceil                          0x08000e58   Section        0  ceil.o(i.__hardfp_ceil)
-    i.app_rx_cmp_callback                    0x08000f48   Section        0  led.o(i.app_rx_cmp_callback)
-    i.app_tx_cmp_callback                    0x08000f58   Section        0  led.o(i.app_tx_cmp_callback)
-    i.bipot                                  0x08000f5c   Section        0  led.o(i.bipot)
-    i.calibration                            0x0800111c   Section        0  led.o(i.calibration)
-    i.conection                              0x08001120   Section        0  led.o(i.conection)
-    i.eis                                    0x08001184   Section        0  led.o(i.eis)
-    i.galv                                   0x0800119c   Section        0  led.o(i.galv)
-    i.generateDPVwaveform                    0x080011b4   Section        0  hal_eq_techniques.o(i.generateDPVwaveform)
-    i.generate_data                          0x080013b8   Section        0  hal_eq_techniques.o(i.generate_data)
-    i.gpio_init                              0x08001400   Section        0  led.o(i.gpio_init)
-    i.hal_gpio_configure_pin_mode            0x08001548   Section        0  hal_gpio_driver.o(i.hal_gpio_configure_pin_mode)
-    i.hal_gpio_configure_pin_otype           0x08001558   Section        0  hal_gpio_driver.o(i.hal_gpio_configure_pin_otype)
-    i.hal_gpio_configure_pin_pupd            0x08001566   Section        0  hal_gpio_driver.o(i.hal_gpio_configure_pin_pupd)
-    i.hal_gpio_configure_pin_speed           0x08001576   Section        0  hal_gpio_driver.o(i.hal_gpio_configure_pin_speed)
-    i.hal_gpio_init                          0x08001586   Section        0  hal_gpio_driver.o(i.hal_gpio_init)
-    i.hal_gpio_read_from_pin                 0x080015be   Section        0  hal_gpio_driver.o(i.hal_gpio_read_from_pin)
-    i.hal_gpio_set_alt_function              0x080015ca   Section        0  hal_gpio_driver.o(i.hal_gpio_set_alt_function)
-    i.hal_gpio_write_to_pin                  0x080015fa   Section        0  hal_gpio_driver.o(i.hal_gpio_write_to_pin)
-    i.hal_spi_configure_baudrate             0x08001616   Section        0  hal_spi_driver.o(i.hal_spi_configure_baudrate)
-    hal_spi_configure_baudrate               0x08001617   Thumb Code     8  hal_spi_driver.o(i.hal_spi_configure_baudrate)
-    i.hal_spi_configure_datasize             0x0800161e   Section        0  hal_spi_driver.o(i.hal_spi_configure_datasize)
-    hal_spi_configure_datasize               0x0800161f   Thumb Code   190  hal_spi_driver.o(i.hal_spi_configure_datasize)
-    i.hal_spi_configure_device_mode          0x080016dc   Section        0  hal_spi_driver.o(i.hal_spi_configure_device_mode)
-    hal_spi_configure_device_mode            0x080016dd   Thumb Code    22  hal_spi_driver.o(i.hal_spi_configure_device_mode)
-    i.hal_spi_configure_direction            0x080016f2   Section        0  hal_spi_driver.o(i.hal_spi_configure_direction)
-    hal_spi_configure_direction              0x080016f3   Thumb Code    42  hal_spi_driver.o(i.hal_spi_configure_direction)
-    i.hal_spi_configure_nss_master           0x0800171c   Section        0  hal_spi_driver.o(i.hal_spi_configure_nss_master)
-    hal_spi_configure_nss_master             0x0800171d   Thumb Code    30  hal_spi_driver.o(i.hal_spi_configure_nss_master)
-    i.hal_spi_configure_nss_slave            0x0800173a   Section        0  hal_spi_driver.o(i.hal_spi_configure_nss_slave)
-    hal_spi_configure_nss_slave              0x0800173b   Thumb Code    22  hal_spi_driver.o(i.hal_spi_configure_nss_slave)
-    i.hal_spi_configure_phase_and_polarity   0x08001750   Section        0  hal_spi_driver.o(i.hal_spi_configure_phase_and_polarity)
-    hal_spi_configure_phase_and_polarity     0x08001751   Thumb Code    42  hal_spi_driver.o(i.hal_spi_configure_phase_and_polarity)
-    i.hal_spi_disable_rxne_interrupt         0x0800177a   Section        0  hal_spi_driver.o(i.hal_spi_disable_rxne_interrupt)
-    hal_spi_disable_rxne_interrupt           0x0800177b   Thumb Code    10  hal_spi_driver.o(i.hal_spi_disable_rxne_interrupt)
-    i.hal_spi_disable_txe_interrupt          0x08001784   Section        0  hal_spi_driver.o(i.hal_spi_disable_txe_interrupt)
-    hal_spi_disable_txe_interrupt            0x08001785   Thumb Code    10  hal_spi_driver.o(i.hal_spi_disable_txe_interrupt)
-    i.hal_spi_enable                         0x0800178e   Section        0  hal_spi_driver.o(i.hal_spi_enable)
-    hal_spi_enable                           0x0800178f   Thumb Code    18  hal_spi_driver.o(i.hal_spi_enable)
-    i.hal_spi_enable_txe_interrupt           0x080017a0   Section        0  hal_spi_driver.o(i.hal_spi_enable_txe_interrupt)
-    hal_spi_enable_txe_interrupt             0x080017a1   Thumb Code    10  hal_spi_driver.o(i.hal_spi_enable_txe_interrupt)
-    i.hal_spi_handle_rx_interrupt            0x080017aa   Section        0  hal_spi_driver.o(i.hal_spi_handle_rx_interrupt)
-    hal_spi_handle_rx_interrupt              0x080017ab   Thumb Code    72  hal_spi_driver.o(i.hal_spi_handle_rx_interrupt)
-    i.hal_spi_handle_tx_interrupt            0x080017f2   Section        0  hal_spi_driver.o(i.hal_spi_handle_tx_interrupt)
-    i.hal_spi_init                           0x08001836   Section        0  hal_spi_driver.o(i.hal_spi_init)
-    i.hal_spi_irq_handler                    0x08001882   Section        0  hal_spi_driver.o(i.hal_spi_irq_handler)
-    i.hal_spi_is_bus_busy                    0x080018c6   Section        0  hal_spi_driver.o(i.hal_spi_is_bus_busy)
-    i.hal_spi_master_tx                      0x080018d8   Section        0  hal_spi_driver.o(i.hal_spi_master_tx)
-    i.hal_spi_rx_close_interrupt             0x080018fa   Section        0  hal_spi_driver.o(i.hal_spi_rx_close_interrupt)
-    hal_spi_rx_close_interrupt               0x080018fb   Thumb Code    30  hal_spi_driver.o(i.hal_spi_rx_close_interrupt)
-    i.hal_spi_tx_close_interrupt             0x08001918   Section        0  hal_spi_driver.o(i.hal_spi_tx_close_interrupt)
-    hal_spi_tx_close_interrupt               0x08001919   Thumb Code    30  hal_spi_driver.o(i.hal_spi_tx_close_interrupt)
-    i.hal_tim67_clear_flag                   0x08001936   Section        0  hal_timer6_driver.o(i.hal_tim67_clear_flag)
-    i.hal_tim67_configure_auto_reload_preload 0x08001944   Section        0  hal_timer6_driver.o(i.hal_tim67_configure_auto_reload_preload)
-    hal_tim67_configure_auto_reload_preload  0x08001945   Thumb Code    26  hal_timer6_driver.o(i.hal_tim67_configure_auto_reload_preload)
-    i.hal_tim67_configure_auto_reload_value  0x08001964   Section        0  hal_timer6_driver.o(i.hal_tim67_configure_auto_reload_value)
-    hal_tim67_configure_auto_reload_value    0x08001965   Thumb Code     6  hal_timer6_driver.o(i.hal_tim67_configure_auto_reload_value)
-    i.hal_tim67_configure_counter_mode       0x0800196a   Section        0  hal_timer6_driver.o(i.hal_tim67_configure_counter_mode)
-    hal_tim67_configure_counter_mode         0x0800196b   Thumb Code    22  hal_timer6_driver.o(i.hal_tim67_configure_counter_mode)
-    i.hal_tim67_configure_prescaler          0x08001980   Section        0  hal_timer6_driver.o(i.hal_tim67_configure_prescaler)
-    hal_tim67_configure_prescaler            0x08001981   Thumb Code     6  hal_timer6_driver.o(i.hal_tim67_configure_prescaler)
-    i.hal_tim67_disable                      0x08001986   Section        0  hal_timer6_driver.o(i.hal_tim67_disable)
-    i.hal_tim67_enable                       0x08001994   Section        0  hal_timer6_driver.o(i.hal_tim67_enable)
-    i.hal_tim67_handle_interrupt             0x080019a2   Section        0  hal_timer6_driver.o(i.hal_tim67_handle_interrupt)
-    i.hal_tim67_init                         0x080019c0   Section        0  hal_timer6_driver.o(i.hal_tim67_init)
-    i.hal_tim67_int_disable                  0x080019f0   Section        0  hal_timer6_driver.o(i.hal_tim67_int_disable)
-    i.hal_tim67_int_enable                   0x08001a0e   Section        0  hal_timer6_driver.o(i.hal_tim67_int_enable)
-    i.hal_uart_clear_error_flag              0x08001a2c   Section        0  hal_usart_driver.o(i.hal_uart_clear_error_flag)
-    hal_uart_clear_error_flag                0x08001a2d   Thumb Code    12  hal_usart_driver.o(i.hal_uart_clear_error_flag)
-    i.hal_uart_configure_error_interrupt     0x08001a38   Section        0  hal_usart_driver.o(i.hal_uart_configure_error_interrupt)
-    hal_uart_configure_error_interrupt       0x08001a39   Thumb Code    22  hal_usart_driver.o(i.hal_uart_configure_error_interrupt)
-    i.hal_uart_configure_over_sampling       0x08001a4e   Section        0  hal_usart_driver.o(i.hal_uart_configure_over_sampling)
-    hal_uart_configure_over_sampling         0x08001a4f   Thumb Code    12  hal_usart_driver.o(i.hal_uart_configure_over_sampling)
-    i.hal_uart_configure_parity_error_interrupt 0x08001a5a   Section        0  hal_usart_driver.o(i.hal_uart_configure_parity_error_interrupt)
-    hal_uart_configure_parity_error_interrupt 0x08001a5b   Thumb Code    22  hal_usart_driver.o(i.hal_uart_configure_parity_error_interrupt)
-    i.hal_uart_configure_rxne_interrupt      0x08001a70   Section        0  hal_usart_driver.o(i.hal_uart_configure_rxne_interrupt)
-    hal_uart_configure_rxne_interrupt        0x08001a71   Thumb Code    22  hal_usart_driver.o(i.hal_uart_configure_rxne_interrupt)
-    i.hal_uart_configure_stop_bits           0x08001a86   Section        0  hal_usart_driver.o(i.hal_uart_configure_stop_bits)
-    hal_uart_configure_stop_bits             0x08001a87   Thumb Code    70  hal_usart_driver.o(i.hal_uart_configure_stop_bits)
-    i.hal_uart_configure_txe_interrupt       0x08001acc   Section        0  hal_usart_driver.o(i.hal_uart_configure_txe_interrupt)
-    hal_uart_configure_txe_interrupt         0x08001acd   Thumb Code    22  hal_usart_driver.o(i.hal_uart_configure_txe_interrupt)
-    i.hal_uart_configure_word_length         0x08001ae2   Section        0  hal_usart_driver.o(i.hal_uart_configure_word_length)
-    hal_uart_configure_word_length           0x08001ae3   Thumb Code   104  hal_usart_driver.o(i.hal_uart_configure_word_length)
-    i.hal_uart_enable                        0x08001b4a   Section        0  hal_usart_driver.o(i.hal_uart_enable)
-    hal_uart_enable                          0x08001b4b   Thumb Code    10  hal_usart_driver.o(i.hal_uart_enable)
-    i.hal_uart_enable_disable_rx             0x08001b54   Section        0  hal_usart_driver.o(i.hal_uart_enable_disable_rx)
-    hal_uart_enable_disable_rx               0x08001b55   Thumb Code    26  hal_usart_driver.o(i.hal_uart_enable_disable_rx)
-    i.hal_uart_enable_disable_tx             0x08001b6e   Section        0  hal_usart_driver.o(i.hal_uart_enable_disable_tx)
-    hal_uart_enable_disable_tx               0x08001b6f   Thumb Code    26  hal_usart_driver.o(i.hal_uart_enable_disable_tx)
-    i.hal_uart_handle_RXNE_interrupt         0x08001b88   Section        0  hal_usart_driver.o(i.hal_uart_handle_RXNE_interrupt)
-    hal_uart_handle_RXNE_interrupt           0x08001b89   Thumb Code   116  hal_usart_driver.o(i.hal_uart_handle_RXNE_interrupt)
-    i.hal_uart_handle_TC_interrupt           0x08001bfc   Section        0  hal_usart_driver.o(i.hal_uart_handle_TC_interrupt)
-    hal_uart_handle_TC_interrupt             0x08001bfd   Thumb Code    36  hal_usart_driver.o(i.hal_uart_handle_TC_interrupt)
-    i.hal_uart_handle_TXE_interrupt          0x08001c20   Section        0  hal_usart_driver.o(i.hal_uart_handle_TXE_interrupt)
-    hal_uart_handle_TXE_interrupt            0x08001c21   Thumb Code    60  hal_usart_driver.o(i.hal_uart_handle_TXE_interrupt)
-    i.hal_uart_handle_interrupt              0x08001c5c   Section        0  hal_usart_driver.o(i.hal_uart_handle_interrupt)
-    i.hal_uart_init                          0x08001d3c   Section        0  hal_usart_driver.o(i.hal_uart_init)
-    i.hal_uart_rx                            0x08001d86   Section        0  hal_usart_driver.o(i.hal_uart_rx)
-    i.hal_uart_set_baud_rate                 0x08001dbc   Section        0  hal_usart_driver.o(i.hal_uart_set_baud_rate)
-    hal_uart_set_baud_rate                   0x08001dbd   Thumb Code    32  hal_usart_driver.o(i.hal_uart_set_baud_rate)
-    i.hal_uart_tx                            0x08001ddc   Section        0  hal_usart_driver.o(i.hal_uart_tx)
-    i.initClock                              0x08001e00   Section        0  led.o(i.initClock)
-    i.led_init                               0x08001e4c   Section        0  led.o(i.led_init)
-    i.led_toggle                             0x08001e90   Section        0  auxfunctions.o(i.led_toggle)
-    i.led_turn_off                           0x08001eb8   Section        0  auxfunctions.o(i.led_turn_off)
-    i.led_turn_on                            0x08001eca   Section        0  auxfunctions.o(i.led_turn_on)
-    i.load_ACV_data                          0x08001edc   Section        0  hal_eq_techniques.o(i.load_ACV_data)
-    i.load_CV_data                           0x080020b0   Section        0  hal_eq_techniques.o(i.load_CV_data)
-    i.load_DNPV_data                         0x08002244   Section        0  hal_eq_techniques.o(i.load_DNPV_data)
-    i.load_DPV_data                          0x08002418   Section        0  hal_eq_techniques.o(i.load_DPV_data)
-    i.load_LSV_data                          0x08002460   Section        0  hal_eq_techniques.o(i.load_LSV_data)
-    i.load_NPV_data                          0x0800259c   Section        0  hal_eq_techniques.o(i.load_NPV_data)
-    i.load_SCV_data                          0x08002720   Section        0  hal_eq_techniques.o(i.load_SCV_data)
-    i.load_SWV_data                          0x080028b4   Section        0  hal_eq_techniques.o(i.load_SWV_data)
-    i.load_data                              0x08002a38   Section        0  hal_eq_techniques.o(i.load_data)
-    i.main                                   0x08002afc   Section        0  led.o(i.main)
-    i.parse_cmd                              0x08002d24   Section        0  auxfunctions.o(i.parse_cmd)
-    i.pot                                    0x08002e9c   Section        0  led.o(i.pot)
-    i.read_ADC_W1                            0x08002fa8   Section        0  auxfunctions.o(i.read_ADC_W1)
-    i.spi_gpio_init                          0x08003014   Section        0  led.o(i.spi_gpio_init)
-    i.start                                  0x08003094   Section        0  led.o(i.start)
-    i.uart_gpio_init                         0x0800310c   Section        0  led.o(i.uart_gpio_init)
-    x$fpl$fpinit                             0x08003164   Section       10  fpinit.o(x$fpl$fpinit)
-    $v0                                      0x08003164   Number         0  fpinit.o(x$fpl$fpinit)
-    .constdata                               0x0800316e   Section       24  system_stm32f7xx.o(.constdata)
-    x$fpl$usenofp                            0x0800316e   Section        0  usenofp.o(x$fpl$usenofp)
-    .data                                    0x20020000   Section      200  led.o(.data)
-    .data                                    0x200200c8   Section        4  system_stm32f7xx.o(.data)
-    .bss                                     0x200200cc   Section    163862  led.o(.bss)
-    .bss                                     0x200480e4   Section      228  rand.o(.bss)
-    .bss                                     0x200481c8   Section       96  libspace.o(.bss)
-    HEAP                                     0x20048228   Section      512  startup_stm32f769xx.o(HEAP)
-    Heap_Mem                                 0x20048228   Data         512  startup_stm32f769xx.o(HEAP)
-    STACK                                    0x20048428   Section     1024  startup_stm32f769xx.o(STACK)
-    Stack_Mem                                0x20048428   Data        1024  startup_stm32f769xx.o(STACK)
-    __initial_sp                             0x20048828   Data           0  startup_stm32f769xx.o(STACK)
+    i.Error                                  0x08000458   Section        0  led.o(i.Error)
+    i.FS_ch                                  0x0800045c   Section        0  led.o(i.FS_ch)
+    i.Idle                                   0x080004d4   Section        0  led.o(i.Idle)
+    i.Measuring                              0x08000574   Section        0  led.o(i.Measuring)
+    i.PrepE                                  0x08000b68   Section        0  led.o(i.PrepE)
+    i.Pretreatment                           0x08000c14   Section        0  led.o(i.Pretreatment)
+    i.SPI2_IRQHandler                        0x08000ed8   Section        0  led.o(i.SPI2_IRQHandler)
+    i.SystemCoreClockUpdate                  0x08000ee8   Section        0  system_stm32f7xx.o(i.SystemCoreClockUpdate)
+    i.SystemInit                             0x08000fa8   Section        0  system_stm32f7xx.o(i.SystemInit)
+    i.TIM6_DAC_IRQHandler                    0x0800100c   Section        0  led.o(i.TIM6_DAC_IRQHandler)
+    i.TIM7_IRQHandler                        0x08001118   Section        0  led.o(i.TIM7_IRQHandler)
+    i.USART6_IRQHandler                      0x0800111c   Section        0  led.o(i.USART6_IRQHandler)
+    i.__NVIC_EnableIRQ                       0x0800112c   Section        0  led.o(i.__NVIC_EnableIRQ)
+    __NVIC_EnableIRQ                         0x0800112d   Thumb Code    26  led.o(i.__NVIC_EnableIRQ)
+    i.__NVIC_SetPriority                     0x08001148   Section        0  led.o(i.__NVIC_SetPriority)
+    __NVIC_SetPriority                       0x08001149   Thumb Code    32  led.o(i.__NVIC_SetPriority)
+    i.__hardfp_ceil                          0x08001170   Section        0  ceil.o(i.__hardfp_ceil)
+    i.app_rx_cmp_callback                    0x08001260   Section        0  led.o(i.app_rx_cmp_callback)
+    i.app_tx_cmp_callback                    0x08001270   Section        0  led.o(i.app_tx_cmp_callback)
+    i.bipot                                  0x08001274   Section        0  led.o(i.bipot)
+    i.calibration                            0x08001434   Section        0  led.o(i.calibration)
+    i.conection                              0x08001438   Section        0  led.o(i.conection)
+    i.eis                                    0x080014a8   Section        0  led.o(i.eis)
+    i.galv                                   0x080014c0   Section        0  led.o(i.galv)
+    i.generateDPVwaveform                    0x080014d8   Section        0  hal_eq_techniques.o(i.generateDPVwaveform)
+    i.generate_data                          0x0800175c   Section        0  hal_eq_techniques.o(i.generate_data)
+    i.gpio_init                              0x080017a4   Section        0  led.o(i.gpio_init)
+    i.hal_gpio_configure_pin_mode            0x080018ec   Section        0  hal_gpio_driver.o(i.hal_gpio_configure_pin_mode)
+    i.hal_gpio_configure_pin_otype           0x080018fc   Section        0  hal_gpio_driver.o(i.hal_gpio_configure_pin_otype)
+    i.hal_gpio_configure_pin_pupd            0x0800190a   Section        0  hal_gpio_driver.o(i.hal_gpio_configure_pin_pupd)
+    i.hal_gpio_configure_pin_speed           0x0800191a   Section        0  hal_gpio_driver.o(i.hal_gpio_configure_pin_speed)
+    i.hal_gpio_init                          0x0800192a   Section        0  hal_gpio_driver.o(i.hal_gpio_init)
+    i.hal_gpio_read_from_pin                 0x08001962   Section        0  hal_gpio_driver.o(i.hal_gpio_read_from_pin)
+    i.hal_gpio_set_alt_function              0x0800196e   Section        0  hal_gpio_driver.o(i.hal_gpio_set_alt_function)
+    i.hal_gpio_write_to_pin                  0x0800199e   Section        0  hal_gpio_driver.o(i.hal_gpio_write_to_pin)
+    i.hal_spi_configure_baudrate             0x080019ba   Section        0  hal_spi_driver.o(i.hal_spi_configure_baudrate)
+    hal_spi_configure_baudrate               0x080019bb   Thumb Code     8  hal_spi_driver.o(i.hal_spi_configure_baudrate)
+    i.hal_spi_configure_datasize             0x080019c2   Section        0  hal_spi_driver.o(i.hal_spi_configure_datasize)
+    hal_spi_configure_datasize               0x080019c3   Thumb Code   190  hal_spi_driver.o(i.hal_spi_configure_datasize)
+    i.hal_spi_configure_device_mode          0x08001a80   Section        0  hal_spi_driver.o(i.hal_spi_configure_device_mode)
+    hal_spi_configure_device_mode            0x08001a81   Thumb Code    22  hal_spi_driver.o(i.hal_spi_configure_device_mode)
+    i.hal_spi_configure_direction            0x08001a96   Section        0  hal_spi_driver.o(i.hal_spi_configure_direction)
+    hal_spi_configure_direction              0x08001a97   Thumb Code    42  hal_spi_driver.o(i.hal_spi_configure_direction)
+    i.hal_spi_configure_nss_master           0x08001ac0   Section        0  hal_spi_driver.o(i.hal_spi_configure_nss_master)
+    hal_spi_configure_nss_master             0x08001ac1   Thumb Code    30  hal_spi_driver.o(i.hal_spi_configure_nss_master)
+    i.hal_spi_configure_nss_slave            0x08001ade   Section        0  hal_spi_driver.o(i.hal_spi_configure_nss_slave)
+    hal_spi_configure_nss_slave              0x08001adf   Thumb Code    22  hal_spi_driver.o(i.hal_spi_configure_nss_slave)
+    i.hal_spi_configure_phase_and_polarity   0x08001af4   Section        0  hal_spi_driver.o(i.hal_spi_configure_phase_and_polarity)
+    hal_spi_configure_phase_and_polarity     0x08001af5   Thumb Code    42  hal_spi_driver.o(i.hal_spi_configure_phase_and_polarity)
+    i.hal_spi_disable_rxne_interrupt         0x08001b1e   Section        0  hal_spi_driver.o(i.hal_spi_disable_rxne_interrupt)
+    hal_spi_disable_rxne_interrupt           0x08001b1f   Thumb Code    10  hal_spi_driver.o(i.hal_spi_disable_rxne_interrupt)
+    i.hal_spi_disable_txe_interrupt          0x08001b28   Section        0  hal_spi_driver.o(i.hal_spi_disable_txe_interrupt)
+    hal_spi_disable_txe_interrupt            0x08001b29   Thumb Code    10  hal_spi_driver.o(i.hal_spi_disable_txe_interrupt)
+    i.hal_spi_enable                         0x08001b32   Section        0  hal_spi_driver.o(i.hal_spi_enable)
+    hal_spi_enable                           0x08001b33   Thumb Code    18  hal_spi_driver.o(i.hal_spi_enable)
+    i.hal_spi_enable_txe_interrupt           0x08001b44   Section        0  hal_spi_driver.o(i.hal_spi_enable_txe_interrupt)
+    hal_spi_enable_txe_interrupt             0x08001b45   Thumb Code    10  hal_spi_driver.o(i.hal_spi_enable_txe_interrupt)
+    i.hal_spi_handle_rx_interrupt            0x08001b4e   Section        0  hal_spi_driver.o(i.hal_spi_handle_rx_interrupt)
+    hal_spi_handle_rx_interrupt              0x08001b4f   Thumb Code    72  hal_spi_driver.o(i.hal_spi_handle_rx_interrupt)
+    i.hal_spi_handle_tx_interrupt            0x08001b96   Section        0  hal_spi_driver.o(i.hal_spi_handle_tx_interrupt)
+    i.hal_spi_init                           0x08001bda   Section        0  hal_spi_driver.o(i.hal_spi_init)
+    i.hal_spi_irq_handler                    0x08001c26   Section        0  hal_spi_driver.o(i.hal_spi_irq_handler)
+    i.hal_spi_is_bus_busy                    0x08001c6a   Section        0  hal_spi_driver.o(i.hal_spi_is_bus_busy)
+    i.hal_spi_master_tx                      0x08001c7c   Section        0  hal_spi_driver.o(i.hal_spi_master_tx)
+    i.hal_spi_rx_close_interrupt             0x08001c9e   Section        0  hal_spi_driver.o(i.hal_spi_rx_close_interrupt)
+    hal_spi_rx_close_interrupt               0x08001c9f   Thumb Code    30  hal_spi_driver.o(i.hal_spi_rx_close_interrupt)
+    i.hal_spi_tx_close_interrupt             0x08001cbc   Section        0  hal_spi_driver.o(i.hal_spi_tx_close_interrupt)
+    hal_spi_tx_close_interrupt               0x08001cbd   Thumb Code    30  hal_spi_driver.o(i.hal_spi_tx_close_interrupt)
+    i.hal_tim67_clear_flag                   0x08001cda   Section        0  hal_timer6_driver.o(i.hal_tim67_clear_flag)
+    i.hal_tim67_configure_auto_reload_preload 0x08001ce8   Section        0  hal_timer6_driver.o(i.hal_tim67_configure_auto_reload_preload)
+    hal_tim67_configure_auto_reload_preload  0x08001ce9   Thumb Code    26  hal_timer6_driver.o(i.hal_tim67_configure_auto_reload_preload)
+    i.hal_tim67_configure_auto_reload_value  0x08001d08   Section        0  hal_timer6_driver.o(i.hal_tim67_configure_auto_reload_value)
+    hal_tim67_configure_auto_reload_value    0x08001d09   Thumb Code     6  hal_timer6_driver.o(i.hal_tim67_configure_auto_reload_value)
+    i.hal_tim67_configure_counter_mode       0x08001d0e   Section        0  hal_timer6_driver.o(i.hal_tim67_configure_counter_mode)
+    hal_tim67_configure_counter_mode         0x08001d0f   Thumb Code    22  hal_timer6_driver.o(i.hal_tim67_configure_counter_mode)
+    i.hal_tim67_configure_prescaler          0x08001d24   Section        0  hal_timer6_driver.o(i.hal_tim67_configure_prescaler)
+    hal_tim67_configure_prescaler            0x08001d25   Thumb Code     6  hal_timer6_driver.o(i.hal_tim67_configure_prescaler)
+    i.hal_tim67_disable                      0x08001d2a   Section        0  hal_timer6_driver.o(i.hal_tim67_disable)
+    i.hal_tim67_enable                       0x08001d38   Section        0  hal_timer6_driver.o(i.hal_tim67_enable)
+    i.hal_tim67_handle_interrupt             0x08001d46   Section        0  hal_timer6_driver.o(i.hal_tim67_handle_interrupt)
+    i.hal_tim67_init                         0x08001d64   Section        0  hal_timer6_driver.o(i.hal_tim67_init)
+    i.hal_tim67_int_disable                  0x08001d94   Section        0  hal_timer6_driver.o(i.hal_tim67_int_disable)
+    i.hal_tim67_int_enable                   0x08001db2   Section        0  hal_timer6_driver.o(i.hal_tim67_int_enable)
+    i.hal_uart_clear_error_flag              0x08001dd0   Section        0  hal_usart_driver.o(i.hal_uart_clear_error_flag)
+    hal_uart_clear_error_flag                0x08001dd1   Thumb Code    12  hal_usart_driver.o(i.hal_uart_clear_error_flag)
+    i.hal_uart_configure_error_interrupt     0x08001ddc   Section        0  hal_usart_driver.o(i.hal_uart_configure_error_interrupt)
+    hal_uart_configure_error_interrupt       0x08001ddd   Thumb Code    22  hal_usart_driver.o(i.hal_uart_configure_error_interrupt)
+    i.hal_uart_configure_over_sampling       0x08001df2   Section        0  hal_usart_driver.o(i.hal_uart_configure_over_sampling)
+    hal_uart_configure_over_sampling         0x08001df3   Thumb Code    12  hal_usart_driver.o(i.hal_uart_configure_over_sampling)
+    i.hal_uart_configure_parity_error_interrupt 0x08001dfe   Section        0  hal_usart_driver.o(i.hal_uart_configure_parity_error_interrupt)
+    hal_uart_configure_parity_error_interrupt 0x08001dff   Thumb Code    22  hal_usart_driver.o(i.hal_uart_configure_parity_error_interrupt)
+    i.hal_uart_configure_rxne_interrupt      0x08001e14   Section        0  hal_usart_driver.o(i.hal_uart_configure_rxne_interrupt)
+    hal_uart_configure_rxne_interrupt        0x08001e15   Thumb Code    22  hal_usart_driver.o(i.hal_uart_configure_rxne_interrupt)
+    i.hal_uart_configure_stop_bits           0x08001e2a   Section        0  hal_usart_driver.o(i.hal_uart_configure_stop_bits)
+    hal_uart_configure_stop_bits             0x08001e2b   Thumb Code    70  hal_usart_driver.o(i.hal_uart_configure_stop_bits)
+    i.hal_uart_configure_txe_interrupt       0x08001e70   Section        0  hal_usart_driver.o(i.hal_uart_configure_txe_interrupt)
+    hal_uart_configure_txe_interrupt         0x08001e71   Thumb Code    22  hal_usart_driver.o(i.hal_uart_configure_txe_interrupt)
+    i.hal_uart_configure_word_length         0x08001e86   Section        0  hal_usart_driver.o(i.hal_uart_configure_word_length)
+    hal_uart_configure_word_length           0x08001e87   Thumb Code   104  hal_usart_driver.o(i.hal_uart_configure_word_length)
+    i.hal_uart_enable                        0x08001eee   Section        0  hal_usart_driver.o(i.hal_uart_enable)
+    hal_uart_enable                          0x08001eef   Thumb Code    10  hal_usart_driver.o(i.hal_uart_enable)
+    i.hal_uart_enable_disable_rx             0x08001ef8   Section        0  hal_usart_driver.o(i.hal_uart_enable_disable_rx)
+    hal_uart_enable_disable_rx               0x08001ef9   Thumb Code    26  hal_usart_driver.o(i.hal_uart_enable_disable_rx)
+    i.hal_uart_enable_disable_tx             0x08001f12   Section        0  hal_usart_driver.o(i.hal_uart_enable_disable_tx)
+    hal_uart_enable_disable_tx               0x08001f13   Thumb Code    26  hal_usart_driver.o(i.hal_uart_enable_disable_tx)
+    i.hal_uart_handle_RXNE_interrupt         0x08001f2c   Section        0  hal_usart_driver.o(i.hal_uart_handle_RXNE_interrupt)
+    hal_uart_handle_RXNE_interrupt           0x08001f2d   Thumb Code   116  hal_usart_driver.o(i.hal_uart_handle_RXNE_interrupt)
+    i.hal_uart_handle_TC_interrupt           0x08001fa0   Section        0  hal_usart_driver.o(i.hal_uart_handle_TC_interrupt)
+    hal_uart_handle_TC_interrupt             0x08001fa1   Thumb Code    36  hal_usart_driver.o(i.hal_uart_handle_TC_interrupt)
+    i.hal_uart_handle_TXE_interrupt          0x08001fc4   Section        0  hal_usart_driver.o(i.hal_uart_handle_TXE_interrupt)
+    hal_uart_handle_TXE_interrupt            0x08001fc5   Thumb Code    60  hal_usart_driver.o(i.hal_uart_handle_TXE_interrupt)
+    i.hal_uart_handle_interrupt              0x08002000   Section        0  hal_usart_driver.o(i.hal_uart_handle_interrupt)
+    i.hal_uart_init                          0x080020e0   Section        0  hal_usart_driver.o(i.hal_uart_init)
+    i.hal_uart_rx                            0x0800212a   Section        0  hal_usart_driver.o(i.hal_uart_rx)
+    i.hal_uart_set_baud_rate                 0x08002160   Section        0  hal_usart_driver.o(i.hal_uart_set_baud_rate)
+    hal_uart_set_baud_rate                   0x08002161   Thumb Code    32  hal_usart_driver.o(i.hal_uart_set_baud_rate)
+    i.hal_uart_tx                            0x08002180   Section        0  hal_usart_driver.o(i.hal_uart_tx)
+    i.initClock                              0x080021a4   Section        0  led.o(i.initClock)
+    i.led_init                               0x080021f0   Section        0  led.o(i.led_init)
+    i.led_turn_off                           0x08002234   Section        0  auxfunctions.o(i.led_turn_off)
+    i.led_turn_on                            0x08002246   Section        0  auxfunctions.o(i.led_turn_on)
+    i.load_ACV_data                          0x08002258   Section        0  hal_eq_techniques.o(i.load_ACV_data)
+    i.load_CV_data                           0x0800242c   Section        0  hal_eq_techniques.o(i.load_CV_data)
+    i.load_DNPV_data                         0x080025c0   Section        0  hal_eq_techniques.o(i.load_DNPV_data)
+    i.load_DPV_data                          0x08002794   Section        0  hal_eq_techniques.o(i.load_DPV_data)
+    i.load_LSV_data                          0x080027dc   Section        0  hal_eq_techniques.o(i.load_LSV_data)
+    i.load_NPV_data                          0x08002918   Section        0  hal_eq_techniques.o(i.load_NPV_data)
+    i.load_SCV_data                          0x08002a9c   Section        0  hal_eq_techniques.o(i.load_SCV_data)
+    i.load_SWV_data                          0x08002c30   Section        0  hal_eq_techniques.o(i.load_SWV_data)
+    i.load_data                              0x08002db4   Section        0  hal_eq_techniques.o(i.load_data)
+    i.main                                   0x08002e78   Section        0  led.o(i.main)
+    i.parse_cmd                              0x08003098   Section        0  auxfunctions.o(i.parse_cmd)
+    i.pot                                    0x080031d4   Section        0  led.o(i.pot)
+    i.read_ADC_W1                            0x080032e0   Section        0  auxfunctions.o(i.read_ADC_W1)
+    i.spi_gpio_init                          0x0800334c   Section        0  led.o(i.spi_gpio_init)
+    i.start                                  0x080033cc   Section        0  led.o(i.start)
+    i.uart_gpio_init                         0x08003444   Section        0  led.o(i.uart_gpio_init)
+    x$fpl$fpinit                             0x0800349c   Section       10  fpinit.o(x$fpl$fpinit)
+    $v0                                      0x0800349c   Number         0  fpinit.o(x$fpl$fpinit)
+    .constdata                               0x080034a6   Section       24  system_stm32f7xx.o(.constdata)
+    x$fpl$usenofp                            0x080034a6   Section        0  usenofp.o(x$fpl$usenofp)
+    .data                                    0x20020000   Section      204  led.o(.data)
+    .data                                    0x200200cc   Section        4  system_stm32f7xx.o(.data)
+    .bss                                     0x200200d0   Section    163886  led.o(.bss)
+    .bss                                     0x20048100   Section      228  rand.o(.bss)
+    .bss                                     0x200481e4   Section       96  libspace.o(.bss)
+    HEAP                                     0x20048248   Section      512  startup_stm32f769xx.o(HEAP)
+    Heap_Mem                                 0x20048248   Data         512  startup_stm32f769xx.o(HEAP)
+    STACK                                    0x20048448   Section     1024  startup_stm32f769xx.o(STACK)
+    Stack_Mem                                0x20048448   Data        1024  startup_stm32f769xx.o(STACK)
+    __initial_sp                             0x20048848   Data           0  startup_stm32f769xx.o(STACK)
 
     Global Symbols
 
@@ -935,160 +943,161 @@ Image Symbol Table
     __semihosting_library_function           0x080003bb   Thumb Code     0  indicate_semi.o(.text)
     _sys_exit                                0x080003bd   Thumb Code     8  sys_exit.o(.text)
     EXTI0_IRQHandler                         0x080003c9   Thumb Code     2  led.o(i.EXTI0_IRQHandler)
-    Ending                                   0x080003cd   Thumb Code    78  led.o(i.Ending)
-    Error                                    0x08000451   Thumb Code     2  led.o(i.Error)
-    FS_ch                                    0x08000455   Thumb Code   102  led.o(i.FS_ch)
-    Idle                                     0x080004cd   Thumb Code   124  led.o(i.Idle)
-    Measuring                                0x08000561   Thumb Code  1344  led.o(i.Measuring)
-    PrepE                                    0x08000ac9   Thumb Code   116  led.o(i.PrepE)
-    Pretreatment                             0x08000b69   Thumb Code    98  led.o(i.Pretreatment)
-    SPI2_IRQHandler                          0x08000bd9   Thumb Code    10  led.o(i.SPI2_IRQHandler)
-    SystemCoreClockUpdate                    0x08000be9   Thumb Code   170  system_stm32f7xx.o(i.SystemCoreClockUpdate)
-    SystemInit                               0x08000ca9   Thumb Code    82  system_stm32f7xx.o(i.SystemInit)
-    TIM6_DAC_IRQHandler                      0x08000d0d   Thumb Code   196  led.o(i.TIM6_DAC_IRQHandler)
-    TIM7_IRQHandler                          0x08000e01   Thumb Code     2  led.o(i.TIM7_IRQHandler)
-    USART6_IRQHandler                        0x08000e05   Thumb Code    10  led.o(i.USART6_IRQHandler)
-    __hardfp_ceil                            0x08000e59   Thumb Code   214  ceil.o(i.__hardfp_ceil)
-    app_rx_cmp_callback                      0x08000f49   Thumb Code    12  led.o(i.app_rx_cmp_callback)
-    app_tx_cmp_callback                      0x08000f59   Thumb Code     2  led.o(i.app_tx_cmp_callback)
-    bipot                                    0x08000f5d   Thumb Code   314  led.o(i.bipot)
-    calibration                              0x0800111d   Thumb Code     2  led.o(i.calibration)
-    conection                                0x08001121   Thumb Code    78  led.o(i.conection)
-    eis                                      0x08001185   Thumb Code    14  led.o(i.eis)
-    galv                                     0x0800119d   Thumb Code    14  led.o(i.galv)
-    generateDPVwaveform                      0x080011b5   Thumb Code   494  hal_eq_techniques.o(i.generateDPVwaveform)
-    generate_data                            0x080013b9   Thumb Code    72  hal_eq_techniques.o(i.generate_data)
-    gpio_init                                0x08001401   Thumb Code   294  led.o(i.gpio_init)
-    hal_gpio_configure_pin_mode              0x08001549   Thumb Code    16  hal_gpio_driver.o(i.hal_gpio_configure_pin_mode)
-    hal_gpio_configure_pin_otype             0x08001559   Thumb Code    14  hal_gpio_driver.o(i.hal_gpio_configure_pin_otype)
-    hal_gpio_configure_pin_pupd              0x08001567   Thumb Code    16  hal_gpio_driver.o(i.hal_gpio_configure_pin_pupd)
-    hal_gpio_configure_pin_speed             0x08001577   Thumb Code    16  hal_gpio_driver.o(i.hal_gpio_configure_pin_speed)
-    hal_gpio_init                            0x08001587   Thumb Code    56  hal_gpio_driver.o(i.hal_gpio_init)
-    hal_gpio_read_from_pin                   0x080015bf   Thumb Code    12  hal_gpio_driver.o(i.hal_gpio_read_from_pin)
-    hal_gpio_set_alt_function                0x080015cb   Thumb Code    48  hal_gpio_driver.o(i.hal_gpio_set_alt_function)
-    hal_gpio_write_to_pin                    0x080015fb   Thumb Code    28  hal_gpio_driver.o(i.hal_gpio_write_to_pin)
-    hal_spi_handle_tx_interrupt              0x080017f3   Thumb Code    68  hal_spi_driver.o(i.hal_spi_handle_tx_interrupt)
-    hal_spi_init                             0x08001837   Thumb Code    76  hal_spi_driver.o(i.hal_spi_init)
-    hal_spi_irq_handler                      0x08001883   Thumb Code    68  hal_spi_driver.o(i.hal_spi_irq_handler)
-    hal_spi_is_bus_busy                      0x080018c7   Thumb Code    18  hal_spi_driver.o(i.hal_spi_is_bus_busy)
-    hal_spi_master_tx                        0x080018d9   Thumb Code    34  hal_spi_driver.o(i.hal_spi_master_tx)
-    hal_tim67_clear_flag                     0x08001937   Thumb Code    14  hal_timer6_driver.o(i.hal_tim67_clear_flag)
-    hal_tim67_disable                        0x08001987   Thumb Code    14  hal_timer6_driver.o(i.hal_tim67_disable)
-    hal_tim67_enable                         0x08001995   Thumb Code    14  hal_timer6_driver.o(i.hal_tim67_enable)
-    hal_tim67_handle_interrupt               0x080019a3   Thumb Code    30  hal_timer6_driver.o(i.hal_tim67_handle_interrupt)
-    hal_tim67_init                           0x080019c1   Thumb Code    48  hal_timer6_driver.o(i.hal_tim67_init)
-    hal_tim67_int_disable                    0x080019f1   Thumb Code    30  hal_timer6_driver.o(i.hal_tim67_int_disable)
-    hal_tim67_int_enable                     0x08001a0f   Thumb Code    30  hal_timer6_driver.o(i.hal_tim67_int_enable)
-    hal_uart_handle_interrupt                0x08001c5d   Thumb Code   224  hal_usart_driver.o(i.hal_uart_handle_interrupt)
-    hal_uart_init                            0x08001d3d   Thumb Code    74  hal_usart_driver.o(i.hal_uart_init)
-    hal_uart_rx                              0x08001d87   Thumb Code    54  hal_usart_driver.o(i.hal_uart_rx)
-    hal_uart_tx                              0x08001ddd   Thumb Code    36  hal_usart_driver.o(i.hal_uart_tx)
-    initClock                                0x08001e01   Thumb Code    72  led.o(i.initClock)
-    led_init                                 0x08001e4d   Thumb Code    60  led.o(i.led_init)
-    led_toggle                               0x08001e91   Thumb Code    40  auxfunctions.o(i.led_toggle)
-    led_turn_off                             0x08001eb9   Thumb Code    18  auxfunctions.o(i.led_turn_off)
-    led_turn_on                              0x08001ecb   Thumb Code    18  auxfunctions.o(i.led_turn_on)
-    load_ACV_data                            0x08001edd   Thumb Code   450  hal_eq_techniques.o(i.load_ACV_data)
-    load_CV_data                             0x080020b1   Thumb Code   386  hal_eq_techniques.o(i.load_CV_data)
-    load_DNPV_data                           0x08002245   Thumb Code   450  hal_eq_techniques.o(i.load_DNPV_data)
-    load_DPV_data                            0x08002419   Thumb Code    70  hal_eq_techniques.o(i.load_DPV_data)
-    load_LSV_data                            0x08002461   Thumb Code   298  hal_eq_techniques.o(i.load_LSV_data)
-    load_NPV_data                            0x0800259d   Thumb Code   372  hal_eq_techniques.o(i.load_NPV_data)
-    load_SCV_data                            0x08002721   Thumb Code   386  hal_eq_techniques.o(i.load_SCV_data)
-    load_SWV_data                            0x080028b5   Thumb Code   372  hal_eq_techniques.o(i.load_SWV_data)
-    load_data                                0x08002a39   Thumb Code   196  hal_eq_techniques.o(i.load_data)
-    main                                     0x08002afd   Thumb Code   464  led.o(i.main)
-    parse_cmd                                0x08002d25   Thumb Code   346  auxfunctions.o(i.parse_cmd)
-    pot                                      0x08002e9d   Thumb Code   192  led.o(i.pot)
-    read_ADC_W1                              0x08002fa9   Thumb Code    96  auxfunctions.o(i.read_ADC_W1)
-    spi_gpio_init                            0x08003015   Thumb Code   114  led.o(i.spi_gpio_init)
-    start                                    0x08003095   Thumb Code    64  led.o(i.start)
-    uart_gpio_init                           0x0800310d   Thumb Code    80  led.o(i.uart_gpio_init)
-    _fp_init                                 0x08003165   Thumb Code    10  fpinit.o(x$fpl$fpinit)
-    __fplib_config_fpu_vfp                   0x0800316d   Thumb Code     0  fpinit.o(x$fpl$fpinit)
-    __fplib_config_pureend_doubles           0x0800316d   Thumb Code     0  fpinit.o(x$fpl$fpinit)
-    AHBPrescTable                            0x0800316e   Data          16  system_stm32f7xx.o(.constdata)
-    __I$use$fp                               0x0800316e   Number         0  usenofp.o(x$fpl$usenofp)
-    APBPrescTable                            0x0800317e   Data           8  system_stm32f7xx.o(.constdata)
-    Region$$Table$$Base                      0x08003188   Number         0  anon$$obj.o(Region$$Table)
-    Region$$Table$$Limit                     0x080031a8   Number         0  anon$$obj.o(Region$$Table)
-    master_write_data                        0x20020000   Data          42  led.o(.data)
-    DACvalue                                 0x2002002a   Data           2  led.o(.data)
-    cont                                     0x2002002c   Data           4  led.o(.data)
-    ack                                      0x20020030   Data           4  led.o(.data)
-    end                                      0x20020034   Data           4  led.o(.data)
-    cont_bipot                               0x20020038   Data           1  led.o(.data)
-    DF_LSV_we1                               0x2002003a   Data           8  led.o(.data)
-    DF_LSV_we2                               0x20020042   Data           8  led.o(.data)
-    exp_config_we1                           0x2002004a   Data           8  led.o(.data)
-    exp_config_we2                           0x20020052   Data           8  led.o(.data)
-    nSamplesLUTWE1                           0x2002005c   Data           4  led.o(.data)
-    nSamplesLUTWE2                           0x20020060   Data           4  led.o(.data)
-    nSamplesExpWE1                           0x20020064   Data           4  led.o(.data)
-    nSamplesExpWE2                           0x20020068   Data           4  led.o(.data)
-    contSamplesLUTWE1                        0x2002006c   Data           4  led.o(.data)
-    contSamplesLUTWE2                        0x20020070   Data           4  led.o(.data)
-    contSamplesExpWE1                        0x20020074   Data           4  led.o(.data)
-    contSamplesExpWE2                        0x20020078   Data           4  led.o(.data)
-    contMedidasADC                           0x2002007c   Data           2  led.o(.data)
-    next_state                               0x2002007e   Data           1  led.o(.data)
-    status_I_we1                             0x2002007f   Data           1  led.o(.data)
-    status_I_we2                             0x20020080   Data           1  led.o(.data)
-    communication_mode                       0x20020081   Data           1  led.o(.data)
-    experiment                               0x20020082   Data           1  led.o(.data)
-    lutwe1A_state                            0x20020083   Data           1  led.o(.data)
-    lutwe1B_state                            0x20020084   Data           1  led.o(.data)
-    lutwe2A_state                            0x20020085   Data           1  led.o(.data)
-    lutwe2B_state                            0x20020086   Data           1  led.o(.data)
-    df_mode                                  0x20020087   Data           1  led.o(.data)
-    mode_working                             0x20020088   Data           1  led.o(.data)
-    pretreatment                             0x20020089   Data           1  led.o(.data)
-    state_equipment                          0x2002008a   Data           1  led.o(.data)
-    pc_ready_to_receive                      0x2002008b   Data           1  led.o(.data)
-    leerLUTAWE1                              0x2002008c   Data           1  led.o(.data)
-    leerLUTBWE1                              0x2002008d   Data           1  led.o(.data)
-    leerLUTAWE2                              0x2002008e   Data           1  led.o(.data)
-    leerLUTBWE2                              0x2002008f   Data           1  led.o(.data)
-    medidasADC                               0x20020090   Data           1  led.o(.data)
-    enviar_dato_DAC                          0x20020091   Data           1  led.o(.data)
-    state_table                              0x20020094   Data          52  led.o(.data)
-    SystemCoreClock                          0x200200c8   Data           4  system_stm32f7xx.o(.data)
-    SpiHandle                                0x200200cc   Data          60  led.o(.bss)
-    uartHandle                               0x20020108   Data          60  led.o(.bss)
-    tim6Handle                               0x20020144   Data          24  led.o(.bss)
-    tim7Handle                               0x2002015c   Data          24  led.o(.bss)
-    dataADC                                  0x20020174   Data        2000  led.o(.bss)
-    data_out                                 0x20020944   Data          14  led.o(.bss)
-    UART_rxBuff                              0x20020952   Data         100  led.o(.bss)
-    UART_txBuff                              0x200209b6   Data         100  led.o(.bss)
-    LUTWE1A                                  0x20020a1a   Data       40000  led.o(.bss)
-    LUTWE1B                                  0x2002a65a   Data       40000  led.o(.bss)
-    LUTWE2A                                  0x2003429a   Data       40000  led.o(.bss)
-    LUTWE2B                                  0x2003deda   Data       40000  led.o(.bss)
-    LUTeCond                                 0x20047b1a   Data         400  led.o(.bss)
-    LUTeDep                                  0x20047caa   Data         400  led.o(.bss)
-    LUTeEq                                   0x20047e3a   Data         400  led.o(.bss)
-    DF_CV_we1                                0x20047fca   Data          12  led.o(.bss)
-    DF_SCV_we1                               0x20047fd6   Data          12  led.o(.bss)
-    DF_DPV_we1                               0x20047fe4   Data          40  led.o(.bss)
-    DF_NPV_we1                               0x2004800c   Data          10  led.o(.bss)
-    DF_DNPV_we1                              0x20048016   Data          14  led.o(.bss)
-    DF_SWV_we1                               0x20048024   Data          10  led.o(.bss)
-    DF_ACV_we1                               0x2004802e   Data          12  led.o(.bss)
-    DF_CV_we2                                0x2004803a   Data          12  led.o(.bss)
-    DF_SCV_we2                               0x20048046   Data          12  led.o(.bss)
-    DF_DPV_we2                               0x20048054   Data          40  led.o(.bss)
-    DF_NPV_we2                               0x2004807c   Data          10  led.o(.bss)
-    DF_DNPV_we2                              0x20048086   Data          14  led.o(.bss)
-    DF_SWV_we2                               0x20048094   Data          10  led.o(.bss)
-    DF_ACV_we2                               0x2004809e   Data          12  led.o(.bss)
-    pretreat_we1                             0x200480aa   Data          12  led.o(.bss)
-    pretreat_we2                             0x200480b6   Data          12  led.o(.bss)
-    df_out_we1                               0x200480c2   Data          16  led.o(.bss)
-    df_out_we2                               0x200480d2   Data          16  led.o(.bss)
-    _random_number_data                      0x200480e4   Data         228  rand.o(.bss)
-    __libspace_start                         0x200481c8   Data          96  libspace.o(.bss)
-    __temporary_stack_top$libspace           0x20048228   Data           0  libspace.o(.bss)
+    Ending                                   0x080003cd   Thumb Code    84  led.o(i.Ending)
+    Error                                    0x08000459   Thumb Code     2  led.o(i.Error)
+    FS_ch                                    0x0800045d   Thumb Code   102  led.o(i.FS_ch)
+    Idle                                     0x080004d5   Thumb Code   132  led.o(i.Idle)
+    Measuring                                0x08000575   Thumb Code  1462  led.o(i.Measuring)
+    PrepE                                    0x08000b69   Thumb Code   122  led.o(i.PrepE)
+    Pretreatment                             0x08000c15   Thumb Code   644  led.o(i.Pretreatment)
+    SPI2_IRQHandler                          0x08000ed9   Thumb Code    10  led.o(i.SPI2_IRQHandler)
+    SystemCoreClockUpdate                    0x08000ee9   Thumb Code   170  system_stm32f7xx.o(i.SystemCoreClockUpdate)
+    SystemInit                               0x08000fa9   Thumb Code    82  system_stm32f7xx.o(i.SystemInit)
+    TIM6_DAC_IRQHandler                      0x0800100d   Thumb Code   220  led.o(i.TIM6_DAC_IRQHandler)
+    TIM7_IRQHandler                          0x08001119   Thumb Code     2  led.o(i.TIM7_IRQHandler)
+    USART6_IRQHandler                        0x0800111d   Thumb Code    10  led.o(i.USART6_IRQHandler)
+    __hardfp_ceil                            0x08001171   Thumb Code   214  ceil.o(i.__hardfp_ceil)
+    app_rx_cmp_callback                      0x08001261   Thumb Code    12  led.o(i.app_rx_cmp_callback)
+    app_tx_cmp_callback                      0x08001271   Thumb Code     2  led.o(i.app_tx_cmp_callback)
+    bipot                                    0x08001275   Thumb Code   314  led.o(i.bipot)
+    calibration                              0x08001435   Thumb Code     2  led.o(i.calibration)
+    conection                                0x08001439   Thumb Code    86  led.o(i.conection)
+    eis                                      0x080014a9   Thumb Code    14  led.o(i.eis)
+    galv                                     0x080014c1   Thumb Code    14  led.o(i.galv)
+    generateDPVwaveform                      0x080014d9   Thumb Code   614  hal_eq_techniques.o(i.generateDPVwaveform)
+    generate_data                            0x0800175d   Thumb Code    72  hal_eq_techniques.o(i.generate_data)
+    gpio_init                                0x080017a5   Thumb Code   294  led.o(i.gpio_init)
+    hal_gpio_configure_pin_mode              0x080018ed   Thumb Code    16  hal_gpio_driver.o(i.hal_gpio_configure_pin_mode)
+    hal_gpio_configure_pin_otype             0x080018fd   Thumb Code    14  hal_gpio_driver.o(i.hal_gpio_configure_pin_otype)
+    hal_gpio_configure_pin_pupd              0x0800190b   Thumb Code    16  hal_gpio_driver.o(i.hal_gpio_configure_pin_pupd)
+    hal_gpio_configure_pin_speed             0x0800191b   Thumb Code    16  hal_gpio_driver.o(i.hal_gpio_configure_pin_speed)
+    hal_gpio_init                            0x0800192b   Thumb Code    56  hal_gpio_driver.o(i.hal_gpio_init)
+    hal_gpio_read_from_pin                   0x08001963   Thumb Code    12  hal_gpio_driver.o(i.hal_gpio_read_from_pin)
+    hal_gpio_set_alt_function                0x0800196f   Thumb Code    48  hal_gpio_driver.o(i.hal_gpio_set_alt_function)
+    hal_gpio_write_to_pin                    0x0800199f   Thumb Code    28  hal_gpio_driver.o(i.hal_gpio_write_to_pin)
+    hal_spi_handle_tx_interrupt              0x08001b97   Thumb Code    68  hal_spi_driver.o(i.hal_spi_handle_tx_interrupt)
+    hal_spi_init                             0x08001bdb   Thumb Code    76  hal_spi_driver.o(i.hal_spi_init)
+    hal_spi_irq_handler                      0x08001c27   Thumb Code    68  hal_spi_driver.o(i.hal_spi_irq_handler)
+    hal_spi_is_bus_busy                      0x08001c6b   Thumb Code    18  hal_spi_driver.o(i.hal_spi_is_bus_busy)
+    hal_spi_master_tx                        0x08001c7d   Thumb Code    34  hal_spi_driver.o(i.hal_spi_master_tx)
+    hal_tim67_clear_flag                     0x08001cdb   Thumb Code    14  hal_timer6_driver.o(i.hal_tim67_clear_flag)
+    hal_tim67_disable                        0x08001d2b   Thumb Code    14  hal_timer6_driver.o(i.hal_tim67_disable)
+    hal_tim67_enable                         0x08001d39   Thumb Code    14  hal_timer6_driver.o(i.hal_tim67_enable)
+    hal_tim67_handle_interrupt               0x08001d47   Thumb Code    30  hal_timer6_driver.o(i.hal_tim67_handle_interrupt)
+    hal_tim67_init                           0x08001d65   Thumb Code    48  hal_timer6_driver.o(i.hal_tim67_init)
+    hal_tim67_int_disable                    0x08001d95   Thumb Code    30  hal_timer6_driver.o(i.hal_tim67_int_disable)
+    hal_tim67_int_enable                     0x08001db3   Thumb Code    30  hal_timer6_driver.o(i.hal_tim67_int_enable)
+    hal_uart_handle_interrupt                0x08002001   Thumb Code   224  hal_usart_driver.o(i.hal_uart_handle_interrupt)
+    hal_uart_init                            0x080020e1   Thumb Code    74  hal_usart_driver.o(i.hal_uart_init)
+    hal_uart_rx                              0x0800212b   Thumb Code    54  hal_usart_driver.o(i.hal_uart_rx)
+    hal_uart_tx                              0x08002181   Thumb Code    36  hal_usart_driver.o(i.hal_uart_tx)
+    initClock                                0x080021a5   Thumb Code    72  led.o(i.initClock)
+    led_init                                 0x080021f1   Thumb Code    60  led.o(i.led_init)
+    led_turn_off                             0x08002235   Thumb Code    18  auxfunctions.o(i.led_turn_off)
+    led_turn_on                              0x08002247   Thumb Code    18  auxfunctions.o(i.led_turn_on)
+    load_ACV_data                            0x08002259   Thumb Code   450  hal_eq_techniques.o(i.load_ACV_data)
+    load_CV_data                             0x0800242d   Thumb Code   386  hal_eq_techniques.o(i.load_CV_data)
+    load_DNPV_data                           0x080025c1   Thumb Code   450  hal_eq_techniques.o(i.load_DNPV_data)
+    load_DPV_data                            0x08002795   Thumb Code    70  hal_eq_techniques.o(i.load_DPV_data)
+    load_LSV_data                            0x080027dd   Thumb Code   298  hal_eq_techniques.o(i.load_LSV_data)
+    load_NPV_data                            0x08002919   Thumb Code   372  hal_eq_techniques.o(i.load_NPV_data)
+    load_SCV_data                            0x08002a9d   Thumb Code   386  hal_eq_techniques.o(i.load_SCV_data)
+    load_SWV_data                            0x08002c31   Thumb Code   372  hal_eq_techniques.o(i.load_SWV_data)
+    load_data                                0x08002db5   Thumb Code   196  hal_eq_techniques.o(i.load_data)
+    main                                     0x08002e79   Thumb Code   454  led.o(i.main)
+    parse_cmd                                0x08003099   Thumb Code   292  auxfunctions.o(i.parse_cmd)
+    pot                                      0x080031d5   Thumb Code   192  led.o(i.pot)
+    read_ADC_W1                              0x080032e1   Thumb Code    96  auxfunctions.o(i.read_ADC_W1)
+    spi_gpio_init                            0x0800334d   Thumb Code   114  led.o(i.spi_gpio_init)
+    start                                    0x080033cd   Thumb Code    64  led.o(i.start)
+    uart_gpio_init                           0x08003445   Thumb Code    80  led.o(i.uart_gpio_init)
+    _fp_init                                 0x0800349d   Thumb Code    10  fpinit.o(x$fpl$fpinit)
+    __fplib_config_fpu_vfp                   0x080034a5   Thumb Code     0  fpinit.o(x$fpl$fpinit)
+    __fplib_config_pureend_doubles           0x080034a5   Thumb Code     0  fpinit.o(x$fpl$fpinit)
+    AHBPrescTable                            0x080034a6   Data          16  system_stm32f7xx.o(.constdata)
+    __I$use$fp                               0x080034a6   Number         0  usenofp.o(x$fpl$usenofp)
+    APBPrescTable                            0x080034b6   Data           8  system_stm32f7xx.o(.constdata)
+    Region$$Table$$Base                      0x080034c0   Number         0  anon$$obj.o(Region$$Table)
+    Region$$Table$$Limit                     0x080034e0   Number         0  anon$$obj.o(Region$$Table)
+    contPtos                                 0x20020000   Data           2  led.o(.data)
+    master_write_data                        0x20020002   Data          42  led.o(.data)
+    DACvalue                                 0x2002002c   Data           2  led.o(.data)
+    ack                                      0x2002002e   Data           4  led.o(.data)
+    end                                      0x20020032   Data           4  led.o(.data)
+    cont_bipot                               0x20020036   Data           1  led.o(.data)
+    contPretreatment                         0x20020038   Data           4  led.o(.data)
+    DF_LSV_we1                               0x2002003c   Data           8  led.o(.data)
+    DF_LSV_we2                               0x20020044   Data           8  led.o(.data)
+    exp_config_we1                           0x2002004c   Data           8  led.o(.data)
+    exp_config_we2                           0x20020054   Data           8  led.o(.data)
+    pret                                     0x2002005c   Data           1  led.o(.data)
+    nSamplesLUTWE1                           0x20020060   Data           4  led.o(.data)
+    nSamplesLUTWE2                           0x20020064   Data           4  led.o(.data)
+    nSamplesExpWE1                           0x20020068   Data           4  led.o(.data)
+    nSamplesExpWE2                           0x2002006c   Data           4  led.o(.data)
+    contSamplesLUTWE1                        0x20020070   Data           4  led.o(.data)
+    contSamplesLUTWE2                        0x20020074   Data           4  led.o(.data)
+    contSamplesExpWE1                        0x20020078   Data           4  led.o(.data)
+    contSamplesExpWE2                        0x2002007c   Data           4  led.o(.data)
+    contMedidasADC                           0x20020080   Data           2  led.o(.data)
+    next_state                               0x20020082   Data           1  led.o(.data)
+    status_I_we1                             0x20020083   Data           1  led.o(.data)
+    status_I_we2                             0x20020084   Data           1  led.o(.data)
+    communication_mode                       0x20020085   Data           1  led.o(.data)
+    experiment                               0x20020086   Data           1  led.o(.data)
+    lutwe1A_state                            0x20020087   Data           1  led.o(.data)
+    lutwe1B_state                            0x20020088   Data           1  led.o(.data)
+    lutwe2A_state                            0x20020089   Data           1  led.o(.data)
+    lutwe2B_state                            0x2002008a   Data           1  led.o(.data)
+    df_mode                                  0x2002008b   Data           1  led.o(.data)
+    mode_working                             0x2002008c   Data           1  led.o(.data)
+    pretreatment                             0x2002008d   Data           1  led.o(.data)
+    state_equipment                          0x2002008e   Data           1  led.o(.data)
+    pc_ready_to_receive                      0x2002008f   Data           1  led.o(.data)
+    leerLUTAWE1                              0x20020090   Data           1  led.o(.data)
+    leerLUTBWE1                              0x20020091   Data           1  led.o(.data)
+    leerLUTAWE2                              0x20020092   Data           1  led.o(.data)
+    leerLUTBWE2                              0x20020093   Data           1  led.o(.data)
+    medidasADC                               0x20020094   Data           1  led.o(.data)
+    enviar_dato_DAC                          0x20020095   Data           1  led.o(.data)
+    state_table                              0x20020098   Data          52  led.o(.data)
+    SystemCoreClock                          0x200200cc   Data           4  system_stm32f7xx.o(.data)
+    SpiHandle                                0x200200d0   Data          60  led.o(.bss)
+    uartHandle                               0x2002010c   Data          60  led.o(.bss)
+    tim6Handle                               0x20020148   Data          24  led.o(.bss)
+    tim7Handle                               0x20020160   Data          24  led.o(.bss)
+    dataADC                                  0x20020178   Data        2000  led.o(.bss)
+    data_out                                 0x20020948   Data          14  led.o(.bss)
+    UART_rxBuff                              0x20020956   Data         100  led.o(.bss)
+    UART_txBuff                              0x200209ba   Data         100  led.o(.bss)
+    LUTWE1A                                  0x20020a1e   Data       40000  led.o(.bss)
+    LUTWE1B                                  0x2002a65e   Data       40000  led.o(.bss)
+    LUTWE2A                                  0x2003429e   Data       40000  led.o(.bss)
+    LUTWE2B                                  0x2003dede   Data       40000  led.o(.bss)
+    LUTeCond                                 0x20047b1e   Data         400  led.o(.bss)
+    LUTeDep                                  0x20047cae   Data         400  led.o(.bss)
+    LUTeEq                                   0x20047e3e   Data         400  led.o(.bss)
+    DF_CV_we1                                0x20047fce   Data          12  led.o(.bss)
+    DF_SCV_we1                               0x20047fda   Data          12  led.o(.bss)
+    DF_DPV_we1                               0x20047fe8   Data          52  led.o(.bss)
+    DF_NPV_we1                               0x2004801c   Data          10  led.o(.bss)
+    DF_DNPV_we1                              0x20048026   Data          14  led.o(.bss)
+    DF_SWV_we1                               0x20048034   Data          10  led.o(.bss)
+    DF_ACV_we1                               0x2004803e   Data          12  led.o(.bss)
+    DF_CV_we2                                0x2004804a   Data          12  led.o(.bss)
+    DF_SCV_we2                               0x20048056   Data          12  led.o(.bss)
+    DF_DPV_we2                               0x20048064   Data          52  led.o(.bss)
+    DF_NPV_we2                               0x20048098   Data          10  led.o(.bss)
+    DF_DNPV_we2                              0x200480a2   Data          14  led.o(.bss)
+    DF_SWV_we2                               0x200480b0   Data          10  led.o(.bss)
+    DF_ACV_we2                               0x200480ba   Data          12  led.o(.bss)
+    pretreat_we1                             0x200480c6   Data          12  led.o(.bss)
+    pretreat_we2                             0x200480d2   Data          12  led.o(.bss)
+    df_out_we1                               0x200480de   Data          16  led.o(.bss)
+    df_out_we2                               0x200480ee   Data          16  led.o(.bss)
+    _random_number_data                      0x20048100   Data         228  rand.o(.bss)
+    __libspace_start                         0x200481e4   Data          96  libspace.o(.bss)
+    __temporary_stack_top$libspace           0x20048244   Data           0  libspace.o(.bss)
 
 
 
@@ -1098,9 +1107,9 @@ Memory Map of the image
 
   Image Entry point : 0x080002d1
 
-  Load Region LR_1 (Base: 0x08000000, Size: 0x00003274, Max: 0xffffffff, ABSOLUTE)
+  Load Region LR_1 (Base: 0x08000000, Size: 0x000035b0, Max: 0xffffffff, ABSOLUTE)
 
-    Execution Region ER_RO (Base: 0x08000000, Size: 0x000031a8, Max: 0xffffffff, ABSOLUTE)
+    Execution Region ER_RO (Base: 0x08000000, Size: 0x000034e0, Max: 0xffffffff, ABSOLUTE)
 
     Base Addr    Size         Type   Attr      Idx    E Section Name        Object
 
@@ -1167,141 +1176,141 @@ Memory Map of the image
     0x080003bc   0x0000000c   Code   RO         1145    .text               c_w.l(sys_exit.o)
     0x080003c8   0x00000002   Code   RO            4    i.EXTI0_IRQHandler  led.o
     0x080003ca   0x00000002   PAD
-    0x080003cc   0x00000084   Code   RO            5    i.Ending            led.o
-    0x08000450   0x00000002   Code   RO            6    i.Error             led.o
-    0x08000452   0x00000002   PAD
-    0x08000454   0x00000078   Code   RO            7    i.FS_ch             led.o
-    0x080004cc   0x00000094   Code   RO            8    i.Idle              led.o
-    0x08000560   0x00000568   Code   RO            9    i.Measuring         led.o
-    0x08000ac8   0x000000a0   Code   RO           10    i.PrepE             led.o
-    0x08000b68   0x00000070   Code   RO           11    i.Pretreatment      led.o
-    0x08000bd8   0x00000010   Code   RO           12    i.SPI2_IRQHandler   led.o
-    0x08000be8   0x000000c0   Code   RO          928    i.SystemCoreClockUpdate  system_stm32f7xx.o
-    0x08000ca8   0x00000064   Code   RO          929    i.SystemInit        system_stm32f7xx.o
-    0x08000d0c   0x000000f4   Code   RO           13    i.TIM6_DAC_IRQHandler  led.o
-    0x08000e00   0x00000002   Code   RO           14    i.TIM7_IRQHandler   led.o
-    0x08000e02   0x00000002   PAD
-    0x08000e04   0x00000010   Code   RO           15    i.USART6_IRQHandler  led.o
-    0x08000e14   0x0000001a   Code   RO           16    i.__NVIC_EnableIRQ  led.o
-    0x08000e2e   0x00000002   PAD
-    0x08000e30   0x00000028   Code   RO           17    i.__NVIC_SetPriority  led.o
-    0x08000e58   0x000000f0   Code   RO          973    i.__hardfp_ceil     m_wv.l(ceil.o)
-    0x08000f48   0x00000010   Code   RO           18    i.app_rx_cmp_callback  led.o
-    0x08000f58   0x00000002   Code   RO           19    i.app_tx_cmp_callback  led.o
-    0x08000f5a   0x00000002   PAD
-    0x08000f5c   0x000001c0   Code   RO           20    i.bipot             led.o
-    0x0800111c   0x00000002   Code   RO           21    i.calibration       led.o
-    0x0800111e   0x00000002   PAD
-    0x08001120   0x00000064   Code   RO           22    i.conection         led.o
-    0x08001184   0x00000018   Code   RO           23    i.eis               led.o
-    0x0800119c   0x00000018   Code   RO           24    i.galv              led.o
-    0x080011b4   0x00000204   Code   RO          721    i.generateDPVwaveform  hal_eq_techniques.o
-    0x080013b8   0x00000048   Code   RO          727    i.generate_data     hal_eq_techniques.o
-    0x08001400   0x00000148   Code   RO           25    i.gpio_init         led.o
-    0x08001548   0x00000010   Code   RO          269    i.hal_gpio_configure_pin_mode  hal_gpio_driver.o
-    0x08001558   0x0000000e   Code   RO          270    i.hal_gpio_configure_pin_otype  hal_gpio_driver.o
-    0x08001566   0x00000010   Code   RO          271    i.hal_gpio_configure_pin_pupd  hal_gpio_driver.o
-    0x08001576   0x00000010   Code   RO          272    i.hal_gpio_configure_pin_speed  hal_gpio_driver.o
-    0x08001586   0x00000038   Code   RO          274    i.hal_gpio_init     hal_gpio_driver.o
-    0x080015be   0x0000000c   Code   RO          275    i.hal_gpio_read_from_pin  hal_gpio_driver.o
-    0x080015ca   0x00000030   Code   RO          276    i.hal_gpio_set_alt_function  hal_gpio_driver.o
-    0x080015fa   0x0000001c   Code   RO          277    i.hal_gpio_write_to_pin  hal_gpio_driver.o
-    0x08001616   0x00000008   Code   RO          439    i.hal_spi_configure_baudrate  hal_spi_driver.o
-    0x0800161e   0x000000be   Code   RO          440    i.hal_spi_configure_datasize  hal_spi_driver.o
-    0x080016dc   0x00000016   Code   RO          441    i.hal_spi_configure_device_mode  hal_spi_driver.o
-    0x080016f2   0x0000002a   Code   RO          442    i.hal_spi_configure_direction  hal_spi_driver.o
-    0x0800171c   0x0000001e   Code   RO          443    i.hal_spi_configure_nss_master  hal_spi_driver.o
-    0x0800173a   0x00000016   Code   RO          444    i.hal_spi_configure_nss_slave  hal_spi_driver.o
-    0x08001750   0x0000002a   Code   RO          445    i.hal_spi_configure_phase_and_polarity  hal_spi_driver.o
-    0x0800177a   0x0000000a   Code   RO          447    i.hal_spi_disable_rxne_interrupt  hal_spi_driver.o
-    0x08001784   0x0000000a   Code   RO          448    i.hal_spi_disable_txe_interrupt  hal_spi_driver.o
-    0x0800178e   0x00000012   Code   RO          449    i.hal_spi_enable    hal_spi_driver.o
-    0x080017a0   0x0000000a   Code   RO          451    i.hal_spi_enable_txe_interrupt  hal_spi_driver.o
-    0x080017aa   0x00000048   Code   RO          452    i.hal_spi_handle_rx_interrupt  hal_spi_driver.o
-    0x080017f2   0x00000044   Code   RO          453    i.hal_spi_handle_tx_interrupt  hal_spi_driver.o
-    0x08001836   0x0000004c   Code   RO          454    i.hal_spi_init      hal_spi_driver.o
-    0x08001882   0x00000044   Code   RO          455    i.hal_spi_irq_handler  hal_spi_driver.o
-    0x080018c6   0x00000012   Code   RO          456    i.hal_spi_is_bus_busy  hal_spi_driver.o
-    0x080018d8   0x00000022   Code   RO          458    i.hal_spi_master_tx  hal_spi_driver.o
-    0x080018fa   0x0000001e   Code   RO          459    i.hal_spi_rx_close_interrupt  hal_spi_driver.o
-    0x08001918   0x0000001e   Code   RO          462    i.hal_spi_tx_close_interrupt  hal_spi_driver.o
-    0x08001936   0x0000000e   Code   RO          355    i.hal_tim67_clear_flag  hal_timer6_driver.o
-    0x08001944   0x00000020   Code   RO          356    i.hal_tim67_configure_auto_reload_preload  hal_timer6_driver.o
-    0x08001964   0x00000006   Code   RO          357    i.hal_tim67_configure_auto_reload_value  hal_timer6_driver.o
-    0x0800196a   0x00000016   Code   RO          358    i.hal_tim67_configure_counter_mode  hal_timer6_driver.o
-    0x08001980   0x00000006   Code   RO          359    i.hal_tim67_configure_prescaler  hal_timer6_driver.o
-    0x08001986   0x0000000e   Code   RO          360    i.hal_tim67_disable  hal_timer6_driver.o
-    0x08001994   0x0000000e   Code   RO          361    i.hal_tim67_enable  hal_timer6_driver.o
-    0x080019a2   0x0000001e   Code   RO          362    i.hal_tim67_handle_interrupt  hal_timer6_driver.o
-    0x080019c0   0x00000030   Code   RO          363    i.hal_tim67_init    hal_timer6_driver.o
-    0x080019f0   0x0000001e   Code   RO          364    i.hal_tim67_int_disable  hal_timer6_driver.o
-    0x08001a0e   0x0000001e   Code   RO          365    i.hal_tim67_int_enable  hal_timer6_driver.o
-    0x08001a2c   0x0000000c   Code   RO          585    i.hal_uart_clear_error_flag  hal_usart_driver.o
-    0x08001a38   0x00000016   Code   RO          586    i.hal_uart_configure_error_interrupt  hal_usart_driver.o
-    0x08001a4e   0x0000000c   Code   RO          587    i.hal_uart_configure_over_sampling  hal_usart_driver.o
-    0x08001a5a   0x00000016   Code   RO          588    i.hal_uart_configure_parity_error_interrupt  hal_usart_driver.o
-    0x08001a70   0x00000016   Code   RO          589    i.hal_uart_configure_rxne_interrupt  hal_usart_driver.o
-    0x08001a86   0x00000046   Code   RO          590    i.hal_uart_configure_stop_bits  hal_usart_driver.o
-    0x08001acc   0x00000016   Code   RO          591    i.hal_uart_configure_txe_interrupt  hal_usart_driver.o
-    0x08001ae2   0x00000068   Code   RO          592    i.hal_uart_configure_word_length  hal_usart_driver.o
-    0x08001b4a   0x0000000a   Code   RO          593    i.hal_uart_enable   hal_usart_driver.o
-    0x08001b54   0x0000001a   Code   RO          594    i.hal_uart_enable_disable_rx  hal_usart_driver.o
-    0x08001b6e   0x0000001a   Code   RO          595    i.hal_uart_enable_disable_tx  hal_usart_driver.o
-    0x08001b88   0x00000074   Code   RO          597    i.hal_uart_handle_RXNE_interrupt  hal_usart_driver.o
-    0x08001bfc   0x00000024   Code   RO          598    i.hal_uart_handle_TC_interrupt  hal_usart_driver.o
-    0x08001c20   0x0000003c   Code   RO          599    i.hal_uart_handle_TXE_interrupt  hal_usart_driver.o
-    0x08001c5c   0x000000e0   Code   RO          600    i.hal_uart_handle_interrupt  hal_usart_driver.o
-    0x08001d3c   0x0000004a   Code   RO          601    i.hal_uart_init     hal_usart_driver.o
-    0x08001d86   0x00000036   Code   RO          602    i.hal_uart_rx       hal_usart_driver.o
-    0x08001dbc   0x00000020   Code   RO          603    i.hal_uart_set_baud_rate  hal_usart_driver.o
-    0x08001ddc   0x00000024   Code   RO          604    i.hal_uart_tx       hal_usart_driver.o
-    0x08001e00   0x0000004c   Code   RO           26    i.initClock         led.o
-    0x08001e4c   0x00000044   Code   RO           27    i.led_init          led.o
-    0x08001e90   0x00000028   Code   RO          873    i.led_toggle        auxfunctions.o
-    0x08001eb8   0x00000012   Code   RO          874    i.led_turn_off      auxfunctions.o
-    0x08001eca   0x00000012   Code   RO          875    i.led_turn_on       auxfunctions.o
-    0x08001edc   0x000001d4   Code   RO          728    i.load_ACV_data     hal_eq_techniques.o
-    0x080020b0   0x00000194   Code   RO          729    i.load_CV_data      hal_eq_techniques.o
-    0x08002244   0x000001d4   Code   RO          730    i.load_DNPV_data    hal_eq_techniques.o
-    0x08002418   0x00000046   Code   RO          731    i.load_DPV_data     hal_eq_techniques.o
-    0x0800245e   0x00000002   PAD
-    0x08002460   0x0000013c   Code   RO          732    i.load_LSV_data     hal_eq_techniques.o
-    0x0800259c   0x00000184   Code   RO          733    i.load_NPV_data     hal_eq_techniques.o
-    0x08002720   0x00000194   Code   RO          734    i.load_SCV_data     hal_eq_techniques.o
-    0x080028b4   0x00000184   Code   RO          735    i.load_SWV_data     hal_eq_techniques.o
-    0x08002a38   0x000000c4   Code   RO          736    i.load_data         hal_eq_techniques.o
-    0x08002afc   0x00000228   Code   RO           28    i.main              led.o
-    0x08002d24   0x00000178   Code   RO          876    i.parse_cmd         auxfunctions.o
-    0x08002e9c   0x0000010c   Code   RO           29    i.pot               led.o
-    0x08002fa8   0x0000006c   Code   RO          877    i.read_ADC_W1       auxfunctions.o
-    0x08003014   0x00000080   Code   RO           33    i.spi_gpio_init     led.o
-    0x08003094   0x00000078   Code   RO           34    i.start             led.o
-    0x0800310c   0x00000058   Code   RO           35    i.uart_gpio_init    led.o
-    0x08003164   0x0000000a   Code   RO         1090    x$fpl$fpinit        fz_wv.l(fpinit.o)
-    0x0800316e   0x00000000   Code   RO         1039    x$fpl$usenofp       fz_wv.l(usenofp.o)
-    0x0800316e   0x00000018   Data   RO          930    .constdata          system_stm32f7xx.o
-    0x08003186   0x00000002   PAD
-    0x08003188   0x00000020   Data   RO         1190    Region$$Table       anon$$obj.o
+    0x080003cc   0x0000008c   Code   RO            5    i.Ending            led.o
+    0x08000458   0x00000002   Code   RO            6    i.Error             led.o
+    0x0800045a   0x00000002   PAD
+    0x0800045c   0x00000078   Code   RO            7    i.FS_ch             led.o
+    0x080004d4   0x000000a0   Code   RO            8    i.Idle              led.o
+    0x08000574   0x000005f4   Code   RO            9    i.Measuring         led.o
+    0x08000b68   0x000000ac   Code   RO           10    i.PrepE             led.o
+    0x08000c14   0x000002c4   Code   RO           11    i.Pretreatment      led.o
+    0x08000ed8   0x00000010   Code   RO           12    i.SPI2_IRQHandler   led.o
+    0x08000ee8   0x000000c0   Code   RO          928    i.SystemCoreClockUpdate  system_stm32f7xx.o
+    0x08000fa8   0x00000064   Code   RO          929    i.SystemInit        system_stm32f7xx.o
+    0x0800100c   0x0000010c   Code   RO           13    i.TIM6_DAC_IRQHandler  led.o
+    0x08001118   0x00000002   Code   RO           14    i.TIM7_IRQHandler   led.o
+    0x0800111a   0x00000002   PAD
+    0x0800111c   0x00000010   Code   RO           15    i.USART6_IRQHandler  led.o
+    0x0800112c   0x0000001a   Code   RO           16    i.__NVIC_EnableIRQ  led.o
+    0x08001146   0x00000002   PAD
+    0x08001148   0x00000028   Code   RO           17    i.__NVIC_SetPriority  led.o
+    0x08001170   0x000000f0   Code   RO          973    i.__hardfp_ceil     m_wv.l(ceil.o)
+    0x08001260   0x00000010   Code   RO           18    i.app_rx_cmp_callback  led.o
+    0x08001270   0x00000002   Code   RO           19    i.app_tx_cmp_callback  led.o
+    0x08001272   0x00000002   PAD
+    0x08001274   0x000001c0   Code   RO           20    i.bipot             led.o
+    0x08001434   0x00000002   Code   RO           21    i.calibration       led.o
+    0x08001436   0x00000002   PAD
+    0x08001438   0x00000070   Code   RO           22    i.conection         led.o
+    0x080014a8   0x00000018   Code   RO           23    i.eis               led.o
+    0x080014c0   0x00000018   Code   RO           24    i.galv              led.o
+    0x080014d8   0x00000284   Code   RO          721    i.generateDPVwaveform  hal_eq_techniques.o
+    0x0800175c   0x00000048   Code   RO          727    i.generate_data     hal_eq_techniques.o
+    0x080017a4   0x00000148   Code   RO           25    i.gpio_init         led.o
+    0x080018ec   0x00000010   Code   RO          269    i.hal_gpio_configure_pin_mode  hal_gpio_driver.o
+    0x080018fc   0x0000000e   Code   RO          270    i.hal_gpio_configure_pin_otype  hal_gpio_driver.o
+    0x0800190a   0x00000010   Code   RO          271    i.hal_gpio_configure_pin_pupd  hal_gpio_driver.o
+    0x0800191a   0x00000010   Code   RO          272    i.hal_gpio_configure_pin_speed  hal_gpio_driver.o
+    0x0800192a   0x00000038   Code   RO          274    i.hal_gpio_init     hal_gpio_driver.o
+    0x08001962   0x0000000c   Code   RO          275    i.hal_gpio_read_from_pin  hal_gpio_driver.o
+    0x0800196e   0x00000030   Code   RO          276    i.hal_gpio_set_alt_function  hal_gpio_driver.o
+    0x0800199e   0x0000001c   Code   RO          277    i.hal_gpio_write_to_pin  hal_gpio_driver.o
+    0x080019ba   0x00000008   Code   RO          439    i.hal_spi_configure_baudrate  hal_spi_driver.o
+    0x080019c2   0x000000be   Code   RO          440    i.hal_spi_configure_datasize  hal_spi_driver.o
+    0x08001a80   0x00000016   Code   RO          441    i.hal_spi_configure_device_mode  hal_spi_driver.o
+    0x08001a96   0x0000002a   Code   RO          442    i.hal_spi_configure_direction  hal_spi_driver.o
+    0x08001ac0   0x0000001e   Code   RO          443    i.hal_spi_configure_nss_master  hal_spi_driver.o
+    0x08001ade   0x00000016   Code   RO          444    i.hal_spi_configure_nss_slave  hal_spi_driver.o
+    0x08001af4   0x0000002a   Code   RO          445    i.hal_spi_configure_phase_and_polarity  hal_spi_driver.o
+    0x08001b1e   0x0000000a   Code   RO          447    i.hal_spi_disable_rxne_interrupt  hal_spi_driver.o
+    0x08001b28   0x0000000a   Code   RO          448    i.hal_spi_disable_txe_interrupt  hal_spi_driver.o
+    0x08001b32   0x00000012   Code   RO          449    i.hal_spi_enable    hal_spi_driver.o
+    0x08001b44   0x0000000a   Code   RO          451    i.hal_spi_enable_txe_interrupt  hal_spi_driver.o
+    0x08001b4e   0x00000048   Code   RO          452    i.hal_spi_handle_rx_interrupt  hal_spi_driver.o
+    0x08001b96   0x00000044   Code   RO          453    i.hal_spi_handle_tx_interrupt  hal_spi_driver.o
+    0x08001bda   0x0000004c   Code   RO          454    i.hal_spi_init      hal_spi_driver.o
+    0x08001c26   0x00000044   Code   RO          455    i.hal_spi_irq_handler  hal_spi_driver.o
+    0x08001c6a   0x00000012   Code   RO          456    i.hal_spi_is_bus_busy  hal_spi_driver.o
+    0x08001c7c   0x00000022   Code   RO          458    i.hal_spi_master_tx  hal_spi_driver.o
+    0x08001c9e   0x0000001e   Code   RO          459    i.hal_spi_rx_close_interrupt  hal_spi_driver.o
+    0x08001cbc   0x0000001e   Code   RO          462    i.hal_spi_tx_close_interrupt  hal_spi_driver.o
+    0x08001cda   0x0000000e   Code   RO          355    i.hal_tim67_clear_flag  hal_timer6_driver.o
+    0x08001ce8   0x00000020   Code   RO          356    i.hal_tim67_configure_auto_reload_preload  hal_timer6_driver.o
+    0x08001d08   0x00000006   Code   RO          357    i.hal_tim67_configure_auto_reload_value  hal_timer6_driver.o
+    0x08001d0e   0x00000016   Code   RO          358    i.hal_tim67_configure_counter_mode  hal_timer6_driver.o
+    0x08001d24   0x00000006   Code   RO          359    i.hal_tim67_configure_prescaler  hal_timer6_driver.o
+    0x08001d2a   0x0000000e   Code   RO          360    i.hal_tim67_disable  hal_timer6_driver.o
+    0x08001d38   0x0000000e   Code   RO          361    i.hal_tim67_enable  hal_timer6_driver.o
+    0x08001d46   0x0000001e   Code   RO          362    i.hal_tim67_handle_interrupt  hal_timer6_driver.o
+    0x08001d64   0x00000030   Code   RO          363    i.hal_tim67_init    hal_timer6_driver.o
+    0x08001d94   0x0000001e   Code   RO          364    i.hal_tim67_int_disable  hal_timer6_driver.o
+    0x08001db2   0x0000001e   Code   RO          365    i.hal_tim67_int_enable  hal_timer6_driver.o
+    0x08001dd0   0x0000000c   Code   RO          585    i.hal_uart_clear_error_flag  hal_usart_driver.o
+    0x08001ddc   0x00000016   Code   RO          586    i.hal_uart_configure_error_interrupt  hal_usart_driver.o
+    0x08001df2   0x0000000c   Code   RO          587    i.hal_uart_configure_over_sampling  hal_usart_driver.o
+    0x08001dfe   0x00000016   Code   RO          588    i.hal_uart_configure_parity_error_interrupt  hal_usart_driver.o
+    0x08001e14   0x00000016   Code   RO          589    i.hal_uart_configure_rxne_interrupt  hal_usart_driver.o
+    0x08001e2a   0x00000046   Code   RO          590    i.hal_uart_configure_stop_bits  hal_usart_driver.o
+    0x08001e70   0x00000016   Code   RO          591    i.hal_uart_configure_txe_interrupt  hal_usart_driver.o
+    0x08001e86   0x00000068   Code   RO          592    i.hal_uart_configure_word_length  hal_usart_driver.o
+    0x08001eee   0x0000000a   Code   RO          593    i.hal_uart_enable   hal_usart_driver.o
+    0x08001ef8   0x0000001a   Code   RO          594    i.hal_uart_enable_disable_rx  hal_usart_driver.o
+    0x08001f12   0x0000001a   Code   RO          595    i.hal_uart_enable_disable_tx  hal_usart_driver.o
+    0x08001f2c   0x00000074   Code   RO          597    i.hal_uart_handle_RXNE_interrupt  hal_usart_driver.o
+    0x08001fa0   0x00000024   Code   RO          598    i.hal_uart_handle_TC_interrupt  hal_usart_driver.o
+    0x08001fc4   0x0000003c   Code   RO          599    i.hal_uart_handle_TXE_interrupt  hal_usart_driver.o
+    0x08002000   0x000000e0   Code   RO          600    i.hal_uart_handle_interrupt  hal_usart_driver.o
+    0x080020e0   0x0000004a   Code   RO          601    i.hal_uart_init     hal_usart_driver.o
+    0x0800212a   0x00000036   Code   RO          602    i.hal_uart_rx       hal_usart_driver.o
+    0x08002160   0x00000020   Code   RO          603    i.hal_uart_set_baud_rate  hal_usart_driver.o
+    0x08002180   0x00000024   Code   RO          604    i.hal_uart_tx       hal_usart_driver.o
+    0x080021a4   0x0000004c   Code   RO           26    i.initClock         led.o
+    0x080021f0   0x00000044   Code   RO           27    i.led_init          led.o
+    0x08002234   0x00000012   Code   RO          874    i.led_turn_off      auxfunctions.o
+    0x08002246   0x00000012   Code   RO          875    i.led_turn_on       auxfunctions.o
+    0x08002258   0x000001d4   Code   RO          728    i.load_ACV_data     hal_eq_techniques.o
+    0x0800242c   0x00000194   Code   RO          729    i.load_CV_data      hal_eq_techniques.o
+    0x080025c0   0x000001d4   Code   RO          730    i.load_DNPV_data    hal_eq_techniques.o
+    0x08002794   0x00000046   Code   RO          731    i.load_DPV_data     hal_eq_techniques.o
+    0x080027da   0x00000002   PAD
+    0x080027dc   0x0000013c   Code   RO          732    i.load_LSV_data     hal_eq_techniques.o
+    0x08002918   0x00000184   Code   RO          733    i.load_NPV_data     hal_eq_techniques.o
+    0x08002a9c   0x00000194   Code   RO          734    i.load_SCV_data     hal_eq_techniques.o
+    0x08002c30   0x00000184   Code   RO          735    i.load_SWV_data     hal_eq_techniques.o
+    0x08002db4   0x000000c4   Code   RO          736    i.load_data         hal_eq_techniques.o
+    0x08002e78   0x00000220   Code   RO           28    i.main              led.o
+    0x08003098   0x0000013c   Code   RO          876    i.parse_cmd         auxfunctions.o
+    0x080031d4   0x0000010c   Code   RO           29    i.pot               led.o
+    0x080032e0   0x0000006c   Code   RO          877    i.read_ADC_W1       auxfunctions.o
+    0x0800334c   0x00000080   Code   RO           33    i.spi_gpio_init     led.o
+    0x080033cc   0x00000078   Code   RO           34    i.start             led.o
+    0x08003444   0x00000058   Code   RO           35    i.uart_gpio_init    led.o
+    0x0800349c   0x0000000a   Code   RO         1090    x$fpl$fpinit        fz_wv.l(fpinit.o)
+    0x080034a6   0x00000000   Code   RO         1039    x$fpl$usenofp       fz_wv.l(usenofp.o)
+    0x080034a6   0x00000018   Data   RO          930    .constdata          system_stm32f7xx.o
+    0x080034be   0x00000002   PAD
+    0x080034c0   0x00000020   Data   RO         1190    Region$$Table       anon$$obj.o
 
 
-    Execution Region ER_RW (Base: 0x20020000, Size: 0x000000cc, Max: 0xffffffff, ABSOLUTE)
-
-    Base Addr    Size         Type   Attr      Idx    E Section Name        Object
-
-    0x20020000   0x000000c8   Data   RW           37    .data               led.o
-    0x200200c8   0x00000004   Data   RW          931    .data               system_stm32f7xx.o
-
-
-    Execution Region ER_ZI (Base: 0x200200cc, Size: 0x0002875c, Max: 0xffffffff, ABSOLUTE)
+    Execution Region ER_RW (Base: 0x20020000, Size: 0x000000d0, Max: 0xffffffff, ABSOLUTE)
 
     Base Addr    Size         Type   Attr      Idx    E Section Name        Object
 
-    0x200200cc   0x00028016   Zero   RW           36    .bss                led.o
-    0x200480e2   0x00000002   PAD
-    0x200480e4   0x000000e4   Zero   RW          966    .bss                c_w.l(rand.o)
-    0x200481c8   0x00000060   Zero   RW         1103    .bss                c_w.l(libspace.o)
-    0x20048228   0x00000200   Zero   RW          919    HEAP                startup_stm32f769xx.o
-    0x20048428   0x00000400   Zero   RW          918    STACK               startup_stm32f769xx.o
+    0x20020000   0x000000cc   Data   RW           37    .data               led.o
+    0x200200cc   0x00000004   Data   RW          931    .data               system_stm32f7xx.o
+
+
+    Execution Region ER_ZI (Base: 0x200200d0, Size: 0x00028778, Max: 0xffffffff, ABSOLUTE)
+
+    Base Addr    Size         Type   Attr      Idx    E Section Name        Object
+
+    0x200200d0   0x0002802e   Zero   RW           36    .bss                led.o
+    0x200480fe   0x00000002   PAD
+    0x20048100   0x000000e4   Zero   RW          966    .bss                c_w.l(rand.o)
+    0x200481e4   0x00000060   Zero   RW         1103    .bss                c_w.l(libspace.o)
+    0x20048244   0x00000004   PAD
+    0x20048248   0x00000200   Zero   RW          919    HEAP                startup_stm32f769xx.o
+    0x20048448   0x00000400   Zero   RW          918    STACK               startup_stm32f769xx.o
 
 
 ==============================================================================
@@ -1311,18 +1320,18 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   Object Name
 
-       560         42          0          0          0       3660   auxfunctions.o
-      3690        160          0          0          0      10354   hal_eq_techniques.o
+       460         36          0          0          0       2907   auxfunctions.o
+      3818        168          0          0          0      10538   hal_eq_techniques.o
        206          0          0          0          0       5439   hal_gpio_driver.o
        800         14          0          0          0      11105   hal_spi_driver.o
        246          6          0          0          0       6375   hal_timer6_driver.o
        980          0          0          0          0      11588   hal_usart_driver.o
-      4648        888          0        200     163862     861861   led.o
+      5444        998          0        204     163886     862467   led.o
         64         26        504          0       1536        896   startup_stm32f769xx.o
        292         40         24          4          0       2187   system_stm32f7xx.o
 
     ----------------------------------------------------------------------
-     11500       1176        562        204     165400     913465   Object Totals
+     12324       1288        562        208     165424     913502   Object Totals
          0          0         32          0          0          0   (incl. Generated)
         14          0          2          0          2          0   (incl. Padding)
 
@@ -1356,8 +1365,8 @@ Image component sizes
        240         26          0          0          0        132   ceil.o
 
     ----------------------------------------------------------------------
-       650         60          0          0        324        992   Library Totals
-         8          0          0          0          0          0   (incl. Padding)
+       650         60          0          0        328        992   Library Totals
+         8          0          0          0          4          0   (incl. Padding)
 
     ----------------------------------------------------------------------
 
@@ -1368,7 +1377,7 @@ Image component sizes
        240         26          0          0          0        132   m_wv.l
 
     ----------------------------------------------------------------------
-       650         60          0          0        324        992   Library Totals
+       650         60          0          0        328        992   Library Totals
 
     ----------------------------------------------------------------------
 
@@ -1377,15 +1386,15 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   
 
-     12150       1236        562        204     165724     904397   Grand Totals
-     12150       1236        562        204     165724     904397   ELF Image Totals
-     12150       1236        562        204          0          0   ROM Totals
+     12974       1348        562        208     165752     904534   Grand Totals
+     12974       1348        562        208     165752     904534   ELF Image Totals
+     12974       1348        562        208          0          0   ROM Totals
 
 ==============================================================================
 
-    Total RO  Size (Code + RO Data)                12712 (  12.41kB)
-    Total RW  Size (RW Data + ZI Data)            165928 ( 162.04kB)
-    Total ROM Size (Code + RO Data + RW Data)      12916 (  12.61kB)
+    Total RO  Size (Code + RO Data)                13536 (  13.22kB)
+    Total RW  Size (RW Data + ZI Data)            165960 ( 162.07kB)
+    Total ROM Size (Code + RO Data + RW Data)      13744 (  13.42kB)
 
 ==============================================================================
 

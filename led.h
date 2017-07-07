@@ -19,17 +19,12 @@ extern spi_handle_t SpiHandle;
 extern uart_handle_t uartHandle;
 
 
-typedef enum  {
-	CV = 0,
-	LSV,
-	SCV,
-	DPV,
-	NPV,
-	DPNV,
-	SWV,
-	ACV
-	// TODO
-}exp_t;
+
+typedef enum{
+	t_cond,
+	t_dep,
+	t_eq
+}pret_state_t;
 
 
 
@@ -178,7 +173,8 @@ typedef enum {
 typedef enum {
 	P_NONE = 0x00,
 	P_RUNNING = 0x01,
-	P_FINISHED = 0x02
+	P_FINISHED = 0x02,
+	P_CANCELLED = 0x03
 }state_pretreatment;
 
 typedef enum {
