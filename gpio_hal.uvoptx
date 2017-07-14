@@ -197,40 +197,7 @@
           <Name>UL2CM3(-S0 -C0 -P0 -FD20020000 -FC1000 -FN2 -FF0STM32F7x_2048 -FS08000000 -FL0200000 -FF1STM32F7xTCM_2048 -FS1200000 -FL1200000 -FP0($$Device:STM32F769NIHx$CMSIS\Flash\STM32F7x_2048.FLM) -FP1($$Device:STM32F769NIHx$CMSIS\Flash\STM32F7xTCM_2048.FLM))</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint>
-        <Bp>
-          <Number>0</Number>
-          <Type>0</Type>
-          <LineNumber>608</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134223080</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>.\hal_EQ_techniques.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\gpio_hal\hal_EQ_techniques.c\608</Expression>
-        </Bp>
-        <Bp>
-          <Number>1</Number>
-          <Type>0</Type>
-          <LineNumber>670</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134223654</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>.\hal_EQ_techniques.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\gpio_hal\hal_EQ_techniques.c\670</Expression>
-        </Bp>
-      </Breakpoint>
+      <Breakpoint/>
       <WatchWindow1>
         <Ww>
           <count>0</count>
@@ -240,189 +207,184 @@
         <Ww>
           <count>1</count>
           <WinNumber>1</WinNumber>
-          <ItemText>pretreat_we1</ItemText>
+          <ItemText>DF_DPV_we1</ItemText>
         </Ww>
         <Ww>
           <count>2</count>
           <WinNumber>1</WinNumber>
-          <ItemText>DF_DPV_we1</ItemText>
+          <ItemText>LUTWE1A</ItemText>
         </Ww>
         <Ww>
           <count>3</count>
           <WinNumber>1</WinNumber>
-          <ItemText>LUTWE1A</ItemText>
+          <ItemText>LUTWE1B</ItemText>
         </Ww>
         <Ww>
           <count>4</count>
           <WinNumber>1</WinNumber>
-          <ItemText>LUTWE1B</ItemText>
+          <ItemText>LUTWE2A</ItemText>
         </Ww>
         <Ww>
           <count>5</count>
           <WinNumber>1</WinNumber>
-          <ItemText>nSamples1</ItemText>
+          <ItemText>LUTWE2B</ItemText>
         </Ww>
         <Ww>
           <count>6</count>
           <WinNumber>1</WinNumber>
-          <ItemText>nSamples2</ItemText>
-        </Ww>
-        <Ww>
-          <count>7</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>step</ItemText>
-        </Ww>
-        <Ww>
-          <count>8</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>sr</ItemText>
-        </Ww>
-        <Ww>
-          <count>9</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>tPulse</ItemText>
-        </Ww>
-        <Ww>
-          <count>10</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>stop</ItemText>
-        </Ww>
-        <Ww>
-          <count>11</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>tSampling</ItemText>
-        </Ww>
-        <Ww>
-          <count>12</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>nSteps</ItemText>
-        </Ww>
-        <Ww>
-          <count>13</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>lutwe1A_state</ItemText>
-        </Ww>
-        <Ww>
-          <count>14</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>LUTWE2A</ItemText>
-        </Ww>
-        <Ww>
-          <count>15</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>LUTWE2B</ItemText>
-        </Ww>
-        <Ww>
-          <count>16</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>pretreat_we2</ItemText>
-        </Ww>
-        <Ww>
-          <count>17</count>
-          <WinNumber>1</WinNumber>
           <ItemText>DF_DPV_we2</ItemText>
-        </Ww>
-        <Ww>
-          <count>18</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>start</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>
         <Ww>
           <count>0</count>
           <WinNumber>2</WinNumber>
-          <ItemText>contSamplesLUTWE1</ItemText>
+          <ItemText>UART_txBuff</ItemText>
         </Ww>
         <Ww>
           <count>1</count>
           <WinNumber>2</WinNumber>
-          <ItemText>contSamplesExpWE1</ItemText>
+          <ItemText>data_out</ItemText>
         </Ww>
         <Ww>
           <count>2</count>
           <WinNumber>2</WinNumber>
-          <ItemText>nSamplesLUTWE1</ItemText>
+          <ItemText>pc_ready_to_receive</ItemText>
         </Ww>
         <Ww>
           <count>3</count>
           <WinNumber>2</WinNumber>
-          <ItemText>contMedidasADC</ItemText>
+          <ItemText>mode_working</ItemText>
         </Ww>
         <Ww>
           <count>4</count>
           <WinNumber>2</WinNumber>
-          <ItemText>nSamplesExpWE1</ItemText>
+          <ItemText>df_mode</ItemText>
         </Ww>
         <Ww>
           <count>5</count>
           <WinNumber>2</WinNumber>
-          <ItemText>UART_txBuff</ItemText>
+          <ItemText>communication_mode</ItemText>
         </Ww>
         <Ww>
           <count>6</count>
           <WinNumber>2</WinNumber>
-          <ItemText>data_out</ItemText>
+          <ItemText>next_state</ItemText>
         </Ww>
         <Ww>
           <count>7</count>
           <WinNumber>2</WinNumber>
-          <ItemText>enviar_dato_DAC</ItemText>
+          <ItemText>next_state_exp_WE1</ItemText>
         </Ww>
         <Ww>
           <count>8</count>
           <WinNumber>2</WinNumber>
-          <ItemText>pc_ready_to_receive</ItemText>
+          <ItemText>next_state_exp_WE2</ItemText>
         </Ww>
         <Ww>
           <count>9</count>
           <WinNumber>2</WinNumber>
-          <ItemText>mode_working</ItemText>
+          <ItemText>pWE1</ItemText>
         </Ww>
         <Ww>
           <count>10</count>
           <WinNumber>2</WinNumber>
-          <ItemText>experiment</ItemText>
+          <ItemText>pWE2</ItemText>
         </Ww>
         <Ww>
           <count>11</count>
           <WinNumber>2</WinNumber>
-          <ItemText>df_mode</ItemText>
+          <ItemText>enviar_dato_DAC_we1</ItemText>
         </Ww>
         <Ww>
           <count>12</count>
           <WinNumber>2</WinNumber>
-          <ItemText>communication_mode</ItemText>
+          <ItemText>enviar_dato_DAC_we2</ItemText>
         </Ww>
         <Ww>
           <count>13</count>
           <WinNumber>2</WinNumber>
-          <ItemText>pretreatment</ItemText>
+          <ItemText>cont_bipot</ItemText>
         </Ww>
         <Ww>
           <count>14</count>
           <WinNumber>2</WinNumber>
-          <ItemText>contPtos</ItemText>
+          <ItemText>real_pret_we1</ItemText>
         </Ww>
         <Ww>
           <count>15</count>
           <WinNumber>2</WinNumber>
-          <ItemText>tim6Handle.Init.Period</ItemText>
+          <ItemText>real_pret_we2</ItemText>
         </Ww>
         <Ww>
           <count>16</count>
           <WinNumber>2</WinNumber>
-          <ItemText>next_state</ItemText>
+          <ItemText>contPretreatment_we2</ItemText>
         </Ww>
         <Ww>
           <count>17</count>
           <WinNumber>2</WinNumber>
-          <ItemText>pret</ItemText>
+          <ItemText>contPretreatment_we1</ItemText>
         </Ww>
         <Ww>
           <count>18</count>
           <WinNumber>2</WinNumber>
-          <ItemText>contPretreatment</ItemText>
+          <ItemText>pretreat_we1</ItemText>
+        </Ww>
+        <Ww>
+          <count>19</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>pretreat_we2</ItemText>
+        </Ww>
+        <Ww>
+          <count>20</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>contPtos_we2</ItemText>
+        </Ww>
+        <Ww>
+          <count>21</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>contPtos_we1</ItemText>
+        </Ww>
+        <Ww>
+          <count>22</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>eWE1</ItemText>
+        </Ww>
+        <Ww>
+          <count>23</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>eWE2</ItemText>
+        </Ww>
+        <Ww>
+          <count>24</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>experimentWE1</ItemText>
+        </Ww>
+        <Ww>
+          <count>25</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>uartHandle</ItemText>
+        </Ww>
+        <Ww>
+          <count>26</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>envio_end_we1</ItemText>
+        </Ww>
+        <Ww>
+          <count>27</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>contMedidasADC_we1</ItemText>
+        </Ww>
+        <Ww>
+          <count>28</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>lutwe1B_state</ItemText>
+        </Ww>
+        <Ww>
+          <count>29</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>lutwe1A_state</ItemText>
         </Ww>
       </WatchWindow2>
       <Tracepoint>
@@ -445,7 +407,7 @@
         <AscS3>0</AscS3>
         <aSer3>0</aSer3>
         <eProf>0</eProf>
-        <aLa>0</aLa>
+        <aLa>1</aLa>
         <aPa1>0</aPa1>
         <AscS4>0</AscS4>
         <aSer4>0</aSer4>

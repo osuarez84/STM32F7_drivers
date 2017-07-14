@@ -5,9 +5,12 @@
 #include "hal_spi_driver.h"
 #include "hal_timer6_driver.h"
 
-#define NMEDIDAS	4			// Variable para el número de medidas a tomar en el experimento.
+#define NMEDIDASWE1	4			// Variable para el número de medidas a tomar en el experimento.
 													// Aquí se define como cte, pero debe calcularse en función
 													// del número de puntos que va a tener la zona donde midamos.
+#define NMEDIDASWE2 2
+#define MCU_FREQ		25000000.0
+#define NSAMPLESLUT	1024
 
 
 /* Global variables */
@@ -17,15 +20,6 @@ extern uint8_t UART_txBuff[];
 
 extern spi_handle_t SpiHandle;
 extern uart_handle_t uartHandle;
-
-
-
-typedef enum{
-	t_cond,
-	t_dep,
-	t_eq
-}pret_state_t;
-
 
 
 /* Macros used for configuring gpios for I/O s */
@@ -118,7 +112,7 @@ typedef enum{
 #define NSTATES			60
 #define DEBUG			1
 
-
+// Estados FSM general
 typedef enum {
 	CONECT = 0,
 	IDLE,
@@ -128,20 +122,20 @@ typedef enum {
 	GALV,
 	EIS,
 	PREP_E,
-	PRETREATMENT,
-	MEASURING,
-	FS_CH,
+	EXPERIMENT,
 	ENDING,
 	ERR
 
 }stateType;
 
+// Estados FSMs de cada WE
 typedef enum {
-	S_WAITING = 0x00,
-	S_RUNNING = 0x01,
-	S_ERROR = 0x02,
+	PRETREATMENT_WE,
+	MEASURING_WE,
+	FS_CH_WE,
+}state_exp_t;
 
-}general_state;
+
 
 typedef enum {
 	M_NONE = 0x00,
@@ -168,14 +162,14 @@ typedef enum {
 	L_EMPTY = 0x00,
 	L_REFRESHED = 0x01,
 	L_FINISHED = 0x02
-}lut_state;
+}lut_status;
 
 typedef enum {
 	P_NONE = 0x00,
 	P_RUNNING = 0x01,
-	P_FINISHED = 0x02,
-	P_CANCELLED = 0x03
-}state_pretreatment;
+	P_CANCELLED = 0x02,
+	P_FINISHED = 0x03
+}status_pretreatment;
 
 typedef enum {
 	E_NONE = 0x00,
@@ -183,39 +177,50 @@ typedef enum {
 	E_CANCELLED = 0x02,
 	E_FINISHED = 0x03,
 	E_ERROR = 0x04
-}state_experiment;
+}status_experiment;
 
-enum yesno{
+
+typedef enum{
+	tCond = 0x00,
+	tDep = 0x01,
+	tEq = 0x02
+
+}pret_value_t;
+
+typedef enum{
 	NO = 0x00,
 	YES = 0x01
-};
+}flag;
 
 typedef enum{
 	NOT_READY = 0x00,
 	READY = 0x01
 }state_pc;
 
+
+
 /* FSM global variables */
 extern stateType next_state;
 extern status_I_measure status_I_we1;
 extern status_I_measure status_I_we2;
 extern mode_com communication_mode;
-extern state_experiment experiment;
-extern lut_state lutwe1A_state;
-extern lut_state lutwe1B_state;
-extern lut_state lutwe2A_state;
-extern lut_state lutwe2B_state;
+extern status_experiment eWE1, eWE2;
+extern lut_status lutwe1A_state;
+extern lut_status lutwe1B_state;
+extern lut_status lutwe2A_state;
+extern lut_status lutwe2B_state;
 extern mode df_mode;
 extern mode mode_working;
-extern state_pretreatment pretreatment;
-extern general_state state_equipment;	
+extern status_pretreatment pWE1, pWE2;
 extern state_pc pc_ready_to_receive;
+extern state_exp_t next_state_we1;
+extern state_exp_t next_state_we2;
 
 
 
 /* FSM Functions definition */
 void start(void);
-void conection(void);
+void connection(void);
 void Idle(void);
 void bipot(void);
 void pot(void);
@@ -223,21 +228,25 @@ void galv(void);
 void eis(void);
 void PrepE(void);
 void Pretreatment(void);
-void Measuring(void);
-void FS_ch(void);
+void Experiment(void);
 void Ending(void);
 void Error(void);
 void calibration(void);
 
+void pretreatment_we1(void);
+void measuring_we1(void);
+void FS_change_we1(void);
+void pretreatment_we2(void);
+void measuring_we2(void);
+void FS_change_we2(void);
+void subStateMachineWE1(void);
+void subStateMachineWE2(void);
 
 
 
 /* USART callback function */
 void app_tx_cmp_callback(void *size);
 void app_rx_cmp_callback(void *size);
-
-
-void sendDFUART(void);
 
 #endif 
 

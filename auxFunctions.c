@@ -87,11 +87,12 @@ void 	parse_cmd(uint8_t* cmd){
 	/* STOP, the experiment is cancelled */
 	else if(cmd[0] == 'S' && cmd[1] == 'T' && cmd[2] == 'O' && cmd[3] == 'P'){
 		
-		if(next_state == PRETREATMENT | next_state == MEASURING){
+		if(next_state == EXPERIMENT){
 			
-			pretreatment = P_CANCELLED;
-			experiment = E_CANCELLED;
-		
+			pWE1 = P_CANCELLED;
+			pWE2 = P_CANCELLED;
+			eWE1 = E_CANCELLED;
+			eWE2 = E_CANCELLED;
 
 		}
 		

@@ -60,28 +60,28 @@ static uint32_t generateRamp(float eStart, float eStop, float eStep, float* lut)
 * @param	No. samples of the LUT3
 * @retval	No. samples of the complete data (1 scan)
 */
-static uint32_t concatenateLUTs(float* lut1, float* lut2, float* lut3, float* lutC, uint32_t n1, uint32_t n2, uint32_t n3) {
+//static uint32_t concatenateLUTs(float* lut1, float* lut2, float* lut3, float* lutC, uint32_t n1, uint32_t n2, uint32_t n3) {
 
-	uint32_t i;
-	
-	n1--;																// El último pto de la LUT1 es igual al primero de la LUT2
-	n2--;																// por lo que lo desechamos. Lo mismo para LUT2 y LUT3
-	
-	for (i = 0; i < n1; i++) {									
-		lutC[i] = lut1[i];												
-	}
+//	uint32_t i;
+//	
+//	n1--;																// El último pto de la LUT1 es igual al primero de la LUT2
+//	n2--;																// por lo que lo desechamos. Lo mismo para LUT2 y LUT3
+//	
+//	for (i = 0; i < n1; i++) {									
+//		lutC[i] = lut1[i];												
+//	}
 
-	for (i = 0; i < n2; i++) {									
-		lutC[i + n1] = lut2[i];
-	}
+//	for (i = 0; i < n2; i++) {									
+//		lutC[i + n1] = lut2[i];
+//	}
 
-	for (i = 0; i < n3; i++) {
-		lutC[i + (n1 + n2)] = lut3[i];
-	}
+//	for (i = 0; i < n3; i++) {
+//		lutC[i + (n1 + n2)] = lut3[i];
+//	}
 
-	return (n1 + n2 + n3);
+//	return (n1 + n2 + n3);
 
-}
+//}
 
 
 /**
@@ -91,596 +91,734 @@ static uint32_t concatenateLUTs(float* lut1, float* lut2, float* lut3, float* lu
 * @param	No. samples of LUT with the output voltage data
 * @retval	None
 */
-void generateDACValues(float* lut, uint16_t* data, uint32_t n) {
+//void generateDACValues(float* lut, uint16_t* data, uint32_t n) {
 
-	uint32_t i;
-	
-	/* Rutina para calcular la potencia de 2^NBITSDAC (para evitar el uso de pow())*/
-	uint32_t DACp = 2;		// base
-	for (i = 0; i < (NBITSDAC - 1); i++) {
-		DACp *= 2;
-	}
+//	uint32_t i;
+//	
+//	/* Rutina para calcular la potencia de 2^NBITSDAC (para evitar el uso de pow())*/
+//	uint32_t DACp = 2;		// base
+//	for (i = 0; i < (NBITSDAC - 1); i++) {
+//		DACp *= 2;
+//	}
 
-	for (i = 0; i <= n; i++) {
-		data[i] = (( (DACp + 1) * lut[i]) / VREF);
-	}
+//	for (i = 0; i <= n; i++) {
+//		data[i] = (( (DACp + 1) * lut[i]) / VREF);
+//	}
 
-}
+//}
 
 
 /************************************************/
 /*					APIs						*/
 /************************************************/
-/**
-* @brief	Generates CV waveform for 1 complete scan
-* @param	Pointer to data structure
-* @param	Pointer to an auxiliar array
-* @param	Pointer to an auxiliar array
-* @param	Pointer to an auxiliar array
-* @param	Pointer to an array to sace complete LUT
-* @retval	Lenght of the LUT
-*/
-uint32_t generateCVsignal(DF_CVTypeDef* df, float* LUT1, float* LUT2, float* LUT3, float* LUTcomplete) {
+///**
+//* @brief	Generates CV waveform for 1 complete scan
+//* @param	Pointer to data structure
+//* @param	Pointer to an auxiliar array
+//* @param	Pointer to an auxiliar array
+//* @param	Pointer to an auxiliar array
+//* @param	Pointer to an array to sace complete LUT
+//* @retval	Lenght of the LUT
+//*/
+//uint32_t generateCVsignal(DF_CVTypeDef* df, float* LUT1, float* LUT2, float* LUT3, float* LUTcomplete) {
 
-	uint32_t nSamples1 = generateRamp(df->start, df->vtx1, df->step, LUT1);
-	uint32_t nSamples2 = generateRamp(df->vtx1, df->vtx2, df->step, LUT2);
-	uint32_t nSamples3 = generateRamp(df->vtx2, df->vtx1, df->step, LUT3);
+//	uint32_t nSamples1 = generateRamp(df->start, df->vtx1, df->step, LUT1);
+//	uint32_t nSamples2 = generateRamp(df->vtx1, df->vtx2, df->step, LUT2);
+//	uint32_t nSamples3 = generateRamp(df->vtx2, df->vtx1, df->step, LUT3);
 
-	uint32_t lengthLUT = concatenateLUTs(LUT1, LUT2, LUT3, LUTcomplete, nSamples1, nSamples2, nSamples3);
+//	uint32_t lengthLUT = concatenateLUTs(LUT1, LUT2, LUT3, LUTcomplete, nSamples1, nSamples2, nSamples3);
 
-	return lengthLUT;
-}
+//	return lengthLUT;
+//}
 
-/**
-* @brief	Generates LSV waveform for 1 complete scan
-* @param	Pointer to data structure
-* @param	Pointer to an array to sace complete LUT
-* @retval	Lenght of the LUT
-*/
-uint32_t generateLSVsignal(DF_LSVTypeDef* df, float* LUTcomplete) {
-	
-	uint32_t lengthLUT = generateRamp(df->start, df->stop, df->step, LUTcomplete);
+///**
+//* @brief	Generates LSV waveform for 1 complete scan
+//* @param	Pointer to data structure
+//* @param	Pointer to an array to sace complete LUT
+//* @retval	Lenght of the LUT
+//*/
+//uint32_t generateLSVsignal(DF_LSVTypeDef* df, float* LUTcomplete) {
+//	
+//	uint32_t lengthLUT = generateRamp(df->start, df->stop, df->step, LUTcomplete);
 
-	/* Escribimos el Estop en el último valor de la LUT */
-	LUTcomplete[lengthLUT-1] = df->stop;
+//	/* Escribimos el Estop en el último valor de la LUT */
+//	LUTcomplete[lengthLUT-1] = df->stop;
 
-	return lengthLUT;
-}
+//	return lengthLUT;
+//}
 
 
-/**
-* @brief	Generates SCV waveform for 1 complete scan
-* @param	Pointer to data structure
-* @param	Pointer to an auxiliar array
-* @param	Pointer to an auxiliar array
-* @param	Pointer to an auxiliar array
-* @param	Pointer to an array to sace complete LUT
-* @retval	Lenght of the LUT
-*/
-uint32_t generateSCVsignal(DF_SCVTypeDef* df, float* LUT1, float* LUT2, float* LUT3, float* LUTcomplete) {
+///**
+//* @brief	Generates SCV waveform for 1 complete scan
+//* @param	Pointer to data structure
+//* @param	Pointer to an auxiliar array
+//* @param	Pointer to an auxiliar array
+//* @param	Pointer to an auxiliar array
+//* @param	Pointer to an array to sace complete LUT
+//* @retval	Lenght of the LUT
+//*/
+//uint32_t generateSCVsignal(DF_SCVTypeDef* df, float* LUT1, float* LUT2, float* LUT3, float* LUTcomplete) {
 
-	uint32_t lengthLUT;
-	uint32_t nSamples1 = generateRamp(df->start, df->stop, df->step, LUT1);
-	uint32_t nSamples2 = generateRamp(df->stop, df->start, df->step, LUT2);
+//	uint32_t lengthLUT;
+//	uint32_t nSamples1 = generateRamp(df->start, df->stop, df->step, LUT1);
+//	uint32_t nSamples2 = generateRamp(df->stop, df->start, df->step, LUT2);
 
-	/* Enviamos el último punto del período completo, que es el start */
-	// Usamos la misma función concatenateLUTs, pero como en este caso son dos tramos hacemos
-	// este truco y enviamos el último punto en la tercera LUT. Así no necesitamos definir
-	// otra función.
-	uint32_t nSamples3 = 1;
-	LUT3[0] = df->start;
+//	/* Enviamos el último punto del período completo, que es el start */
+//	// Usamos la misma función concatenateLUTs, pero como en este caso son dos tramos hacemos
+//	// este truco y enviamos el último punto en la tercera LUT. Así no necesitamos definir
+//	// otra función.
+//	uint32_t nSamples3 = 1;
+//	LUT3[0] = df->start;
 
-	lengthLUT = concatenateLUTs(LUT1, LUT2, LUT3, LUTcomplete, nSamples1, nSamples2, nSamples3);
+//	lengthLUT = concatenateLUTs(LUT1, LUT2, LUT3, LUTcomplete, nSamples1, nSamples2, nSamples3);
 
-	return lengthLUT;
+//	return lengthLUT;
 
-}
+//}
 
 
-/**
-* @brief	Generates DPV waveform for 1 complete experiment
-* @param	Pointer to data structure
-* @param	Pointer to an array to sace complete LUT
-* @retval	Lenght of the LUT
-*/
-uint32_t generateDPVsignal(DF_DPVTypeDef* df, float* LUTcomplete) {
+///**
+//* @brief	Generates DPV waveform for 1 complete experiment
+//* @param	Pointer to data structure
+//* @param	Pointer to an array to sace complete LUT
+//* @retval	Lenght of the LUT
+//*/
+//uint32_t generateDPVsignal(DF_DPVTypeDef* df, float* LUTcomplete) {
 
-	uint16_t i, j;
+//	uint16_t i, j;
 
-	/* Establecemos un nº mínimo de samples en el pulso para evitar aliasing a frecuencias altas */
-	uint16_t nSamplesPulse = 10;
+//	/* Establecemos un nº mínimo de samples en el pulso para evitar aliasing a frecuencias altas */
+//	uint16_t nSamplesPulse = 10;
 
-	/* Tiempo de disparo de cada sample */
-	float tTimer = df->tPulse / nSamplesPulse;
+//	/* Tiempo de disparo de cada sample */
+//	float tTimer = df->tPulse / nSamplesPulse;
 
-	/* Calculamos t interval (t dc + t pulse) */
-	float tInt = df->step / df->sr;
+//	/* Calculamos t interval (t dc + t pulse) */
+//	float tInt = df->step / df->sr;
 
-	/* Calculamos nº de samples en la zona DC */
-	float nSamplesDC = ceil((tInt - df->tPulse) / tTimer);
+//	/* Calculamos nº de samples en la zona DC */
+//	float nSamplesDC = ceil((tInt - df->tPulse) / tTimer);
 
-	/* Calculamos el nº de steps */
-	// TODO
-	uint32_t nSteps = abs((df->stop - df->start) / df->step);
+//	/* Calculamos el nº de steps */
+//	// TODO
+//	uint32_t nSteps = abs((df->stop - df->start) / df->step);
 
-	uint32_t contRow = 0;	// Lleva el seguimiento de la posición de la LUT 
+//	uint32_t contRow = 0;	// Lleva el seguimiento de la posición de la LUT 
 
 
-	/* Generamos el patrón de señal */
-	if (df->stop > df->start) {		// Si steps suben...
+//	/* Generamos el patrón de señal */
+//	if (df->stop > df->start) {		// Si steps suben...
 
-		for (i = 0; i < nSteps; i++) {
-			for (j = 0; j < nSamplesDC; j++) {				// Generamos parte DC..
-				
-				LUTcomplete[j + contRow] = df->start + (df->step * (i));
+//		for (i = 0; i < nSteps; i++) {
+//			for (j = 0; j < nSamplesDC; j++) {				// Generamos parte DC..
+//				
+//				LUTcomplete[j + contRow] = df->start + (df->step * (i));
 
-			}
-			contRow += j;
+//			}
+//			contRow += j;
 
-			for (j = 0; j < nSamplesPulse; j++) {			// Generamos pulso...
+//			for (j = 0; j < nSamplesPulse; j++) {			// Generamos pulso...
 
-				LUTcomplete[j + contRow] = (df->start + df->ePulse) + \
-					(df->step * i);
-			}
+//				LUTcomplete[j + contRow] = (df->start + df->ePulse) + \
+//					(df->step * i);
+//			}
 
-			contRow += j;
+//			contRow += j;
 
-		}
+//		}
 
-	}
+//	}
 
-	else {													// Si steps bajan...
-		
-		for (i = 0; i < nSteps; i++) {
-			for (j = 0; j < nSamplesDC; j++) {				// Generamos parte DC..
+//	else {													// Si steps bajan...
+//		
+//		for (i = 0; i < nSteps; i++) {
+//			for (j = 0; j < nSamplesDC; j++) {				// Generamos parte DC..
 
-				LUTcomplete[j + contRow] = df->start - (df->step * (i));
+//				LUTcomplete[j + contRow] = df->start - (df->step * (i));
 
-			}
-			contRow += j;
+//			}
+//			contRow += j;
 
-			for (j = 0; j < nSamplesPulse; j++) {			// Generamos pulso...
+//			for (j = 0; j < nSamplesPulse; j++) {			// Generamos pulso...
 
-				LUTcomplete[j + contRow] = (df->start + df->ePulse) - \
-					(df->step * i);
-			}
+//				LUTcomplete[j + contRow] = (df->start + df->ePulse) - \
+//					(df->step * i);
+//			}
 
-			contRow += j;
+//			contRow += j;
 
-		}
+//		}
 
-	}
+//	}
 
-	return contRow;
+//	return contRow;
 
-}
+//}
 
-/**
-* @brief	Generates NPV waveform for 1 complete experiment
-* @param	Pointer to data structure
-* @param	Pointer to an array to sace complete LUT
-* @retval	Lenght of the LUT
-*/
-uint32_t generateNPVsignal(DF_NPVTypeDef* df, float* LUTcomplete) {
+///**
+//* @brief	Generates NPV waveform for 1 complete experiment
+//* @param	Pointer to data structure
+//* @param	Pointer to an array to sace complete LUT
+//* @retval	Lenght of the LUT
+//*/
+//uint32_t generateNPVsignal(DF_NPVTypeDef* df, float* LUTcomplete) {
 
-	uint16_t i, j;
-	
-	/* Establecemos un nº mínimo de samples en el pulso para evitar aliasing a frecuencias altas */
-	uint16_t nSamplesPulse = 10;
+//	uint16_t i, j;
+//	
+//	/* Establecemos un nº mínimo de samples en el pulso para evitar aliasing a frecuencias altas */
+//	uint16_t nSamplesPulse = 10;
 
-	/* Tiempo de disparo de cada sample */
-	float tTimer = df->tPulse / nSamplesPulse;
+//	/* Tiempo de disparo de cada sample */
+//	float tTimer = df->tPulse / nSamplesPulse;
 
-	/* Calculamos t interval (t dc + t pulse) */
-	float tInt = df->step / df->sr;
+//	/* Calculamos t interval (t dc + t pulse) */
+//	float tInt = df->step / df->sr;
 
-	/* Calculamos nº de samples en la zona DC */
-	float nSamplesDC = ceil((tInt - df->tPulse) / tTimer);
+//	/* Calculamos nº de samples en la zona DC */
+//	float nSamplesDC = ceil((tInt - df->tPulse) / tTimer);
 
-	/* Calculamos el nº de steps */
-	uint32_t nSteps = abs((df->stop - df->start) / df->step);
+//	/* Calculamos el nº de steps */
+//	uint32_t nSteps = abs((df->stop - df->start) / df->step);
 
-	uint32_t contRow = 0;
+//	uint32_t contRow = 0;
 
-	/* Generamos el patrón de señal */
-	if (df->stop > df->start) {			// Si step sube...
+//	/* Generamos el patrón de señal */
+//	if (df->stop > df->start) {			// Si step sube...
 
-		for (i = 0; i < nSteps; i++) {
-			for (j = 0; j < nSamplesDC; j++) {					// Generamos parte DC...
+//		for (i = 0; i < nSteps; i++) {
+//			for (j = 0; j < nSamplesDC; j++) {					// Generamos parte DC...
 
-				LUTcomplete[j + contRow] = df->start;
-			}
+//				LUTcomplete[j + contRow] = df->start;
+//			}
 
-			contRow += j;
+//			contRow += j;
 
-			for (j = 0; j < nSamplesPulse; j++) {				// Generamos pulso...
+//			for (j = 0; j < nSamplesPulse; j++) {				// Generamos pulso...
 
-				LUTcomplete[j + contRow] = df->start + (df->step * i);
-			}
-			contRow += j;
-		}
-	}
-	
-	else {														// Si step baja...
+//				LUTcomplete[j + contRow] = df->start + (df->step * i);
+//			}
+//			contRow += j;
+//		}
+//	}
+//	
+//	else {														// Si step baja...
 
-		for (i = 0; i < nSteps; i++) {
-			for (j = 0; j < nSamplesDC; j++) {					// Generamos parte DC...
+//		for (i = 0; i < nSteps; i++) {
+//			for (j = 0; j < nSamplesDC; j++) {					// Generamos parte DC...
 
-				LUTcomplete[j + contRow] = df->start;
-			}
-			contRow += j;
+//				LUTcomplete[j + contRow] = df->start;
+//			}
+//			contRow += j;
 
-			for (j = 0; j < nSamplesPulse; j++) {				// Generamos pulso...
+//			for (j = 0; j < nSamplesPulse; j++) {				// Generamos pulso...
 
-				LUTcomplete[j + contRow] = df->start - (df->step * i);
-			}
-			contRow += j;
-		}
-		
-	}
+//				LUTcomplete[j + contRow] = df->start - (df->step * i);
+//			}
+//			contRow += j;
+//		}
+//		
+//	}
 
-	return contRow;
+//	return contRow;
 
-}
+//}
 
 
-/**
-* @brief	Generates DNPV waveform for 1 complete experiment
-* @param	Pointer to data structure
-* @param	Pointer to an array to sace complete LUT
-* @retval	Lenght of the LUT
-*/
-uint32_t generateDNPVsignal(DF_DNPVTypeDef* df, float* LUTcomplete) {
+///**
+//* @brief	Generates DNPV waveform for 1 complete experiment
+//* @param	Pointer to data structure
+//* @param	Pointer to an array to sace complete LUT
+//* @retval	Lenght of the LUT
+//*/
+//uint32_t generateDNPVsignal(DF_DNPVTypeDef* df, float* LUTcomplete) {
 
-	uint16_t i, j;
-	
-	/* Establecemos un nº mínimo de samples en el pulso para evitar aliasing a frecuencias altas */
-	uint16_t nSamplesPulse1 = 10;
+//	uint16_t i, j;
+//	
+//	/* Establecemos un nº mínimo de samples en el pulso para evitar aliasing a frecuencias altas */
+//	uint16_t nSamplesPulse1 = 10;
 
-	/* Tiempo de disparo de cada sample */
-	float tTimer = df->tPulse1 / nSamplesPulse1;
+//	/* Tiempo de disparo de cada sample */
+//	float tTimer = df->tPulse1 / nSamplesPulse1;
 
-	/* Calculamos t interval (t dc + t pulse) */
-	float tInt = df->step / df->sr;
+//	/* Calculamos t interval (t dc + t pulse) */
+//	float tInt = df->step / df->sr;
 
-	/* Calculamos nº de samples en la zona DC */
-	float nSamplesDC = ceil((tInt - (df->tPulse1 + df->tPulse2 )) / tTimer);
+//	/* Calculamos nº de samples en la zona DC */
+//	float nSamplesDC = ceil((tInt - (df->tPulse1 + df->tPulse2 )) / tTimer);
 
-	/* Nº de samples en pulse1 */
-	float nSamplesP1 = ceil(df->tPulse1 / tTimer);
+//	/* Nº de samples en pulse1 */
+//	float nSamplesP1 = ceil(df->tPulse1 / tTimer);
 
-	/* Nº de samples en pulse2 */
-	float nSamplesP2 = ceil(df->tPulse2 / tTimer);
+//	/* Nº de samples en pulse2 */
+//	float nSamplesP2 = ceil(df->tPulse2 / tTimer);
 
-	/* Calculamos el nº de steps */
-	uint32_t nSteps = abs((df->stop - df->start) / df->step);
+//	/* Calculamos el nº de steps */
+//	uint32_t nSteps = abs((df->stop - df->start) / df->step);
 
-	uint32_t contRow = 0;
+//	uint32_t contRow = 0;
 
-	/* Generamos el patrón de señal */
-	if (df->stop > df->start) {		// Si steps suben...
-		for (i = 0; i < nSteps; i++) {
+//	/* Generamos el patrón de señal */
+//	if (df->stop > df->start) {		// Si steps suben...
+//		for (i = 0; i < nSteps; i++) {
 
-			for (j = 0; j < nSamplesDC; j++) {				// Generamos parte DC...
+//			for (j = 0; j < nSamplesDC; j++) {				// Generamos parte DC...
 
-				LUTcomplete[j + contRow] = df->start;
-			}
-			contRow += j;
+//				LUTcomplete[j + contRow] = df->start;
+//			}
+//			contRow += j;
 
-			for (j = 0; j < nSamplesP1; j++) {				// Generamos pulse1...
+//			for (j = 0; j < nSamplesP1; j++) {				// Generamos pulse1...
 
-				LUTcomplete[j + contRow] = df->start + (df->step * i);
-			}
-			contRow += j;
+//				LUTcomplete[j + contRow] = df->start + (df->step * i);
+//			}
+//			contRow += j;
 
-			for (j = 0; j < nSamplesP2; j++) {				// Generamos pulse2...
+//			for (j = 0; j < nSamplesP2; j++) {				// Generamos pulse2...
 
-				LUTcomplete[j + contRow] = (df->start + df->ePulse) + \
-					(df->step * i);
-			}
-			contRow += j;
+//				LUTcomplete[j + contRow] = (df->start + df->ePulse) + \
+//					(df->step * i);
+//			}
+//			contRow += j;
 
-		}
+//		}
 
 
-	}
+//	}
 
-	else {													// Si steps bajan...
-		for (i = 0; i < nSteps; i++) {
+//	else {													// Si steps bajan...
+//		for (i = 0; i < nSteps; i++) {
 
-			for (j = 0; j < nSamplesDC; j++) {				// Generamos parte DC...
+//			for (j = 0; j < nSamplesDC; j++) {				// Generamos parte DC...
 
-				LUTcomplete[j + contRow] = df->start;
-			}
-			contRow += j;
+//				LUTcomplete[j + contRow] = df->start;
+//			}
+//			contRow += j;
 
-			for (j = 0; j < nSamplesP1; j++) {				// Generamos pulse1...
+//			for (j = 0; j < nSamplesP1; j++) {				// Generamos pulse1...
 
-				LUTcomplete[j + contRow] = df->start - (df->step * i);
-			}
-			contRow += j;
+//				LUTcomplete[j + contRow] = df->start - (df->step * i);
+//			}
+//			contRow += j;
 
-			for (j = 0; j < nSamplesP2; j++) {				// Generamos pulse2...
+//			for (j = 0; j < nSamplesP2; j++) {				// Generamos pulse2...
 
-				LUTcomplete[j + contRow] = (df->start + df->ePulse) - \
-					(df->step * i);
-			}
-			contRow += j;
+//				LUTcomplete[j + contRow] = (df->start + df->ePulse) - \
+//					(df->step * i);
+//			}
+//			contRow += j;
 
-		}
+//		}
 
 
-	}
+//	}
 
-	return contRow;
-}
+//	return contRow;
+//}
 
 
-/**
-* @brief	Generates SWV waveform for 1 complete experiment
-* @param	Pointer to data structure
-* @param	Pointer to an auxiliar array
-* @param	Pointer to an auxiliar array
-* @param	Pointer to an array to sace complete LUT
-* @retval	Lenght of the LUT
-*/
-uint32_t generateSWVsignal(DF_SWVTypeDef* df, float* LUT1, float* LUT2, float* LUTcomplete) {
+///**
+//* @brief	Generates SWV waveform for 1 complete experiment
+//* @param	Pointer to data structure
+//* @param	Pointer to an auxiliar array
+//* @param	Pointer to an auxiliar array
+//* @param	Pointer to an array to sace complete LUT
+//* @retval	Lenght of the LUT
+//*/
+//uint32_t generateSWVsignal(DF_SWVTypeDef* df, float* LUT1, float* LUT2, float* LUTcomplete) {
 
-	uint16_t i, j;
-	uint32_t contRow = 0;
+//	uint16_t i, j;
+//	uint32_t contRow = 0;
 
-	/* Sacamos samples totales conociendo frecuencia */
-	float fSampling = 100 * df->freq;		// oversampling...
+//	/* Sacamos samples totales conociendo frecuencia */
+//	float fSampling = 100 * df->freq;		// oversampling...
 
-	/* Tiempo de disparo de cada sample */
-	float tTimer = 1 / df->freq;
+//	/* Tiempo de disparo de cada sample */
+//	float tTimer = 1 / df->freq;
 
 
-	/* Calculamos el nº de steps */
-	uint32_t nSteps = abs((df->start - df->stop) / df->step);
+//	/* Calculamos el nº de steps */
+//	uint32_t nSteps = abs((df->start - df->stop) / df->step);
 
-	/* Hacemos la señal en dos pasos... */
-	/* PASO 1: generamos la onda cuadrada */
-	float nSamples1 = (1 / df->freq) / tTimer;
-	float nSamples2 = (1 / df->freq) / tTimer;
+//	/* Hacemos la señal en dos pasos... */
+//	/* PASO 1: generamos la onda cuadrada */
+//	float nSamples1 = (1 / df->freq) / tTimer;
+//	float nSamples2 = (1 / df->freq) / tTimer;
 
-	for (i = 0; i < nSamples1; i++) {				// Primer semiperíodo...
+//	for (i = 0; i < nSamples1; i++) {				// Primer semiperíodo...
 
-		LUT1[i] = df->amplitude;
-	}
+//		LUT1[i] = df->amplitude;
+//	}
 
-	for (i = 0; i < nSamples2; i++) {				// Segundo semiperíodo...
+//	for (i = 0; i < nSamples2; i++) {				// Segundo semiperíodo...
 
-		LUT2[i] = - (df->amplitude);
-	}
+//		LUT2[i] = - (df->amplitude);
+//	}
 
 
-	/* PASO 2: generamos el DC offset */
+//	/* PASO 2: generamos el DC offset */
 
 
-	if (df->start < df->stop) {		// Si steps suben...
+//	if (df->start < df->stop) {		// Si steps suben...
 
-		for (i = 0; i < nSteps; i++) {
+//		for (i = 0; i < nSteps; i++) {
 
-			for (j = 0; j < nSamples1; j++) {			// Generamos primer semiperíodo más parte DC
+//			for (j = 0; j < nSamples1; j++) {			// Generamos primer semiperíodo más parte DC
 
-				LUTcomplete[j + contRow] = (df->start + df->step * i) + \
-					LUT1[j];
-			}
-			contRow += j;
+//				LUTcomplete[j + contRow] = (df->start + df->step * i) + \
+//					LUT1[j];
+//			}
+//			contRow += j;
 
-			for (j = 0; j < nSamples2; j++) {			// Generamos segundo semiperíodo más parte DC
+//			for (j = 0; j < nSamples2; j++) {			// Generamos segundo semiperíodo más parte DC
 
-				LUTcomplete[j + contRow] = (df->start + df->step * i) + \
-					LUT2[j];
-			}
-			contRow += j;
-		}
+//				LUTcomplete[j + contRow] = (df->start + df->step * i) + \
+//					LUT2[j];
+//			}
+//			contRow += j;
+//		}
 
-	}
+//	}
 
-	else {												// Si steps bajan...
+//	else {												// Si steps bajan...
 
-		for (i = 0; i < nSteps; i++) {
+//		for (i = 0; i < nSteps; i++) {
 
-			for (j = 0; j < nSamples1; j++) {			// Generamos primer semiperíodo más parte DC
+//			for (j = 0; j < nSamples1; j++) {			// Generamos primer semiperíodo más parte DC
 
-				LUTcomplete[j + contRow] = (df->start - df->step * i) + \
-					LUT1[j];
-			}
-			contRow += j;
+//				LUTcomplete[j + contRow] = (df->start - df->step * i) + \
+//					LUT1[j];
+//			}
+//			contRow += j;
 
-			for (j = 0; j < nSamples2; j++) {			// Generamos segundo semiperíodo más parte DC
+//			for (j = 0; j < nSamples2; j++) {			// Generamos segundo semiperíodo más parte DC
 
-				LUTcomplete[j + contRow] = (df->start - df->step * i) + \
-					LUT2[j];
-			}
-			contRow += j;
-		}
+//				LUTcomplete[j + contRow] = (df->start - df->step * i) + \
+//					LUT2[j];
+//			}
+//			contRow += j;
+//		}
 
-	}
+//	}
 
 
-	return contRow;
-}
+//	return contRow;
+//}
 
-/**
-* @brief	Generates ACV waveform for 1 complete experiment
-* @param	Pointer to data structure
-* @param	Pointer to an auxiliar array
-* @param	Pointer to an array to sace complete LUT
-* @retval	Lenght of the LUT
-*/
-uint32_t generateACVsignal(DF_ACTypeDef* df, float* LUT1, float* LUTcomplete) {
+///**
+//* @brief	Generates ACV waveform for 1 complete experiment
+//* @param	Pointer to data structure
+//* @param	Pointer to an auxiliar array
+//* @param	Pointer to an array to sace complete LUT
+//* @retval	Lenght of the LUT
+//*/
+//uint32_t generateACVsignal(DF_ACTypeDef* df, float* LUT1, float* LUTcomplete) {
 
-	uint16_t i, j;
-	float nSteps;
+//	uint16_t i, j;
+//	float nSteps;
 
-	/* Sacamos samples totales conociendo la frecuencia */
-	float fSampling = df->freq * 100;
-	float tTimer = 1 / fSampling;
-	float nSamplesAC = ceil((1 / df->freq) / tTimer);
+//	/* Sacamos samples totales conociendo la frecuencia */
+//	float fSampling = df->freq * 100;
+//	float tTimer = 1 / fSampling;
+//	float nSamplesAC = ceil((1 / df->freq) / tTimer);
 
-	/* Calculamos el t interval */
-	float tInt = df->step / df->sr;
+//	/* Calculamos el t interval */
+//	float tInt = df->step / df->sr;
 
-	/* PASO 1 : generación de la senoide para todo el período */
-	/* Calculamos nº períodos AC que caben en t interval */
-	float nPerAC = tInt / (1 / df->freq);
+//	/* PASO 1 : generación de la senoide para todo el período */
+//	/* Calculamos nº períodos AC que caben en t interval */
+//	float nPerAC = tInt / (1 / df->freq);
 
-	/* Esto nos da el nº de ptos totales del t interval */
-	float nSamplesTint = ceil(nPerAC * nSamplesAC);
+//	/* Esto nos da el nº de ptos totales del t interval */
+//	float nSamplesTint = ceil(nPerAC * nSamplesAC);
 
-	/* Generamos la senoidal para todo el t int */
-	/* IMPORTANTE */
-	/* En caso de que el nº de períodos AC que caben en el t itnerval no sea
-	 un número entero, debemos de poder sacar los puntos del período incompleto.
-	 Esto se hace en la segunda parte del "if" */
+//	/* Generamos la senoidal para todo el t int */
+//	/* IMPORTANTE */
+//	/* En caso de que el nº de períodos AC que caben en el t itnerval no sea
+//	 un número entero, debemos de poder sacar los puntos del período incompleto.
+//	 Esto se hace en la segunda parte del "if" */
 
-	uint32_t contRow = 0;
+//	uint32_t contRow = 0;
 
-	for (i = 0; i < ceil(nPerAC); i++) {
+//	for (i = 0; i < ceil(nPerAC); i++) {
 
-		if (i < nPerAC) {						// Si no es el último período...
-			for (j = 0; j < nSamplesAC; j++) {
+//		if (i < nPerAC) {						// Si no es el último período...
+//			for (j = 0; j < nSamplesAC; j++) {
 
-				LUT1[j + contRow] = df->ACamplitude * sin((2 * PI / nSamplesAC)*j);
-			}
-			contRow += j;
-		}
-		else {									// Si último período...
+//				LUT1[j + contRow] = df->ACamplitude * sin((2 * PI / nSamplesAC)*j);
+//			}
+//			contRow += j;
+//		}
+//		else {									// Si último período...
 
-			float nSamplesRest = nSamplesTint - contRow;
+//			float nSamplesRest = nSamplesTint - contRow;
 
-			for (j = 0; j < nSamplesRest; j++) {
+//			for (j = 0; j < nSamplesRest; j++) {
 
-				LUT1[j + contRow] = df->ACamplitude * sin((2 * PI / nSamplesAC)*j);
-			}
-		}
+//				LUT1[j + contRow] = df->ACamplitude * sin((2 * PI / nSamplesAC)*j);
+//			}
+//		}
 
-	}
+//	}
 
-	/* Generación del offset + AC para toda la prueba */
-	nSteps = ceil(abs((df->start - df->stop) / df->step));
+//	/* Generación del offset + AC para toda la prueba */
+//	nSteps = ceil(abs((df->start - df->stop) / df->step));
 
-	contRow = 0;
+//	contRow = 0;
 
-	if (df->start < df->stop) {			// Si steps suben...
-		for (i = 0; i < nSteps; i++) {
-			for (j = 0; j < nSamplesTint; j++) {
+//	if (df->start < df->stop) {			// Si steps suben...
+//		for (i = 0; i < nSteps; i++) {
+//			for (j = 0; j < nSamplesTint; j++) {
 
-				LUTcomplete[j + contRow] = (df->start + (df->step*i)) + \
-					LUT1[j];
-			}
-			contRow += j;
-		}
-	}
-	else {														// Si steps bajan...
-		for (i = 0; i < nSteps; i++) {
-			for (j = 0; j < nSamplesTint; j++) {
+//				LUTcomplete[j + contRow] = (df->start + (df->step*i)) + \
+//					LUT1[j];
+//			}
+//			contRow += j;
+//		}
+//	}
+//	else {														// Si steps bajan...
+//		for (i = 0; i < nSteps; i++) {
+//			for (j = 0; j < nSamplesTint; j++) {
 
-				LUTcomplete[j + contRow] = (df->start - (df->step*i)) + \
-					LUT1[j];
-			}
-			contRow += j;
+//				LUTcomplete[j + contRow] = (df->start - (df->step*i)) + \
+//					LUT1[j];
+//			}
+//			contRow += j;
 
-		}
-	}
+//		}
+//	}
 
-	return contRow;
-}
+//	return contRow;
+//}
 
 
 
 /* FUNCION EN PRUEBAS PARA GENERAR LUT PERIODICA */
-void generateDPVwaveform(DF_DPVTypeDef* df, uint16_t* LUT, uint32_t* nSExp, uint32_t* nSLUT){
+//void generateDPVwaveform(DF_DPVTypeDef* df, uint16_t* LUT, uint32_t* nSExp, uint32_t* nSLUT){
 
-	uint32_t i,j;
-	
-	if(experiment == E_NONE){				// Si entramos por primera vez a lanzar el experimento calculamos todos los datos necesarios...
-	
-		uint32_t fSampling = 10000;		// TODO: este valor dependerá del filtro seleccionado.
-																	// Hemos seleccionado aquí la frec para un filtro de butterworth del equipo de CEMITEC.	
-																	// La idea es que esta frecuencia sea de aprox 20x la frec de corte del filtro.
-																	// Hay que enviar el valor del filtro seleccionado a esta función como argumento.
-		
-		// Recupero todos los decimales para los cálculos...
-		float step =  df->Init.step / 1000.0;		// V  ( ((df->step / 1000.0) * VREF) / 32768.0)
-		float sr =  df->Init.sr / 1000.0;															// V/seg
-		
-		float tPulse = df->Init.tPulse / 1000.0;												// seg
-		float stop = ((int16_t)(df->Init.stop)) / 1000.0;			// V
-		float start = ((int16_t)(df->Init.start)) / 1000.0; //((df->start - 32768.0) * VREF) / 32768.0;		// V
-		float ePulse = ((int16_t)(df->Init.ePulse)) / 1000.0;		
-		
-		float tSampling = 1 / (float)fSampling;
-		float tInt = step / sr;
-		
-		// Transformo a valores DAC para generación de forma de onda...
-		df->start = (((start * 32768.0) / VREF) + 32768.0);
-		df->stop = (((stop * 32768.0) / VREF) + 327680.0);
-		df->ePulse = ((ePulse * 32768.0) / VREF);
-		df->step = ((step * 32768.0) / VREF);
-		
-		// Número de samples para cada tramo de la señal en cada período
-		df->nSamples1 = ceil((tInt - tPulse) / tSampling);
-		df->nSamples2 = ceil((tPulse / tSampling));
-		
-		// Calculamos nº de steps
-		df->nSteps = ceil(fabs(stop - start) / step);
-		
-		
-		/* Inicializamos las variables para llevar la cuenta
-		de los samples que vamos leyendo de la LUT y de los 
-		samples totales del exp	en la ISR */
-		*nSLUT = df->nSamples1 + df->nSamples2;				// Samples de cada período de LUT (suma samples cada tramo)
-		*nSExp = df->nSteps * (*nSLUT);								// Samples totales del experimento
-	}
-	
-	
-	if (df->stop > df->start){			// Si steps suben....
-		
-		// Primera parte de la onda...
-		for(j = 0; j < df->nSamples1; j++){
-			LUT[j] = df->start + (df->step * (df->realStep));
-		
-		}
-		
-		// Segunda parte de la onda...
-		for(j = 0; j < df->nSamples2; j++){
-			LUT[j + df->nSamples1] = (df->start + df->ePulse) + (df->step * df->realStep);
-		
-		}
-		//df->realStep++;				// Nos sirve para llevar cuenta de en qué step estamos generando la forma de onda. Comienza en cero.
-	}
-	
-	else {																									// Si steps bajan...
-	
-		// Primera parte de la onda...
-		for(j = 0; j < df->nSamples1; j++){
-			LUT[j] = df->start - (df->step * (df->realStep));
-		
-		}
-		
-		// Segunda parte de la onda...
-		for(j = 0; j < df->nSamples2; j++){
-			LUT[j + df->nSamples1] = (df->start + df->ePulse) - (df->step * df->realStep);
-		
-		}
-		//df->realStep++;
+//	uint32_t i,j;
+//	
+//	if(eWE1 == E_NONE | eWE2 == E_NONE){				// Si entramos por primera vez a lanzar el experimento calculamos todos los datos necesarios...
+//	
+//		uint32_t fSampling = 10000;		// TODO: este valor dependerá del filtro seleccionado.
+//																	// Hemos seleccionado aquí la frec para un filtro de butterworth del equipo de CEMITEC.	
+//																	// La idea es que esta frecuencia sea de aprox 20x la frec de corte del filtro.
+//																	// Hay que enviar el valor del filtro seleccionado a esta función como argumento.
+//		
+//		// Recupero todos los decimales para los cálculos...
+//		float step =  df->Init.step / 1000.0;		// V  ( ((df->step / 1000.0) * VREF) / 32768.0)
+//		float sr =  df->Init.sr / 1000.0;															// V/seg
+//		
+//		float tPulse = df->Init.tPulse / 1000.0;												// seg
+//		float stop = ((int16_t)(df->Init.stop)) / 1000.0;			// V
+//		float start = ((int16_t)(df->Init.start)) / 1000.0; //((df->start - 32768.0) * VREF) / 32768.0;		// V
+//		float ePulse = ((int16_t)(df->Init.ePulse)) / 1000.0;		
+//		
+//		float tSampling = 1 / (float)fSampling;
+//		float tInt = step / sr;
+//		
+//		// Transformo a valores DAC para generación de forma de onda...
+//		df->start = (((start * 32768.0) / VREF) + 32768.0);
+//		df->stop = (((stop * 32768.0) / VREF) + 327680.0);
+//		df->ePulse = ((ePulse * 32768.0) / VREF);
+//		df->step = ((step * 32768.0) / VREF);
+//		
+//		// Número de samples para cada tramo de la señal en cada período
+//		df->nSamples1 = ceil((tInt - tPulse) / tSampling);
+//		df->nSamples2 = ceil((tPulse / tSampling));
+//		
+//		// Calculamos nº de steps
+//		df->nSteps = ceil(fabs(stop - start) / step);
+//		
+//		
+//		/* Inicializamos las variables para llevar la cuenta
+//		de los samples que vamos leyendo de la LUT y de los 
+//		samples totales del exp	en la ISR */
+//		*nSLUT = df->nSamples1 + df->nSamples2;				// Samples de cada período de LUT (suma samples cada tramo)
+//		*nSExp = df->nSteps * (*nSLUT);								// Samples totales del experimento
+//	}
+//	
+//	
+//	if (df->stop > df->start){			// Si steps suben....
+//		
+//		// Primera parte de la onda...
+//		for(j = 0; j < df->nSamples1; j++){
+//			LUT[j] = df->start + (df->step * (df->realStep));
+//		
+//		}
+//		
+//		// Segunda parte de la onda...
+//		for(j = 0; j < df->nSamples2; j++){
+//			LUT[j + df->nSamples1] = (df->start + df->ePulse) + (df->step * df->realStep);
+//		
+//		}
+//		//df->realStep++;				// Nos sirve para llevar cuenta de en qué step estamos generando la forma de onda. Comienza en cero.
+//	}
+//	
+//	else {																									// Si steps bajan...
+//	
+//		// Primera parte de la onda...
+//		for(j = 0; j < df->nSamples1; j++){
+//			LUT[j] = df->start - (df->step * (df->realStep));
+//		
+//		}
+//		
+//		// Segunda parte de la onda...
+//		for(j = 0; j < df->nSamples2; j++){
+//			LUT[j + df->nSamples1] = (df->start + df->ePulse) - (df->step * df->realStep);
+//		
+//		}
+//		//df->realStep++;
 
+//	}
+//	
+//	df->realStep++;																// subimos un step para la siguiente vez
+//	
+//}
+	
+//void generateDPVwaveform(exp_param_values_t* e, status_experiment* eWE, uint16_t* LUT){
+
+//	uint32_t i,j;
+//	
+//	if(*eWE == E_NONE){				// Si entramos por primera vez a lanzar el experimento calculamos todos los datos necesarios...
+//		
+//		//uint32_t fSampling = 10000;		// TODO: este valor dependerá del filtro seleccionado.
+//																	// Hemos seleccionado aquí la frec para un filtro de butterworth del equipo de CEMITEC.	
+//																	// La idea es que esta frecuencia sea de aprox 20x la frec de corte del filtro.
+//																	// Hay que enviar el valor del filtro seleccionado a esta función como argumento.
+//		
+//		// Recupero todos los decimales para los cálculos...
+//		float step = e->Init.step / 1000.0;
+//		float sr = e->Init.sr / 1000.0;
+//		
+//		float tPulse = e->Init.tPulse1 / 1000.0;
+//		float stop = ((int16_t)(e->Init.stop)) / 1000.0;
+//		float start = ((int16_t)(e->Init.start)) / 1000.0;
+//		float ePulse = ((int16_t)(e->Init.ePulse1)) / 1000.0;
+//		
+//		float tSampling = 1 / (float)e->fSampling;
+//		float tInt = step / sr;
+
+
+//		
+//		// Número de samples para cada tramo de la señal en cada período
+//		e->nSamples1 = ceil((tInt - tPulse) / tSampling);
+//		e->nSamples2 = ceil((tPulse / tSampling));
+//		
+//		// Calculamos nº de steps
+//		e->nSteps = ceil(fabs(stop - start) / step);
+//		
+//		
+//		/* Inicializamos las variables para llevar la cuenta
+//		de los samples que vamos leyendo de la LUT y de los 
+//		samples totales del exp	en la ISR */
+//		e->nSamplesLUT = e->nSamples1 + e->nSamples2;				// Samples de cada período de LUT (suma samples cada tramo)
+//		e->nSamplesExp = e->nSteps * e->nSamplesLUT;								// Samples totales del experimento
+//		
+//				
+//		// Transformo a valores DAC para generación de forma de onda...
+//		e->runTime.start = (((start * 32768.0) / VREF) + 32768.0);
+//		e->runTime.stop = (((stop * 32768.0) / VREF) + 327680.0);
+//		e->runTime.ePulse1 = ((ePulse * 32768.0) / VREF);
+//		e->runTime.step = ((step * 32768.0) / VREF);
+//	}
+//	
+//	
+//	if (e->Init.stop > e->Init.start){			// Si steps suben....
+//		
+//		// Primera parte de la onda...
+//		for(j = 0; j < e->nSamples1; j++){
+//			LUT[j] = e->runTime.start + (e->runTime.step * (e->contStep));
+//		
+//		}
+//		
+//		// Segunda parte de la onda...
+//		for(j = 0; j < e->nSamples2; j++){
+//			LUT[j + e->nSamples1] = (e->runTime.start + e->runTime.ePulse1) + (e->runTime.step * e->contStep);
+//		
+//		}
+
+//	}
+//	
+//	else {																									// Si steps bajan...
+//	
+//		// Primera parte de la onda...
+//		for(j = 0; j < e->nSamples1; j++){
+//			LUT[j] = e->runTime.start - (e->runTime.step * (e->cont));
+//		
+//		}
+//		
+//		// Segunda parte de la onda...
+//		for(j = 0; j < e->nSamples2; j++){
+//			LUT[j + e->nSamples1] = (e->runTime.start + e->runTime.ePulse1) - (e->runTime.step * e->cont);
+//		
+//		}
+//		//df->realStep++;
+
+//	}
+//	
+//	e->cont++;																// subimos un step para la siguiente vez
+//	
+//}
+
+
+
+// Función que genera 1024 ptos de señal DPV
+void generateDPV(exp_param_values_t* e, uint16_t* LUT){
+	
+	uint16_t i;
+	
+	if(e->upwardsStep){										// Steps suben...
+		
+		for(i = 0; i < NSAMPLESLUT; i++){
+			if(e->contSamplesPer <= e->nSamples1){									// Estamos en primera parte de la onda (DC)
+			
+				LUT[i] = e->Init.start + (e->Init.step * e->contStep);
+			}
+			
+			else if((e->contSamplesPer - e->nSamples1) <= e->nSamples2){		// Estamos en segunda parte de la onda (pulse)
+			
+				LUT[i] = (e->Init.start + (e->Init.step * e->contStep)) + e->Init.ePulse1;
+			}
+			
+			e->contSamplesPer++;
+			
+			if(e->contSamplesPer > e->nSamplesPer){													// Hemos terminado de sacar un período completo...?
+			
+				e->contSamplesPer = 0;																				// Reseteamos contadores y subimosr un step el siguiente período...
+				e->contStep++;
+			}
+		
+		}
 	}
 	
-	df->realStep++;																// subimos un step para la siguiente vez
-	
+	else{ 																								// Steps bajan...
+		
+		for(i = 0; i < NSAMPLESLUT; i++){
+			if(e->contSamplesPer <= e->nSamples1){									// Estamos en primera parte de la onda (DC)
+			
+				LUT[i] = e->Init.start - (e->Init.step * e->contStep);
+			}
+			
+			else if((e->contSamplesPer - e->nSamples1) <= e->nSamples2){		// Estamos en segunda parte de la onda (pulse)
+			
+				LUT[i] = (e->Init.start - (e->Init.step * e->contStep)) + e->Init.ePulse1;
+			}
+			
+			e->contSamplesPer++;
+			
+			if(e->contSamplesPer > e->nSamplesPer){													// Hemos terminado de sacar un período completo...?
+			
+				e->contSamplesPer = 0;																				// Reseteamos contadores y subimosr un step el siguiente período...
+				e->contStep++;
+			}
+		
+		}
+	}
+
 }
-	
-	
 
-	
-void load_data(uint8_t* buff, DF_CVTypeDef* df_cv, DF_LSVTypeDef* df_lsv, DF_SCVTypeDef* df_scv, \
-	DF_DPVTypeDef* df_dpv, DF_NPVTypeDef* df_npv, DF_DNPVTypeDef* df_dnpv, DF_SWVTypeDef* df_swv, DF_ACTypeDef* df_acv, pretreat_t* p,\
-	exp_config_t* e){
+// Función para cargar datos recibidos desde el PC en la estructura del experimento correspondiente
+void load_data(uint8_t* buff, exp_param_values_t* e, pretreat_param_t* p, exp_config_t* eConfig){
 	
 	/* Recogemos datos pretratamiento */
 	p->tCond =  ((buff[10] << 8) | (buff[11] & 0xFF));
@@ -691,43 +829,43 @@ void load_data(uint8_t* buff, DF_CVTypeDef* df_cv, DF_LSVTypeDef* df_lsv, DF_SCV
 	p->eEq = ((buff[22] << 8) | (buff[23] & 0xFF));
 		
 	/* Recogemos otros datos del experimento */
-	e->bipot = buff[3];
-	e->cell_on = buff[9];
-	e->exp = buff[5];
+	eConfig->bipot = buff[3];
+	eConfig->cell_on = buff[9];
+	eConfig->exp = buff[5];
 	
 	
 	/* en función de la técnica guardamos los datos del experimento en la estructura correspondiente */
-	switch(e->exp){
+	switch(eConfig->exp){
 		case 0:													// CV
-			load_CV_data(df_cv, buff);
+			//load_CV_data(e, buff);
 			break;
 		
 		case 1:													// LSV
-			load_LSV_data(df_lsv, buff);
+			//load_LSV_data(e, buff);
 			break;
 		
 		case 2:													// SCV
-			load_SCV_data(df_scv, buff);
+			//load_SCV_data(e, buff);
 			break;
 		
 		case 3:													// DPV
-			load_DPV_data(df_dpv, buff);
+			load_DPV_data(e, buff);
 			break;
 			
 		case 4:													// NPV
-			load_NPV_data(df_npv, buff);
+			//load_NPV_data(e, buff);
 			break;
 		
 		case 5:													// DNPV
-			load_DNPV_data(df_dnpv, buff);
+			//load_DNPV_data(e, buff);
 			break;
 		
 		case 6:													// SWV
-			load_SWV_data(df_swv, buff);
+			//load_SWV_data(e, buff);
 			break;
 		
 		case 7:													// ACV
-			load_ACV_data(df_acv, buff);
+			//load_ACV_data(e, buff);
 			break;
 	
 	
@@ -737,12 +875,10 @@ void load_data(uint8_t* buff, DF_CVTypeDef* df_cv, DF_LSVTypeDef* df_lsv, DF_SCV
 }
 	
 
-void generate_data(DF_CVTypeDef* df_cv, DF_LSVTypeDef* df_lsv, DF_SCVTypeDef* df_scv, \
-	DF_DPVTypeDef* df_dpv, DF_NPVTypeDef* df_npv, DF_DNPVTypeDef* df_dnpv, DF_SWVTypeDef* df_swv, DF_ACTypeDef* df_acv,\
-	exp_config_t* e, uint16_t* lut, uint32_t* nSamplesExp, uint32_t* nSamplesLUT){
+void generate_data(exp_param_values_t* e,	exp_config_t* eConfig, uint16_t* lut){
 
 	/* En función de la técnica guardamos los datos del experimento en la estructura correspondiente */
-	switch(e->exp){
+	switch(eConfig->exp){
 		case 0:													// CV
 			// TODO
 			break;
@@ -756,7 +892,7 @@ void generate_data(DF_CVTypeDef* df_cv, DF_LSVTypeDef* df_lsv, DF_SCVTypeDef* df
 			break;
 		
 		case 3:													// DPV
-			generateDPVwaveform(df_dpv, lut, nSamplesExp, nSamplesLUT);
+			generateDPV(e, lut);
 			break;
 			
 		case 4:													// NPV
@@ -783,109 +919,260 @@ void generate_data(DF_CVTypeDef* df_cv, DF_LSVTypeDef* df_lsv, DF_SCVTypeDef* df
 
 
 /* 	FUNCIONES PARA PRECARGA DE DATOS EN ESTRUCTURAS PARA GENERAR EL EXPERIMENTO */
-void load_CV_data(DF_CVTypeDef* df, uint8_t* cmd){
-								
-	/* Experiment values */
-	df->start = (int)(((( ((cmd[22] << 8) | (cmd[23] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	df->vtx1 = (int)(((( ((cmd[24] << 8) | (cmd[25] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	df->vtx2 = (int)(((( ((cmd[26] << 8) | (cmd[27] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	df->step = (int)(((( ((cmd[28] << 8) | (cmd[29] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	df->sr = (int)(((( ((cmd[30] << 8) | (cmd[31] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
-	df->scans = ((cmd[32] << 8) | (cmd[33] & 0xFF));
+//void load_CV_data(DF_CVTypeDef* df, uint8_t* cmd){
+//								
+//	/* Experiment values */
+//	df->start = (int)(((( ((cmd[22] << 8) | (cmd[23] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+//	df->vtx1 = (int)(((( ((cmd[24] << 8) | (cmd[25] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+//	df->vtx2 = (int)(((( ((cmd[26] << 8) | (cmd[27] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+//	df->step = (int)(((( ((cmd[28] << 8) | (cmd[29] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+//	df->sr = (int)(((( ((cmd[30] << 8) | (cmd[31] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0;
+//	df->scans = ((cmd[32] << 8) | (cmd[33] & 0xFF));
 
-					
-}
-
-
-void load_LSV_data(DF_LSVTypeDef* df, uint8_t* cmd){
-
-	/* Experiment values */
-	df->start = (uint16_t) ((int)(((( ((cmd[22] << 8) | (cmd[23] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
-	df->stop = (uint16_t) ((int)(((( ((cmd[24] << 8) | (cmd[25] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
-	df->step = (uint16_t) ((int)(((( ((cmd[26] << 8) | (cmd[27] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
-	df->sr = (uint16_t) ((int)(((( ((cmd[28] << 8) | (cmd[29] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
-	
-
-}
+//					
+//}
 
 
+//void load_LSV_data(DF_LSVTypeDef* df, uint8_t* cmd){
 
-void load_SCV_data(DF_SCVTypeDef* df, uint8_t* cmd){
+//	/* Experiment values */
+//	df->start = (uint16_t) ((int)(((( ((cmd[22] << 8) | (cmd[23] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
+//	df->stop = (uint16_t) ((int)(((( ((cmd[24] << 8) | (cmd[25] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
+//	df->step = (uint16_t) ((int)(((( ((cmd[26] << 8) | (cmd[27] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
+//	df->sr = (uint16_t) ((int)(((( ((cmd[28] << 8) | (cmd[29] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
+//	
 
-	/* Experiment values */
-	df->start = (uint16_t)((int)(((( ((cmd[22] << 8) | (cmd[23] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
-	df->stop = (uint16_t)((int)(((( ((cmd[24] << 8) | (cmd[25] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
-	df->step = (uint16_t) ((int)(((( ((cmd[26] << 8) | (cmd[27] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
-	df->tHold = (uint16_t) ((int)(((( ((cmd[28] << 8) | (cmd[29] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
-	df->sr = (uint16_t) ((int)(((( ((cmd[30] << 8) | (cmd[31] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
-	df->scans = ((cmd[32] << 8) | (cmd[33] & 0xFF));	
+//}
 
-}
 
-void load_DPV_data(DF_DPVTypeDef* df, uint8_t* cmd){
-					
-	/* Experiment values */
-	df->Init.start = ((cmd[22] << 8) | (cmd[23] & 0xFF));
-	df->Init.stop = ((cmd[24] << 8) | (cmd[25] & 0xFF));
-	df->Init.step = ((cmd[26] << 8) | (cmd[27] & 0xFF));
-	df->Init.ePulse =((cmd[28] << 8) | (cmd[29] & 0xFF));
-	df->Init.tPulse = ((cmd[30] << 8) | (cmd[31] & 0xFF));
-	df->Init.sr = ((cmd[32] << 8) | (cmd[33] & 0xFF));
-		
-	df->realStep = 0;
 
-}
+//void load_SCV_data(DF_SCVTypeDef* df, uint8_t* cmd){
 
-void load_NPV_data(DF_NPVTypeDef* df, uint8_t* cmd){
+//	/* Experiment values */
+//	df->start = (uint16_t)((int)(((( ((cmd[22] << 8) | (cmd[23] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
+//	df->stop = (uint16_t)((int)(((( ((cmd[24] << 8) | (cmd[25] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
+//	df->step = (uint16_t) ((int)(((( ((cmd[26] << 8) | (cmd[27] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
+//	df->tHold = (uint16_t) ((int)(((( ((cmd[28] << 8) | (cmd[29] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
+//	df->sr = (uint16_t) ((int)(((( ((cmd[30] << 8) | (cmd[31] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
+//	df->scans = ((cmd[32] << 8) | (cmd[33] & 0xFF));	
+
+//}
+
+
+
+void load_DPV_data(exp_param_values_t* e, uint8_t* cmd){
 				
+	
+	float step, sr, tPulse, stop, start, tSampling, tInt;
+	
+	// BORRAR
+	e->fSampling = 10000;		// Va a depender del filtro seleccionado
+	
 	/* Experiment values */
-	df->start = (uint16_t) ((int)(((( ((cmd[22] << 8) | (cmd[23] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
-	df->stop = (uint16_t) ((int)(((( ((cmd[24] << 8) | (cmd[25] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
-	df->step = (uint16_t) ((int)(((( ((cmd[26] << 8) | (cmd[27] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
-	df->tPulse = (uint16_t) ((int)(((( ((cmd[28] << 8) | (cmd[29] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
-	df->sr = (uint16_t) ((int)(((( ((cmd[30] << 8) | (cmd[31] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
+	e->Init.start = ((cmd[22] << 8) | (cmd[23] & 0xFF));
+	e->Init.stop = ((cmd[24] << 8) | (cmd[25] & 0xFF));
+	e->Init.step = ((cmd[26] << 8) | (cmd[27] & 0xFF));
+	e->Init.ePulse1 =((cmd[28] << 8) | (cmd[29] & 0xFF));
+	e->Init.tPulse1 = ((cmd[30] << 8) | (cmd[31] & 0xFF));
+	e->Init.sr = ((cmd[32] << 8) | (cmd[33] & 0xFF));
+	
+	// Recupero todos los decimales para los cálculos...
+	step = e->Init.step / 1000.0;
+	sr = e->Init.sr / 1000.0;
+		
+	tPulse = e->Init.tPulse1 / 1000.0;
+	stop = ((int16_t)(e->Init.stop)) / 1000.0;
+	start = ((int16_t)(e->Init.start)) / 1000.0;
+		
+	tSampling = 1 / (float)e->fSampling;
+	tInt = step / sr;
+	
+	if(stop > start){
+		e->upwardsStep = 1;
+	}
+	else{
+		e->upwardsStep = 0;
+	}
+	
+	// Número de samples para cada tramo de la señal en cada período
+	e->nSamples1 = ceil((tInt - tPulse) / tSampling);
+	e->nSamples2 = ceil((tPulse / tSampling));
+		
+	// Calculamos nº de steps
+	e->nSteps = ceil(fabs(stop - start) / step);
+		
+		
+	/* Inicializamos las variables para llevar la cuenta
+	de los samples que vamos leyendo de la LUT y de los 
+	samples totales del exp	en la ISR */
+	e->nSamplesPer = e->nSamples1 + e->nSamples2;				// Samples de cada período de LUT (suma samples cada tramo)
+	e->nSamplesExp = e->nSteps * e->nSamplesPer;								// Samples totales del experimento
+	e->nSamplesLUT = NSAMPLESLUT;
+		
+	// Inicializamos contadores
+	e->contSamplesPer = 0;
+	e->contStep = 0;
+	e->contSamplesExp = 0;
+	e->contSamplesLUT = 0;
 
 }
 
 
-void load_DNPV_data(DF_DNPVTypeDef* df, uint8_t* cmd){
-
+void load_NPV_data(exp_param_values_t* e, uint8_t* cmd){
+	
+	float step, sr, tPulse, stop, start, tSampling, tInt;
+	
 	/* Experiment values */
-	df->start = (uint16_t) ((int)(((( ((cmd[22] << 8) | (cmd[23] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
-	df->stop = (uint16_t) ((int)(((( ((cmd[24] << 8) | (cmd[25] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
-	df->step = (uint16_t) ((int)(((( ((cmd[26] << 8) | (cmd[27] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
-	df->ePulse = (uint16_t) ((int)(((( ((cmd[28] << 8) | (cmd[29] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
-	df->tPulse1 = (uint16_t) ((int)(((( ((cmd[30] << 8) | (cmd[31] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
-	df->tPulse2 = (uint16_t) ((int)(((( ((cmd[32] << 8) | (cmd[33] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
+	e->Init.start = ((cmd[22] << 8) | (cmd[23] & 0xFF));
+	e->Init.stop = ((cmd[24] << 8) | (cmd[25] & 0xFF));
+	e->Init.step = ((cmd[26] << 8) | (cmd[27] & 0xFF));
+	e->Init.tPulse1 = ((cmd[28] << 8) | (cmd[29] & 0xFF));
+	e->Init.sr = ((cmd[30] << 8) | (cmd[31] & 0xFF));
+	
+	// Recupero todos los decimales para los cálculos...
+	step = e->Init.step / 1000.0;
+	sr = e->Init.sr / 1000.0;
+		
+	tPulse = e->Init.tPulse1 / 1000.0;
+	stop = ((int16_t)(e->Init.stop)) / 1000.0;
+	start = ((int16_t)(e->Init.start)) / 1000.0;
+		
+	tSampling = 1 / (float)e->fSampling;
+	tInt = step / sr;
+	
+	
+	// Número de samples para cada tramo de la señal en cada período
+	e->nSamples1 = ceil((tInt - tPulse) / tSampling);
+	e->nSamples2 = ceil((tPulse / tSampling));
+		
+	// Calculamos nº de steps
+	e->nSteps = ceil(fabs(stop - start) / step);
+		
+		
+	/* Inicializamos las variables para llevar la cuenta
+	de los samples que vamos leyendo de la LUT y de los 
+	samples totales del exp	en la ISR */
+	e->nSamplesPer = e->nSamples1 + e->nSamples2;				// Samples de cada período de LUT (suma samples cada tramo)
+	e->nSamplesExp = e->nSteps * e->nSamplesPer;								// Samples totales del experimento
+	e->nSamplesLUT = NSAMPLESLUT;
+	
+	// Inicializamos contadores
+	e->contSamplesPer = 0;
+	e->contStep = 0;
+	e->contSamplesExp = 0;
+	e->contSamplesLUT = 0;
+}
+
+
+void load_DNPV_data(exp_param_values_t* e, uint8_t* cmd){
+
+	float step, sr, tPulse1, tPulse2, stop, start, tSampling, tInt;
+	
+	/* Experiment values */
+	e->Init.start = ((cmd[22] << 8) | (cmd[23] & 0xFF));
+	e->Init.stop = ((cmd[24] << 8) | (cmd[25] & 0xFF));
+	e->Init.step = ((cmd[26] << 8) | (cmd[27] & 0xFF));
+	e->Init.ePulse1 = ((cmd[28] << 8) | (cmd[29] & 0xFF));
+	e->Init.tPulse1 = ((cmd[30] << 8) | (cmd[31] & 0xFF));
+	e->Init.tPulse2 = ((cmd[32] << 8) | (cmd[33] & 0xFF));
+	
+	// Recupero los decimales
+	step = e->Init.step / 1000.0;
+	sr = e->Init.sr / 1000.0;
+	
+	tPulse1 = e->Init.tPulse1 / 1000.0;
+	tPulse2 = e->Init.tPulse2 / 1000.0;
+	stop = ((int16_t)(e->Init.stop)) / 1000.0;
+	start = ((int16_t)(e->Init.start)) / 1000.0;
+	
+	tSampling = 1 / (float)e->fSampling;
+	tInt = step / sr;
+	
+	// Número de samples para cada tramo de la señal en cada período
+	e->nSamples1 = ceil((tInt - (tPulse1 + tPulse2)) / tSampling);
+	e->nSamples2 = ceil(tPulse1 / tSampling);
+	e->nSamples3 = ceil(tPulse2 / tSampling);
+		
+	// Calculamos nº de steps
+	e->nSteps = ceil(fabs(stop - start) / step);
+		
+		
+	/* Inicializamos las variables para llevar la cuenta
+	de los samples que vamos leyendo de la LUT y de los 
+	samples totales del exp	en la ISR */
+	e->nSamplesPer = e->nSamples1 + e->nSamples2 + e->nSamples3;				// Samples de cada período de LUT (suma samples cada tramo)
+	e->nSamplesExp = e->nSteps * e->nSamplesPer;												// Samples totales del experimento
+	e->nSamplesLUT = NSAMPLESLUT;
+	
+	// Inicializamos contadores
+	e->contSamplesPer = 0;
+	e->contStep = 0;
+	e->contSamplesExp = 0;
+	e->contSamplesLUT = 0;
+
+
+}
+
+void load_SWV_data(exp_param_values_t* e, uint8_t* cmd){
+	
+	float step, period, stop, start, tSampling;
+	
+	/* Experiment values */
+	e->Init.start = ((cmd[22] << 8) | (cmd[23] & 0xFF));
+	e->Init.stop = ((cmd[24] << 8) | (cmd[25] & 0xFF));
+	e->Init.step = ((cmd[26] << 8) | (cmd[27] & 0xFF));
+	e->Init.amplitude = ((cmd[28] << 8) | (cmd[29] & 0xFF));
+	e->Init.freq = ((cmd[30] << 8) | (cmd[31] & 0xFF));
+	
+	// Recupero los decimales
+	step = e->Init.step / 1000.0;
+
+	period = 1 / (float)e->Init.freq;
+	stop = ((int16_t)(e->Init.stop)) / 1000.0;
+	start = ((int16_t)(e->Init.start)) / 1000.0;
+	
+	tSampling = 1 / (float)e->fSampling;
+
+	
+	// Número de samples para cada tramo de la señal en cada período
+	e->nSamples1 = ceil((period / 2) / tSampling);
+	e->nSamples2 = ceil((period / 2) / tSampling);
+
+		
+	// Calculamos nº de steps
+	e->nSteps = ceil(fabs(stop - start) / step);
+		
+		
+	/* Inicializamos las variables para llevar la cuenta
+	de los samples que vamos leyendo de la LUT y de los 
+	samples totales del exp	en la ISR */
+	e->nSamplesPer = e->nSamples1 + e->nSamples2;				// Samples de cada período de LUT (suma samples cada tramo)
+	e->nSamplesExp = e->nSteps * e->nSamplesPer;												// Samples totales del experimento
+	e->nSamplesLUT = NSAMPLESLUT;
+		
+	// Inicializamos contadores
+	e->contSamplesPer = 0;
+	e->contStep = 0;
+	e->contSamplesExp = 0;
+	e->contSamplesLUT = 0;
+
 
 }
 
 
-void load_SWV_data(DF_SWVTypeDef* df, uint8_t* cmd){
-
-	/* Experiment values */
-	df->start = (uint16_t) ((int)(((( ((cmd[22] << 8) | (cmd[23] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
-	df->stop = (uint16_t) ((int)(((( ((cmd[24] << 8) | (cmd[25] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
-	df->step = (uint16_t) ((int)(((( ((cmd[26] << 8) | (cmd[27] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
-	df->amplitude = (uint16_t) ((int)(((( ((cmd[28] << 8) | (cmd[29] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
-	df->freq = (uint16_t) ((int)(((( ((cmd[30] << 8) | (cmd[31] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
-
-
-}
-
-/* Función de muestra de cómo estaba hecho anteriormente con doubles */
-void load_ACV_data(DF_ACTypeDef* df, uint8_t* cmd){
-					
-	/* Experiment values */
-	df->start = (uint16_t) ((int)(((( ((cmd[22] << 8) | (cmd[23] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
-	df->stop = (uint16_t) ((int)(((( ((cmd[24] << 8) | (cmd[25] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
-	df->step = (uint16_t) ((int)(((( ((cmd[26] << 8) | (cmd[27] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
-	df->ACamplitude = (uint16_t) ((int)(((( ((cmd[28] << 8) | (cmd[29] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
-	df->freq = (uint16_t) ((int)(((( ((cmd[30] << 8) | (cmd[31] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
-	df->sr = (uint16_t) ((int)(((( ((cmd[32] << 8) | (cmd[33] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
+///* Función de muestra de cómo estaba hecho anteriormente con doubles */
+//void load_ACV_data(DF_ACTypeDef* df, uint8_t* cmd){
+//					
+//	/* Experiment values */
+//	df->start = (uint16_t) ((int)(((( ((cmd[22] << 8) | (cmd[23] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
+//	df->stop = (uint16_t) ((int)(((( ((cmd[24] << 8) | (cmd[25] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
+//	df->step = (uint16_t) ((int)(((( ((cmd[26] << 8) | (cmd[27] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
+//	df->ACamplitude = (uint16_t) ((int)(((( ((cmd[28] << 8) | (cmd[29] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
+//	df->freq = (uint16_t) ((int)(((( ((cmd[30] << 8) | (cmd[31] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
+//	df->sr = (uint16_t) ((int)(((( ((cmd[32] << 8) | (cmd[33] & 0xFF)) - 32768.0) * VREF) / 32768.0) * 10000.0) / 10000.0);
 
 
-}
+//}
 
 /* Función de muestra de cómo estaba hecho anteriormente con doubles */
 //void load_ACV_data(DF_ACTypeDef* df, uint8_t* cmd){
