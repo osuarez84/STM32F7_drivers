@@ -24,10 +24,18 @@ uint16_t dataADCwe1[1000];				// Array para almacenar datos leídos por el DAC
 uint16_t dataADCwe2[1000];
 
 uint32_t cont = 5;
-uint16_t contAux = 0;
-uint16_t contPtos_we1 = 0;
+uint16_t contAux_we1 = 0;
+uint16_t contAux_we2 = 0;
+uint16_t contPtos_we1 = 0;	// Contadores para controlar ptos enviados por USART6 a PC
 uint16_t contPtos_we2 = 0;
+
+// Contadores para probar cuántas veces se refrescan las LUTs. Para testeos del funcionamiento.
+uint16_t contRefrescosLUTWE1A = 0;
+uint16_t contRefrescosLUTWE1B = 0;
+uint16_t contRefrescosLUTWE2A = 0;
+uint16_t contRefrescosLUTWE2B = 0; 
 													
+uint8_t data_out[14] = {0};
 uint8_t ack[] = "ACK";
 uint8_t end[] = "END";
 
@@ -565,6 +573,11 @@ void PrepE() {
 			// Configuramos filtros
 			// Generamos primer refresco LUT1 y LUT2		
 			// lut1A_state = REFRESHED y lut2A_state
+			generate_data(&experimentWE1, &exp_config_we1, LUTWE1A);
+			generate_data(&experimentWE1, &exp_config_we1, LUTWE1B);
+			generate_data(&experimentWE2, &exp_config_we2, LUTWE2A);
+			generate_data(&experimentWE2, &exp_config_we2, LUTWE2B);
+			
 			lutwe1A_state = L_REFRESHED;
 			lutwe1B_state = L_REFRESHED;
 			lutwe2A_state = L_REFRESHED;
@@ -643,13 +656,13 @@ void Experiment(void){
 	if (df_mode == M_POT){
 		subStateMachineWE1();
 		
-		if(eWE1 == E_FINISHED | eWE1 == E_CANCELLED){						// Ha terminado el exp. en WE1...?
+		if(eWE1 == E_FINISHED | eWE1 == E_CANCELLED){						// Ha terminado o ha sido cancelado el exp. en WE1...?
 			
 			if(eWE1 == E_FINISHED){
 				
-				if(envio_end_we1 == YES){
+				if(envio_end_we1 == YES){	
 					
-					uint8_t data_out[14] = {0};
+					//uint8_t data_out[14] = {0};
 					
 					data_out[0] = 'E';
 					data_out[1] = 'N';
@@ -710,10 +723,107 @@ void Experiment(void){
 		subStateMachineWE1();
 		subStateMachineWE2();
 		
-		if((eWE1 == E_FINISHED | eWE1 == E_CANCELLED) & (eWE2 == E_FINISHED | eWE2 == E_CANCELLED)){		// Han terminado los exp. en WE1 y WE2...?
-			next_state = ENDING;
-		
+		if(eWE1 == E_FINISHED | eWE1 == E_CANCELLED | eWE2 == E_FINISHED | eWE2 == E_CANCELLED){		// Han terminado los exp. en WE1 y WE2...?
+			
+			/* Comprobamos estado experimento WE1 */
+			if(eWE1 == E_FINISHED){
+					
+				if(envio_end_we1 == YES){	
+						
+					//uint8_t data_out[14] = {0};
+						
+					data_out[0] = 'E';
+					data_out[1] = 'N';
+					data_out[2] = 'D';
+					data_out[3] = 0;
+					data_out[4] = 0;
+					data_out[5] = 0;
+					data_out[6] = 0;
+					data_out[7] = 0;
+					data_out[8] = 0;
+					data_out[9] = 0;
+					data_out[10] = 0;
+					data_out[11] = 0;
+					data_out[12] = 0;
+					data_out[13] = 'F';
+						
+					// Montamos trama datos finalización exp
+					while(uartHandle.tx_state != HAL_UART_STATE_READY){};
+					hal_uart_tx(&uartHandle, data_out, sizeof(data_out));
+							
+					envio_end_we1 = NO;
+					
+				}
+			}
+			
+			
+			/* Comprobamos estado experimento WE2 */
+			if(eWE2 == E_FINISHED){
+					
+				if(envio_end_we2 == YES){	
+						
+					//uint8_t data_out[14] = {0};
+						
+					data_out[0] = 'E';
+					data_out[1] = 'N';
+					data_out[2] = 'D';
+					data_out[3] = 1;
+					data_out[4] = 0;
+					data_out[5] = 0;
+					data_out[6] = 0;
+					data_out[7] = 0;
+					data_out[8] = 0;
+					data_out[9] = 0;
+					data_out[10] = 0;
+					data_out[11] = 0;
+					data_out[12] = 0;
+					data_out[13] = 'F';
+						
+					// Montamos trama datos finalización exp
+					while(uartHandle.tx_state != HAL_UART_STATE_READY){};
+					hal_uart_tx(&uartHandle, data_out, sizeof(data_out));
+							
+					envio_end_we2 = NO;
+					
+				}
+			}
+			
+			
+			
+			/* Comprobamos si hemos terminado ambos experimentos. Si es así salimos. */
+			if((eWE1 == E_FINISHED | eWE1 == E_CANCELLED) & (eWE2 == E_FINISHED | eWE2 == E_CANCELLED)){		// Han acabado los dos, nos vamos al estado ending...
+				
+				
+				/* antes de finalizar, si se han cancelado los experimentos deshabilitamos interrupciones y habilitamos el USART */
+				if(eWE1 == E_CANCELLED | eWE2 == E_CANCELLED){
+						
+					// Deshabilitamos todas temporizaciones
+					// WE1
+					hal_tim67_int_disable(&tim6Handle); 					// Deshabilitamos interrupción
+					hal_tim67_disable(&tim6Handle);								// Deshabilitamos timer
+					hal_tim67_clear_flag(&tim6Handle);						// Borramos la flag de int pendiente
+					
+					// Deshabilitamos todas temporizaciones
+					// WE2
+					hal_tim67_int_disable(&tim7Handle); 					// Deshabilitamos interrupción
+					hal_tim67_disable(&tim7Handle);								// Deshabilitamos timer
+					hal_tim67_clear_flag(&tim7Handle);						// Borramos la flag de int pendiente
+					
+					// Montamos trama datos finalización por cancelación (mensaje END)
+					while(uartHandle.tx_state != HAL_UART_STATE_READY){};
+					hal_uart_tx(&uartHandle, end, sizeof(end)-1);
+					
+					// Habilitamos mensajes de CON de nuevo
+					while(uartHandle.rx_state != HAL_UART_STATE_READY){};		
+					hal_uart_rx(&uartHandle, UART_rxBuff, 39);
+				
+				}
+				
+				next_state = ENDING;
+			}
+			
 		}
+		
 	}
 	
 	
@@ -809,9 +919,10 @@ void pretreatment_we1(void){
 		// Esperamos a que termine el pretratamiento en WE1...
 		
 	}
+	
 	else if(pWE1 == P_FINISHED | pWE1 == P_CANCELLED){
 		
-		uint8_t data_out[14] = {0};
+		//uint8_t data_out[14] = {0};
 		
 		// Enviamos finalización de pretratamiento
 		data_out[0] = 'E';
@@ -902,7 +1013,7 @@ void pretreatment_we2(void){
 	
 	else if (pWE2 == P_FINISHED | pWE2 == P_CANCELLED){
 		
-		uint8_t data_out[14] = {0};
+		//uint8_t data_out[14] = {0};
 		
 		// Enviamos finalización de pretratamiento
 		data_out[0] = 'E';
@@ -1008,7 +1119,7 @@ void measuring_we1 (void){
 				if(contMedidasADC_we1 == NMEDIDASWE1){				// ¿Paramos de tomar medidas...?
 					// Hacemos medida y enviamos datos
 					// TODO
-					uint8_t data_out[14] = {0};
+					//uint8_t data_out[14] = {0};
 					//calculate media(dataADC);
 
 					
@@ -1048,11 +1159,16 @@ void measuring_we1 (void){
 			// Refrescamos la LUT
 			generate_data(&experimentWE1, &exp_config_we1, LUTWE1A);
 			lutwe1A_state = L_REFRESHED;
+			
+			contRefrescosLUTWE1A++;
+			
 		}
 		else if (lutwe1B_state == L_FINISHED) {
 			// Refrescamos la LUT
 			generate_data(&experimentWE1, &exp_config_we1, LUTWE1B);
 			lutwe1B_state = L_REFRESHED;
+			
+			contRefrescosLUTWE1B++;
 		}
 		
 		/* Comprobamos si debemos cambiar el FS */
@@ -1078,10 +1194,7 @@ void measuring_we2 (void){
 	if(eWE2 == E_NONE){
 		
 		eWE2 = E_RUNNING;
-		// BORRAR : solo para testeo
-		//experimentWE2.nSamplesPer = 70;
-		//experimentWE2.nSamplesExp = 81340;
-		
+
 
 		// Configuramos TIM7
 		// Configuramos timer para fSampling = 10000
@@ -1163,7 +1276,7 @@ void measuring_we2 (void){
 				if(contMedidasADC_we2 == NMEDIDASWE2){				// ¿Paramos de tomar medidas...?
 					// Hacemos medida y enviamos datos
 					// TODO
-					uint8_t data_out[14] = {0};
+					//uint8_t data_out[14] = {0};
 					//calculate media(dataADC);
 
 					
@@ -1198,13 +1311,17 @@ void measuring_we2 (void){
 		/* Comprobamos si debemos de refrescar alguna LUT */
 		if (lutwe2A_state == L_FINISHED) {
 			// Refrescamos la LUT
-
+			generate_data(&experimentWE2, &exp_config_we2, LUTWE2A);
 			lutwe2A_state = L_REFRESHED;
+			
+			contRefrescosLUTWE2A++;
 		}
 		else if (lutwe2B_state == L_FINISHED) {
 			// Refrescamos la LUT
-
+			generate_data(&experimentWE2, &exp_config_we2, LUTWE2B);
 			lutwe2B_state = L_REFRESHED;
+			
+			contRefrescosLUTWE2B++;
 		}
 		
 		/* Comprobamos si debemos cambiar el FS */
@@ -1220,50 +1337,7 @@ void measuring_we2 (void){
 	else if (eWE2 == E_FINISHED | eWE2 == E_CANCELLED){
 		// Estado de espera una vez el experimento haya terminado
 		
-		if(eWE2 == E_FINISHED){
-			if(envio_end_we2 == YES){
-				
-				uint8_t data_out[14] = {0};
-				
-				data_out[0] = 'E';
-				data_out[1] = 'N';
-				data_out[2] = 'D';
-				data_out[3] = 1;
-				data_out[4] = 0;
-				data_out[5] = 0;
-				data_out[6] = 0;
-				data_out[7] = 0;
-				data_out[8] = 0;
-				data_out[9] = 0;
-				data_out[10] = 0;
-				data_out[11] = 0;
-				data_out[12] = 0;
-				data_out[13] = 'F';
-				
-				// Montamos trama datos finalización exp
-				while(uartHandle.tx_state != HAL_UART_STATE_READY){};
-				hal_uart_tx(&uartHandle, data_out, sizeof(data_out));
-					
-				envio_end_we2 = NO;
-			
-			}
-		}
 		
-		else if(eWE2 == E_CANCELLED){
-				
-			// Deshabilitamos todas temporizaciones
-			// WE2
-			hal_tim67_int_disable(&tim7Handle); 					// Deshabilitamos interrupción
-			hal_tim67_disable(&tim7Handle);								// Deshabilitamos timer
-			hal_tim67_clear_flag(&tim7Handle);						// Borramos la flag de int pendiente
-		
-			// Habilitamos mensajes de CON de nuevo
-			while(uartHandle.rx_state != HAL_UART_STATE_READY){};		
-			hal_uart_rx(&uartHandle, UART_rxBuff, 39);
-			
-		}
-		
-
 	}
 
 }
@@ -1332,6 +1406,12 @@ void Ending(void){
 	contPtos_we1 = 0;		// Nº de data frames enviados durante experimento WE1
 	contPtos_we2 = 0;
 	
+	// Variables testeo refrescos de LUTs
+	contRefrescosLUTWE1A = 0;
+	contRefrescosLUTWE1B = 0;
+	contRefrescosLUTWE2A = 0;
+	contRefrescosLUTWE2B = 0;
+	
 	
 	// Reinicializamos todos los estados
 	next_state_exp_WE1 = PRETREATMENT_WE;
@@ -1347,383 +1427,6 @@ void Ending(void){
 
 
 //-----------------------------------------------------------------------------------------------
-
-
-
-
-
-//void Measuring() {
-
-
-//	if(experiment == E_NONE){
-//		
-//		// Ponemos YA el experimento en running antes de habilitar interrupciones, para que las haga correctamente
-//		experiment = E_RUNNING;	
-//		
-//		
-//		if(mode_working == M_POT){
-//			
-//			
-//			// Arrancamos temporización DAC WE1 
-//			
-//			// Para un filtro de fSampling = 10000Hz que utilizamos en el testeo
-//			// calculamos el período que hay que cargar en el timer para obtener 
-//			tim6Handle.Init.Prescaler = 512;
-//			tim6Handle.Init.Period = ceil((1 / 10000.0) / ((tim6Handle.Init.Prescaler + 1) * (1 / 25000000.0)) );
-//			
-//			hal_tim67_int_enable(&tim6Handle);
-//			hal_tim67_init(&tim6Handle);
-//		
-//		}
-//		
-//		else if(mode_working == M_BIPOT){
-//			// Arrancamos temporización DAC WE1
-//			// Arrancamos temporización DAC WE2
-//			
-//		}
-//		
-//		else if(mode_working == M_GALV){
-//		// TODO
-//		
-//		}
-//		
-//		else if(mode_working == M_EIS){
-//		// TODO
-//		
-//		
-//		}
-
-//		
-
-//	
-//	}
-//	
-//	else if(experiment == E_RUNNING){
-//		
-//		// En la ISR pondremos experiment = E_FINISHED o E_CANCELLED cuando corresponda
-//		
-//		
-//		if (mode_working == M_POT) {
-//			
-//			/* Enviar datos a DAC? */
-//			if (enviar_dato_DAC == YES){
-//				if(leerLUTAWE1 == YES){							// Leemos de LUTA...
-//					// Pasamos el sample al DAC
-//					hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 0);				// CS to LOW
-//					DACvalue[0] = (uint8_t) LUTWE1A[contSamplesLUTWE1];
-//					DACvalue[1] = (uint8_t) (LUTWE1A[contSamplesLUTWE1] >> 8);
-//					hal_spi_master_tx(&SpiHandle, DACvalue, 2);
-//					while(SpiHandle.State != HAL_SPI_STATE_READY);
-//					hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 1);				// CS to HIGH					
-
-//					contSamplesLUTWE1++;
-//					
-//					// Habilitamos de nuevo el timer para el siguiente sample
-//					hal_tim67_int_enable(&tim6Handle);				// Habilitamos interrupción TIM6
-//					hal_tim67_enable(&tim6Handle);						// Habilitamos el timer					
-//					
-
-//					
-//					// ¿Hay que cambiar de LUT...?
-//					if(contSamplesLUTWE1 == nSamplesLUTWE1){
-//						leerLUTAWE1 = NO;								// Cambiamos a LUTB
-//						leerLUTBWE1 = YES;
-//						lutwe1A_state = L_FINISHED;			// Avisamos a la FSM para que refresque...
-//						contSamplesLUTWE1 = 0;					// Reiniciamos contador
-//					
-//					}
-
-//				}		
-//				else if(leerLUTBWE1 == YES){				// Leemos de LUTB
-//					// Pasamos el sample al DAC
-//					hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 0);				// CS to LOW
-//					DACvalue[0] = (uint8_t) LUTWE1A[contSamplesLUTWE1];
-//					DACvalue[1] = (uint8_t) (LUTWE1A[contSamplesLUTWE1] >> 8);
-//					hal_spi_master_tx(&SpiHandle, DACvalue, 2);
-//					while(SpiHandle.State != HAL_SPI_STATE_READY);
-//					hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 1);				// CS to HIGH		
-
-//					contSamplesLUTWE1++;
-//					
-//					// Habilitamos de nuevo el timer para el siguiente sample
-//					hal_tim67_int_enable(&tim6Handle);				// Habilitamos interrupción TIM6
-//					hal_tim67_enable(&tim6Handle);						// Habilitamos el timer	
-//					
-//					
-
-//					
-//					// ¿Hay que cambiar de LUT...?
-//					if(contSamplesLUTWE1 == nSamplesLUTWE1){
-//						leerLUTBWE1 = NO;								// Cambiamos a LUTA
-//						leerLUTAWE1 = YES;
-//						lutwe1B_state = L_FINISHED;			// Avisamos a la FSM para que refresque...
-//						contSamplesLUTWE1 = 0;					// Reiniciamos contador
-//					}
-//				
-//				}
-//				enviar_dato_DAC = NO;
-//			
-//			}
-
-//			/* Hay que tomar medidas en el ADC ? */
-//			if(medidasADC == YES){
-//				// Tomamos medida
-//				dataADC[contMedidasADC] = read_ADC_W1();
-//				
-//				contMedidasADC++;
-
-//				if(contMedidasADC == NMEDIDAS){				// ¿Paramos de tomar medidas...?
-//					// Hacemos medida y enviamos datos
-//					// TODO
-//					//calculate media(dataADC);
-
-//					
-//					// Montamos el paquete de datos
-//					// Esto dependerá de cada tipo de técnica
-//					data_out[0] = 'D';
-//					data_out[1] = 'A';
-//					data_out[2] = 'T';
-//					data_out[3] = 0;
-//					data_out[4] = rand();
-//					data_out[5] = rand();
-//					data_out[6] = rand();
-//					data_out[7] = rand();
-//					data_out[8] = rand();
-//					data_out[9] = rand();
-//					data_out[10] = 0;
-//					data_out[11] = 0;
-//					data_out[12] = 0;
-//					data_out[13] = 'F';
-
-//					// Enviamos los datos
-//					while(uartHandle.tx_state != HAL_UART_STATE_READY){};
-//					hal_uart_tx(&uartHandle, data_out, sizeof(data_out));
-//					
-//					//enviar = YES;
-//					medidasADC = NO;
-//					contMedidasADC = 0;
-//					contPtos++;
-//				}
-//			}
-//			
-//			
-//			
-//			
-//			/* Comprobamos si debemos de refrescar alguna LUT */
-//			if (lutwe1A_state == L_FINISHED) {
-//				// Refrescamos la LUT
-//				generate_data(&DF_CV_we1, &DF_LSV_we1, &DF_SCV_we1, &DF_DPV_we1, &DF_NPV_we1, &DF_DNPV_we1, \
-//											&DF_SWV_we1, &DF_ACV_we1, &exp_config_we1, LUTWE1A, &nSamplesExpWE1, &nSamplesLUTWE1);
-//				lutwe1A_state = L_REFRESHED;
-//			}
-//			else if (lutwe1B_state == L_FINISHED) {
-//				// Refrescamos la LUT
-//				generate_data(&DF_CV_we1, &DF_LSV_we1, &DF_SCV_we1, &DF_DPV_we1, &DF_NPV_we1, &DF_DNPV_we1, \
-//											&DF_SWV_we1, &DF_ACV_we1, &exp_config_we1, LUTWE1B, &nSamplesExpWE1, &nSamplesLUTWE1);
-//				lutwe1B_state = L_REFRESHED;
-//			}
-
-
-//			/* Comprobamos si debemos cambiar el FS */
-//			if (status_I_we1 != I_DEFAULT) {
-//				next_state = FS_CH;
-//			}
-
-//			
-//			
-//		}
-//		else if (mode_working == M_BIPOT) {
-//			if (lutwe1A_state == L_FINISHED) {
-//				// Refrescamos la LUTWE1A
-//				generate_data(&DF_CV_we1, &DF_LSV_we1, &DF_SCV_we1, &DF_DPV_we1, &DF_NPV_we1, &DF_DNPV_we1, \
-//											&DF_SWV_we1, &DF_ACV_we1, &exp_config_we1, LUTWE1A, &nSamplesExpWE1, &nSamplesLUTWE1);
-//				lutwe1A_state = L_REFRESHED;
-//			}
-//			else if (lutwe1B_state == L_FINISHED) {
-//				// Refrescamos la LUTWE1B
-//				generate_data(&DF_CV_we1, &DF_LSV_we1, &DF_SCV_we1, &DF_DPV_we1, &DF_NPV_we1, &DF_DNPV_we1, \
-//											&DF_SWV_we1, &DF_ACV_we1, &exp_config_we1, LUTWE1B, &nSamplesExpWE1, &nSamplesLUTWE1);
-//				lutwe2A_state = L_REFRESHED;
-//			}
-//			if (lutwe2A_state == L_FINISHED) {
-//				// Refrescamos la LUTWE2A
-//				generate_data(&DF_CV_we1, &DF_LSV_we1, &DF_SCV_we1, &DF_DPV_we1, &DF_NPV_we1, &DF_DNPV_we1, \
-//											&DF_SWV_we1, &DF_ACV_we1, &exp_config_we1, LUTWE2A, &nSamplesExpWE2, &nSamplesLUTWE2);
-//				lutwe1B_state = L_REFRESHED;
-//			}
-//			else if (lutwe2B_state == L_FINISHED) {
-//				// Refrescamos la LUTWE2B
-//				generate_data(&DF_CV_we1, &DF_LSV_we1, &DF_SCV_we1, &DF_DPV_we1, &DF_NPV_we1, &DF_DNPV_we1, \
-//											&DF_SWV_we1, &DF_ACV_we1, &exp_config_we1, LUTWE2B, &nSamplesExpWE2, &nSamplesLUTWE2);
-//				lutwe2B_state = L_REFRESHED;
-//			}
-
-//			if ((status_I_we1 != I_DEFAULT) | (status_I_we2 != I_DEFAULT)) {
-//				next_state = FS_CH;
-//			}
-//		}
-//		else if (mode_working == M_GALV) {
-//			/* Comprobamos si debemos de refrescar alguna LUT */
-//			if (lutwe1A_state == L_FINISHED) {
-//				// Refrescamos la LUT
-//				lutwe1A_state = L_REFRESHED;
-//			}
-//			else if (lutwe1B_state == L_FINISHED) {
-//				// Refrescamos la LUT
-//				lutwe2A_state = L_REFRESHED;
-//			}
-//			if (lutwe1B_state == L_FINISHED) {
-//				// Refrescamos la LUT
-//				lutwe1B_state = L_REFRESHED;
-//			}
-
-//			/* Comprobamos si debemos cambiar el FS */
-//			if (status_I_we1 != I_DEFAULT) {
-//				next_state = FS_CH;
-//			}
-//		}
-//		else if (mode_working == M_EIS) {
-//			// TODO
-//		}
-//	}
-//	
-
-
-
-//	else if ((experiment == E_FINISHED) | (experiment == E_CANCELLED)) {
-//		
-//		if(experiment == E_FINISHED){
-//			data_out[0] = 'E';
-//			data_out[1] = 'N';
-//			data_out[2] = 'D';
-//			data_out[3] = 0;
-//			data_out[4] = 0;
-//			data_out[5] = 0;
-//			data_out[6] = 0;
-//			data_out[7] = 0;
-//			data_out[8] = 0;
-//			data_out[9] = 0;
-//			data_out[10] = 0;
-//			data_out[11] = 0;
-//			data_out[12] = 0;
-//			data_out[13] = 'F';
-//			
-//			// Montamos trama datos finalización exp
-//			while(uartHandle.tx_state != HAL_UART_STATE_READY){};
-//			hal_uart_tx(&uartHandle, data_out, sizeof(data_out));
-//			
-
-//		}
-//		
-
-//		
-//		else if(experiment == E_CANCELLED){
-//			
-//			// Montamos trama datos finalización por cancelación (mensaje END)
-//			while(uartHandle.tx_state != HAL_UART_STATE_READY){};
-//			hal_uart_tx(&uartHandle, end, sizeof(end)-1);
-//			
-//			
-//			// Deshabilitamos todas temporizaciones
-//			// WE1
-
-//			hal_tim67_int_disable(&tim6Handle); 					// Deshabilitamos interrupción
-//			hal_tim67_disable(&tim6Handle);								// Deshabilitamos timer
-//			hal_tim67_clear_flag(&tim6Handle);						// Borramos la flag de int pendiente
-//			
-//			
-//			// WE2
-//			// TODO
-//	
-//	
-//		}
-//		
-
-//		// Reseteamos contadores
-//		contSamplesExpWE1 = 0;
-//		contSamplesLUTWE1 = 0;
-//		//contSamplesExpWE2 = 0;
-//		//contSamplesLUTWE2 = 0;
-//		
-//		// Habilitamos mensajes de CON de nuevo
-//		while(uartHandle.rx_state != HAL_UART_STATE_READY){};		
-//		hal_uart_rx(&uartHandle, UART_rxBuff, 39);
-//		
-//		next_state = ENDING;
-//		
-//	
-//		// switch off USER LED testing
-//		led_turn_off(GPIOJ, LED_GREEN);
-//		
-//		
-//	}
-//	
-
-//}
-
-
-//// TODO: comprobamos si se ha habilitado MAS de un FS. En caso de que haya solamente uno, no debemos entrar en este estado.
-//void FS_ch() {
-
-//	if (mode_working == M_POT) {
-//		if (status_I_we1 == I_SATURA) {
-//			// Cambiamos FS WE1 a un FS mayor
-//			// Reseteamos FLAG_SATURA_WE1 => flag_satura_we1 = DEFAULT;
-//		}
-//		else if (status_I_we1 == I_BELOW_THRESHOLD) {
-//			// Cambiamos FS WE1 a una FS menor
-//			// Reseteamos status_I_we1 => status_I_we1 = DEFAULT;
-
-//		}
-
-//		status_I_we1 = I_DEFAULT;		// Reseteamos el flag
-
-//	}
-//	else if (mode_working == M_BIPOT) {
-//		if (status_I_we1 == I_SATURA) {
-//			// Cambiamos FS WE1 a un FS mayor
-//			// Reseteamos la status_I_we1 => status_I_we1 = DEFAULT;
-//		}
-//		else if (status_I_we1 == I_BELOW_THRESHOLD) {
-//			// Cambiamos FS WE1 a un FS menor
-//			// Reseteamos la status_I_we1 => status_I_we1 = DEFAULT;
-//		}
-//		if (status_I_we2 == I_SATURA) {
-//			// Cambiamos FS WE2 a un FS mayor
-//			// Reseteamos la status_I_we2 => status_I_we2 = DEFAULT;
-//		}
-//		else if (status_I_we2 == I_BELOW_THRESHOLD) {
-//			// Cambiamos FS WE2 a un FS menor
-//			// Reseteamos la status_I_we2 => status_I_we2 = DEFAULT;
-//		}
-//		status_I_we1 = I_DEFAULT;		// Reseteamos los flags
-//		status_I_we2 = I_DEFAULT;
-
-//	}
-
-//	else if (mode_working == M_GALV) {
-//		if (status_I_we1 == I_SATURA) {
-//			// Cambiamos FS WE1 a un FS mayor
-//			// Reseteamos FLAG_SATURA_WE1 => flag_satura_we1 = DEFAULT;
-//		}
-//		else if (status_I_we1 == I_BELOW_THRESHOLD) {
-//			// Cambiamos FS WE1 a una FS menor
-//			// Reseteamos status_I_we1 => status_I_we1 = DEFAULT;
-
-//		}
-
-//		status_I_we1 = I_DEFAULT;		// Reseteamos el flag
-//	}
-
-//	else if (mode_working == M_EIS) {
-//		// TODO
-//	}
-
-//	next_state = MEASURING;
-
-
-
-//}
 
 
 void Error() {
@@ -2028,16 +1731,16 @@ void TIM6_DAC_IRQHandler(void){
 			enviar_dato_DAC_we1 = YES;
 
 			/* ¿empezamos a hacer medidas en el ADC ...? */
-			if(contAux >= (experimentWE1.nSamplesPer - NMEDIDASWE1)){
+			if(contAux_we1 >= (experimentWE1.nSamplesPer - NMEDIDASWE1)){
 				medidasADC_we1 = YES;
 			}
 			
 			
 			/* Contamos el sample lanzado para controlar la finalización del experimento */
 			experimentWE1.contSamplesExp++;
-			contAux++;												// Contador auxiliar para resolver cuando debemos comenzar a tomar medidas con el ADC
-			if(contAux >= experimentWE1.nSamplesPer){			// Si el contador llega al valor de un período completo lo reseteamos a 0 para el siguiente período
-				contAux = 0;
+			contAux_we1++;												// Contador auxiliar para resolver cuando debemos comenzar a tomar medidas con el ADC
+			if(contAux_we1 >= experimentWE1.nSamplesPer){			// Si el contador llega al valor de un período completo lo reseteamos a 0 para el siguiente período
+				contAux_we1 = 0;
 			}
 			
 			
@@ -2126,13 +1829,17 @@ void TIM7_IRQHandler(){
 			enviar_dato_DAC_we2 = YES;
 
 			/* ¿empezamos a hacer medidas en el ADC ...? */
-			if(experimentWE2.contSamplesPer >= (experimentWE2.nSamplesPer - NMEDIDASWE2)){
+			if(contAux_we2 >= (experimentWE2.nSamplesPer - NMEDIDASWE2)){
 				medidasADC_we2 = YES;
 			}
 			
 			
 			/* Contamos el sample lanzado para controlar la finalización del experimento */
 			experimentWE2.contSamplesExp++;
+			contAux_we2++;
+			if(contAux_we2 >= experimentWE2.nSamplesPer){
+				contAux_we2 = 0;
+			}
 			
 			/* ¿Hemos finalizado el experimento? */
 			if(experimentWE2.contSamplesExp > experimentWE2.nSamplesExp){			// Hemos leído el último sample del experimento...
@@ -2143,8 +1850,8 @@ void TIM7_IRQHandler(){
 			else{
 
 				hal_tim67_clear_flag(&tim7Handle);				// Borramos la flag de int pendiente
-//				hal_tim67_int_enable(&tim7Handle);				// Habilitamos interrupción TIM6
-//				hal_tim67_enable(&tim7Handle);						// Habilitamos el timer
+				hal_tim67_int_enable(&tim7Handle);				// Habilitamos interrupción TIM6
+				hal_tim67_enable(&tim7Handle);						// Habilitamos el timer
 					
 			}
 

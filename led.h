@@ -8,7 +8,7 @@
 #define NMEDIDASWE1	4			// Variable para el número de medidas a tomar en el experimento.
 													// Aquí se define como cte, pero debe calcularse en función
 													// del número de puntos que va a tener la zona donde midamos.
-#define NMEDIDASWE2 2
+#define NMEDIDASWE2 3
 #define MCU_FREQ		25000000.0
 #define NSAMPLESLUT	1024
 
