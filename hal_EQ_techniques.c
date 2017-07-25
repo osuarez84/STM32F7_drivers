@@ -175,7 +175,7 @@ static void generateSCV(exp_param_values_t* e, uint16_t* LUT){
 			
 			e->contSamplesPer++;
 			
-			if(e->contSamplesPer > e->nSamplesPer){			// Hemos terminado el período..??
+			if(e->contSamplesPer == e->nSamplesPer){			// Hemos terminado el período..??
 				if(e->flagSube){
 					e->contStep++;													// SI: si estamos subiendo aumentamos un step
 				}
@@ -200,7 +200,7 @@ static void generateSCV(exp_param_values_t* e, uint16_t* LUT){
 			
 			e->contSamplesPer++;
 			
-			if(e->contSamplesPer > e->nSamplesPer){
+			if(e->contSamplesPer == e->nSamplesPer){
 			
 				if(e->flagSube){
 					e->contStep--;
@@ -236,19 +236,19 @@ static void generateDPV(exp_param_values_t* e, uint16_t* LUT){
 	if(e->upwardsStep){										// Steps suben...
 		
 		for(i = 0; i < NSAMPLESLUT; i++){
-			if(e->contSamplesPer <= e->nSamples1){									// Estamos en primera parte de la onda (DC)
+			if(e->contSamplesPer < e->nSamples1){									// Estamos en primera parte de la onda (DC)
 			
 				LUT[i] = e->runTime.start + (e->runTime.step * e->contStep);
 			}
 			
-			else if((e->contSamplesPer - e->nSamples1) <= e->nSamples2){		// Estamos en segunda parte de la onda (pulse)
+			else if((e->contSamplesPer - e->nSamples1) < e->nSamples2){		// Estamos en segunda parte de la onda (pulse)
 			
 				LUT[i] = (e->runTime.start + (e->runTime.step * e->contStep)) + e->runTime.ePulse1;
 			}
 			
 			e->contSamplesPer++;
 			
-			if(e->contSamplesPer > e->nSamplesPer){													// Hemos terminado de sacar un período completo...?
+			if(e->contSamplesPer == e->nSamplesPer){													// Hemos terminado de sacar un período completo...?
 			
 				e->contSamplesPer = 0;																				// Reseteamos contadores y subimosr un step el siguiente período...
 				e->contStep++;
@@ -259,7 +259,7 @@ static void generateDPV(exp_param_values_t* e, uint16_t* LUT){
 	else{ 																								// Steps bajan...
 		
 		for(i = 0; i < NSAMPLESLUT; i++){
-			if(e->contSamplesPer <= e->nSamples1){									// Estamos en primera parte de la onda (DC)
+			if(e->contSamplesPer < e->nSamples1){									// Estamos en primera parte de la onda (DC)
 			
 				LUT[i] = e->runTime.start - (e->runTime.step * e->contStep);
 			}
@@ -271,7 +271,7 @@ static void generateDPV(exp_param_values_t* e, uint16_t* LUT){
 			
 			e->contSamplesPer++;
 			
-			if(e->contSamplesPer > e->nSamplesPer){													// Hemos terminado de sacar un período completo...?
+			if(e->contSamplesPer == e->nSamplesPer){													// Hemos terminado de sacar un período completo...?
 			
 				e->contSamplesPer = 0;																				// Reseteamos contadores y subimosr un step el siguiente período...
 				e->contStep++;
@@ -292,7 +292,7 @@ static void generateNPV(exp_param_values_t* e, uint16_t* LUT){
 	
 	if(e->upwardsStep){																						// Steps suben...
 		for(i = 0; i < NSAMPLESLUT; i++){
-			if(e->contSamplesPer <= e->nSamples1){														// Primera parte de la onda
+			if(e->contSamplesPer < e->nSamples1){														// Primera parte de la onda
 				LUT[i] = e->runTime.start;
 			}
 			
@@ -303,7 +303,7 @@ static void generateNPV(exp_param_values_t* e, uint16_t* LUT){
 			
 			e->contSamplesPer++;
 			
-			if(e->contSamplesPer > e->nSamplesPer){														// Hemos acabado un período..?
+			if(e->contSamplesPer == e->nSamplesPer){														// Hemos acabado un período..?
 				e->contSamplesPer = 0;														// Reseteamos el contador de samples por período
 				e->contStep++;																		// Aumentamos un step
 			}
@@ -315,7 +315,7 @@ static void generateNPV(exp_param_values_t* e, uint16_t* LUT){
 	
 	else{																													// Steps bajan...
 		for (i = 0; i < NSAMPLESLUT; i++) {
-				if (e->contSamplesPer <= e->nSamples1) {													// Primera parte de la onda
+				if (e->contSamplesPer < e->nSamples1) {													// Primera parte de la onda
 
 					LUT[i] = e->runTime.start;
 				}
@@ -327,7 +327,7 @@ static void generateNPV(exp_param_values_t* e, uint16_t* LUT){
 
 				e->contSamplesPer++;
 
-				if (e->contSamplesPer > e->nSamplesPer) {												// Hemos acabado un período...?
+				if (e->contSamplesPer == e->nSamplesPer) {												// Hemos acabado un período...?
 
 					e->contSamplesPer = 0;
 					e->contStep++;
@@ -349,22 +349,22 @@ static void generateDNPV(exp_param_values_t* e, uint16_t* LUT){
 	if (e->upwardsStep) {																// Steps suben
 		for (i = 0; i < NSAMPLESLUT; i++) {
 
-			if (e->contSamplesPer <= e->nSamples1) {																				// Primera parte onda
+			if (e->contSamplesPer < e->nSamples1) {																				// Primera parte onda
 				LUT[i] = e->runTime.start;
 
 			}
 
-			else if ((e->contSamplesPer - e->nSamples1) <= e->nSamples2) {									// Segunda parte onda
+			else if ((e->contSamplesPer - e->nSamples1) < e->nSamples2) {									// Segunda parte onda
 				LUT[i] = e->runTime.start + (e->runTime.step * e->contStep);
 			}
 
-			else if((e->contSamplesPer - (e->nSamples1 + e->nSamples2)) <= e->nSamples3){		// Tercera parte onda
+			else if((e->contSamplesPer - (e->nSamples1 + e->nSamples2)) < e->nSamples3){		// Tercera parte onda
 				LUT[i] = e->runTime.start + (e->runTime.step * e->contStep) + e->runTime.ePulse1;
 			}
 
 			e->contSamplesPer++;
 
-			if (e->contSamplesPer > e->nSamplesPer) {							// Hemos terminado un período?
+			if (e->contSamplesPer == e->nSamplesPer) {							// Hemos terminado un período?
 				e->contSamplesPer = 0;															// Reseteamos contador ptos de período
 				e->contStep++;																			// Subimos un step
 			}
@@ -374,23 +374,23 @@ static void generateDNPV(exp_param_values_t* e, uint16_t* LUT){
 	else {																																	// Steps bajan
 		for (i = 0; i < NSAMPLESLUT; i++) {
 
-			if (e->contSamplesPer <= e->nSamples1) {																				// Primera parte onda
+			if (e->contSamplesPer < e->nSamples1) {																				// Primera parte onda
 				LUT[i] = e->runTime.start;
 
 			}
 
-			else if ((e->contSamplesPer - e->nSamples1) <= e->nSamples2) {									// Segunda parte onda
+			else if ((e->contSamplesPer - e->nSamples1) < e->nSamples2) {									// Segunda parte onda
 				LUT[i] = e->runTime.start - (e->runTime.step * e->contStep);
 			}
 
-			else if ((e->contSamplesPer - (e->nSamples1 + e->nSamples2)) <= e->nSamples3) {	// Tercera parte onda
+			else if ((e->contSamplesPer - (e->nSamples1 + e->nSamples2)) < e->nSamples3) {	// Tercera parte onda
 				LUT[i] = e->runTime.start - (e->runTime.step * e->contStep) + e->runTime.ePulse1;
 			}
 
 
 			e->contSamplesPer++;
 
-			if (e->contSamplesPer > e->nSamplesPer) {					// Hemos terminado un período?
+			if (e->contSamplesPer == e->nSamplesPer) {					// Hemos terminado un período?
 				e->contSamplesPer = 0;													// Reseteamos contador ptos de período
 				e->contStep++;																	// Subimos un step
 			}
@@ -410,19 +410,19 @@ static void generateSWV(exp_param_values_t* e, uint16_t* LUT){
 
 	if(e->upwardsStep){																													// Steps suben
 		for (i = 0; i < NSAMPLESLUT; i++) {
-			if (e->contSamplesPer <= e->nSamples1) {																					// Primera parte onda
+			if (e->contSamplesPer < e->nSamples1) {																					// Primera parte onda
 				LUT[i] = (e->runTime.start + (e->runTime.step * e->contStep)) + e->runTime.amplitude;
 
 			}
 
-			else if ((e->contSamplesPer - e->nSamples1) <= e->nSamples2) {										// Segunda parte onda
+			else if ((e->contSamplesPer - e->nSamples1) < e->nSamples2) {										// Segunda parte onda
 				LUT[i] = (e->runTime.start + (e->runTime.step * e->contStep)) - e->runTime.amplitude;
 
 			}
 
 			e->contSamplesPer++;
 
-			if (e->contSamplesPer > e->nSamplesPer) {					// Hemos terminado un período?
+			if (e->contSamplesPer == e->nSamplesPer) {					// Hemos terminado un período?
 				e->contSamplesPer = 0;													// Reseteamos contador ptos de período
 				e->contStep++;																	// Subimos un step
 
@@ -433,19 +433,19 @@ static void generateSWV(exp_param_values_t* e, uint16_t* LUT){
 
 	else {																									// Steps bajan
 		for (i = 0; i < NSAMPLESLUT; i++) {
-			if (e->contSamplesPer <= e->nSamples1) {																				// Primera parte onda
+			if (e->contSamplesPer < e->nSamples1) {																				// Primera parte onda
 				LUT[i] = (e->runTime.start - (e->runTime.step * e->contStep)) + e->runTime.amplitude;
 
 			}
 
-			else if ((e->contSamplesPer - e->nSamples1) <= e->nSamples2) {									// Segunda parte onda
+			else if ((e->contSamplesPer - e->nSamples1) < e->nSamples2) {									// Segunda parte onda
 				LUT[i] = (e->runTime.start - (e->runTime.step * e->contStep)) - e->runTime.amplitude;
 
 			}
 
 			e->contSamplesPer++;
 
-			if (e->contSamplesPer > e->nSamplesPer) {		// Hemos terminado un período?
+			if (e->contSamplesPer == e->nSamplesPer) {		// Hemos terminado un período?
 				e->contSamplesPer = 0;										// Reseteamos contador ptos de período
 				e->contStep++;														// Subimos un step
 
@@ -468,7 +468,7 @@ static void generateACV(exp_param_values_t* e, uint16_t* LUT){
 			e->contSamplesPer++;
 			e->contSin++;
 
-			if (e->contSamplesPer > e->nSamplesPer) {
+			if (e->contSamplesPer == e->nSamplesPer) {
 				e->contSamplesPer = 0;
 				e->contSin = 0;
 				e->contStep++;
@@ -484,7 +484,7 @@ static void generateACV(exp_param_values_t* e, uint16_t* LUT){
 			e->contSamplesPer++;
 			e->contSin++;
 
-			if (e->contSamplesPer > e->nSamplesPer) {
+			if (e->contSamplesPer == e->nSamplesPer) {
 				e->contSamplesPer = 0;
 				e->contSin = 0;
 				e->contStep++;

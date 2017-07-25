@@ -299,6 +299,11 @@
           <WinNumber>1</WinNumber>
           <ItemText>exp_config_we2</ItemText>
         </Ww>
+        <Ww>
+          <count>20</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>next_state_exp_WE2</ItemText>
+        </Ww>
       </WatchWindow1>
       <WatchWindow2>
         <Ww>
@@ -484,6 +489,10 @@
         <Entry>
           <Name>System Viewer\TIM6</Name>
           <WinId>35900</WinId>
+        </Entry>
+        <Entry>
+          <Name>System Viewer\TIM7</Name>
+          <WinId>35899</WinId>
         </Entry>
         <Entry>
           <Name>System Viewer\USART6</Name>

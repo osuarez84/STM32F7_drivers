@@ -35,7 +35,8 @@ uint16_t contRefrescosLUTWE1B = 0;
 uint16_t contRefrescosLUTWE2A = 0;
 uint16_t contRefrescosLUTWE2B = 0; 
 													
-uint8_t data_out[14] = {0};
+uint8_t data_out_we1[14] = {0};
+uint8_t data_out_we2[14] = {0};
 uint8_t ack[] = "ACK";
 uint8_t end[] = "END";
 
@@ -661,27 +662,25 @@ void Experiment(void){
 			if(eWE1 == E_FINISHED){
 				
 				if(envio_end_we1 == YES){	
-					
-					//uint8_t data_out[14] = {0};
-					
-					data_out[0] = 'E';
-					data_out[1] = 'N';
-					data_out[2] = 'D';
-					data_out[3] = 0;
-					data_out[4] = 0;
-					data_out[5] = 0;
-					data_out[6] = 0;
-					data_out[7] = 0;
-					data_out[8] = 0;
-					data_out[9] = 0;
-					data_out[10] = 0;
-					data_out[11] = 0;
-					data_out[12] = 0;
-					data_out[13] = 'F';
+									
+					data_out_we1[0] = 'E';
+					data_out_we1[1] = 'N';
+					data_out_we1[2] = 'D';
+					data_out_we1[3] = 0;
+					data_out_we1[4] = 0;
+					data_out_we1[5] = 0;
+					data_out_we1[6] = 0;
+					data_out_we1[7] = 0;
+					data_out_we1[8] = 0;
+					data_out_we1[9] = 0;
+					data_out_we1[10] = 0;
+					data_out_we1[11] = 0;
+					data_out_we1[12] = 0;
+					data_out_we1[13] = 'F';
 					
 					// Montamos trama datos finalización exp
 					while(uartHandle.tx_state != HAL_UART_STATE_READY){};
-					hal_uart_tx(&uartHandle, data_out, sizeof(data_out));
+					hal_uart_tx(&uartHandle, data_out_we1, sizeof(data_out_we1));
 						
 					envio_end_we1 = NO;
 				
@@ -729,27 +728,25 @@ void Experiment(void){
 			if(eWE1 == E_FINISHED){
 					
 				if(envio_end_we1 == YES){	
-						
-					//uint8_t data_out[14] = {0};
-						
-					data_out[0] = 'E';
-					data_out[1] = 'N';
-					data_out[2] = 'D';
-					data_out[3] = 0;
-					data_out[4] = 0;
-					data_out[5] = 0;
-					data_out[6] = 0;
-					data_out[7] = 0;
-					data_out[8] = 0;
-					data_out[9] = 0;
-					data_out[10] = 0;
-					data_out[11] = 0;
-					data_out[12] = 0;
-					data_out[13] = 'F';
+												
+					data_out_we1[0] = 'E';
+					data_out_we1[1] = 'N';
+					data_out_we1[2] = 'D';
+					data_out_we1[3] = 0;
+					data_out_we1[4] = 0;
+					data_out_we1[5] = 0;
+					data_out_we1[6] = 0;
+					data_out_we1[7] = 0;
+					data_out_we1[8] = 0;
+					data_out_we1[9] = 0;
+					data_out_we1[10] = 0;
+					data_out_we1[11] = 0;
+					data_out_we1[12] = 0;
+					data_out_we1[13] = 'F';
 						
 					// Montamos trama datos finalización exp
 					while(uartHandle.tx_state != HAL_UART_STATE_READY){};
-					hal_uart_tx(&uartHandle, data_out, sizeof(data_out));
+					hal_uart_tx(&uartHandle, data_out_we1, sizeof(data_out_we1));
 							
 					envio_end_we1 = NO;
 					
@@ -761,27 +758,25 @@ void Experiment(void){
 			if(eWE2 == E_FINISHED){
 					
 				if(envio_end_we2 == YES){	
-						
-					//uint8_t data_out[14] = {0};
-						
-					data_out[0] = 'E';
-					data_out[1] = 'N';
-					data_out[2] = 'D';
-					data_out[3] = 1;
-					data_out[4] = 0;
-					data_out[5] = 0;
-					data_out[6] = 0;
-					data_out[7] = 0;
-					data_out[8] = 0;
-					data_out[9] = 0;
-					data_out[10] = 0;
-					data_out[11] = 0;
-					data_out[12] = 0;
-					data_out[13] = 'F';
+											
+					data_out_we2[0] = 'E';
+					data_out_we2[1] = 'N';
+					data_out_we2[2] = 'D';
+					data_out_we2[3] = 1;
+					data_out_we2[4] = 0;
+					data_out_we2[5] = 0;
+					data_out_we2[6] = 0;
+					data_out_we2[7] = 0;
+					data_out_we2[8] = 0;
+					data_out_we2[9] = 0;
+					data_out_we2[10] = 0;
+					data_out_we2[11] = 0;
+					data_out_we2[12] = 0;
+					data_out_we2[13] = 'F';
 						
 					// Montamos trama datos finalización exp
 					while(uartHandle.tx_state != HAL_UART_STATE_READY){};
-					hal_uart_tx(&uartHandle, data_out, sizeof(data_out));
+					hal_uart_tx(&uartHandle, data_out_we2, sizeof(data_out_we2));
 							
 					envio_end_we2 = NO;
 					
@@ -790,10 +785,7 @@ void Experiment(void){
 			
 			
 			
-			/* Comprobamos si hemos terminado ambos experimentos. Si es así salimos. */
-			//if((eWE1 == E_FINISHED | eWE1 == E_CANCELLED) & (eWE2 == E_FINISHED | eWE2 == E_CANCELLED)\
-				& envio_end_we1 == NO & envio_end_we2 == NO){		// Han acabado los dos y se han enviado los mensajes de finalización? => nos vamos al estado ending...
-				
+			/* Comprobamos si hemos terminado ambos experimentos. Si es así salimos. */			
 			if(((eWE1 == E_FINISHED & envio_end_we1 == NO) & (eWE2 == E_FINISHED & envio_end_we2 == NO)) | (eWE1 == E_CANCELLED & eWE2 == E_CANCELLED)){
 				
 				
@@ -860,7 +852,7 @@ void pretreatment_we1(void){
 		
 		if(real_pret_we1 == tCond){
 			
-			if(pretreat_we1.tCond != 0){
+			if(pretreat_we1.tCond != 0){														// Hay tCond?
 				pWE1 = P_RUNNING;
 				// Configuramos TIM6 para DAC WE1
 				// Con los 25MHz del oscilador y con 1ms de disparo
@@ -871,8 +863,7 @@ void pretreatment_we1(void){
 				// Calculamos hasta donde debe de contar el contador según el tiempo que cuente el timer...
 				// sabiendo que en cada disparo el timer cuenta aprox 1ms (0.001).
 				contPretreatment_we1 = ceil((pretreat_we1.tCond / 1000.0) / 0.001);					// tiempo_pretratamiento(seg) / tiempo de trigger del timer
-					
-					
+									
 				hal_tim67_int_enable(&tim6Handle);
 				hal_tim67_init(&tim6Handle);
 					
@@ -886,13 +877,12 @@ void pretreatment_we1(void){
 			}
 			else{
 				real_pret_we1 = tDep;
-			}
-			
+			}		
 		}
 			
 		else if(real_pret_we1 == tDep){
 			
-			if(pretreat_we1.tDep != 0){
+			if(pretreat_we1.tDep != 0){															// Hay tDep?
 				pWE1 = P_RUNNING;
 				contPretreatment_we1 = ceil((pretreat_we1.tDep / 1000.0) / 0.001);
 					
@@ -918,7 +908,7 @@ void pretreatment_we1(void){
 			
 		else if(real_pret_we1 == tEq){
 			
-			if(pretreat_we1.tEq != 0){
+			if(pretreat_we1.tEq != 0){															// Hay tEq?
 				pWE1 = P_RUNNING;
 				contPretreatment_we1 = ceil((pretreat_we1.tEq / 1000.0) / 0.001);
 					
@@ -953,24 +943,24 @@ void pretreatment_we1(void){
 		//uint8_t data_out[14] = {0};
 		
 		// Enviamos finalización de pretratamiento
-		data_out[0] = 'E';
-		data_out[1] = 'N';
-		data_out[2] = 'D';
-		data_out[3] = 'P';
-		data_out[4] = 'R';
-		data_out[5] = 'E';
-		data_out[6] = 'T';
-		data_out[7] = 'W';
-		data_out[8] = 'E';
-		data_out[9] = '1';
-		data_out[10] = 0;
-		data_out[11] = 0;
-		data_out[12] = 0;
-		data_out[13] = 'F';
+		data_out_we1[0] = 'E';
+		data_out_we1[1] = 'N';
+		data_out_we1[2] = 'D';
+		data_out_we1[3] = 'P';
+		data_out_we1[4] = 'R';
+		data_out_we1[5] = 'E';
+		data_out_we1[6] = 'T';
+		data_out_we1[7] = 'W';
+		data_out_we1[8] = 'E';
+		data_out_we1[9] = '1';
+		data_out_we1[10] = 0;
+		data_out_we1[11] = 0;
+		data_out_we1[12] = 0;
+		data_out_we1[13] = 'F';
 			
 		// Montamos trama datos finalización exp
 		while(uartHandle.tx_state != HAL_UART_STATE_READY){};
-		hal_uart_tx(&uartHandle, data_out, sizeof(data_out));
+		hal_uart_tx(&uartHandle, data_out_we1, sizeof(data_out_we1));
 		
 		next_state_exp_WE1 = MEASURING_WE;
 		
@@ -982,54 +972,71 @@ void pretreatment_we1(void){
 void pretreatment_we2(void){
 	// configurar el pretreatment WE2 aquí
 	if(pWE2 == P_NONE){
-		
-		pWE2 = P_RUNNING;
-		
-		// Generamos señales de pretratamiento
 			
 		if(real_pret_we2 == tCond){
-			// Configuramos TIM6 para DAC WE1
-			// Con los 25MHz del oscilador y con 1ms de disparo
-			// para el timer por cada punto, necesitamos esta configuración :
-			tim7Handle.Init.Period = 49;			
-			tim7Handle.Init.Prescaler = 512;
+			if(pretreat_we2.tCond != 0){								// Hay tCond?
+				pWE2 = P_RUNNING;
+				// Configuramos TIM6 para DAC WE1
+				// Con los 25MHz del oscilador y con 1ms de disparo
+				// para el timer por cada punto, necesitamos esta configuración :
+				tim7Handle.Init.Period = 49;			
+				tim7Handle.Init.Prescaler = 512;
+					
+				// Calculamos hasta donde debe de contar el contador según el tiempo que cuente el timer...
+				// sabiendo que en cada disparo el timer cuenta aprox 1ms (0.001).
+				contPretreatment_we2 = ceil((pretreat_we2.tCond / 1000.0) / 0.001);					// tiempo_pretratamiento / tiempo de trigger del timer
+					
+					
+				hal_tim67_int_enable(&tim7Handle);
+				hal_tim67_init(&tim7Handle);
+					
+				// Sacamos el valor por el DAC
+				// TODO
 				
-			// Calculamos hasta donde debe de contar el contador según el tiempo que cuente el timer...
-			// sabiendo que en cada disparo el timer cuenta aprox 1ms (0.001).
-			contPretreatment_we2 = ceil((pretreat_we2.tCond / 1000.0) / 0.001);					// tiempo_pretratamiento / tiempo de trigger del timer
-				
-				
-			hal_tim67_int_enable(&tim7Handle);
-			hal_tim67_init(&tim7Handle);
-				
-			// Sacamos el valor por el DAC
-			// TODO
+			}
+			else{
+				real_pret_we2 = tDep;
+			}
 		}
 			
-		else if(real_pret_we2 == tDep){
-			contPretreatment_we2 = ceil((pretreat_we2.tDep / 1000.0) / 0.001);
+		else if(real_pret_we2 == tDep){								// Hay tDep?
+			if(pretreat_we2.tDep != 0){
 				
-			tim7Handle.Init.Period = 49;			
-			tim7Handle.Init.Prescaler = 512;
-			hal_tim67_int_enable(&tim7Handle);
-			hal_tim67_init(&tim7Handle);
+				pWE2 = P_RUNNING;
 				
-			// Sacamos el valor por el DAC
-			// TODO
+				contPretreatment_we2 = ceil((pretreat_we2.tDep / 1000.0) / 0.001);
+					
+				tim7Handle.Init.Period = 49;			
+				tim7Handle.Init.Prescaler = 512;
+				hal_tim67_int_enable(&tim7Handle);
+				hal_tim67_init(&tim7Handle);
+					
+				// Sacamos el valor por el DAC
+				// TODO
+			}
+			else{
+				real_pret_we2 = tEq;
+			}
 			
 		}
 			
-		else if(real_pret_we2 == tEq){
-			contPretreatment_we2 = ceil((pretreat_we2.tEq / 1000.0) / 0.001);
+		else if(real_pret_we2 == tEq){							// Hay tEq?
+			if(pretreat_we2.tEq != 0){
+				pWE2 = P_RUNNING;
+				contPretreatment_we2 = ceil((pretreat_we2.tEq / 1000.0) / 0.001);
+					
+				tim7Handle.Init.Period = 49;			
+				tim7Handle.Init.Prescaler = 512;
+				hal_tim67_int_enable(&tim7Handle);
+				hal_tim67_init(&tim7Handle);
+					
+				// Sacamos el valor por el DAC
+				// TODO
 				
-			tim7Handle.Init.Period = 49;			
-			tim7Handle.Init.Prescaler = 512;
-			hal_tim67_int_enable(&tim7Handle);
-			hal_tim67_init(&tim7Handle);
-				
-			// Sacamos el valor por el DAC
-			// TODO
-			
+			}
+			else{
+				pWE2 = P_FINISHED;
+			}
 		}
 		
 	}
@@ -1040,28 +1047,26 @@ void pretreatment_we2(void){
 	}
 	
 	else if (pWE2 == P_FINISHED | pWE2 == P_CANCELLED){
-		
-		//uint8_t data_out[14] = {0};
-		
+			
 		// Enviamos finalización de pretratamiento
-		data_out[0] = 'E';
-		data_out[1] = 'N';
-		data_out[2] = 'D';
-		data_out[3] = 'P';
-		data_out[4] = 'R';
-		data_out[5] = 'E';
-		data_out[6] = 'T';
-		data_out[7] = 'W';
-		data_out[8] = 'E';
-		data_out[9] = '2';
-		data_out[10] = 0;
-		data_out[11] = 0;
-		data_out[12] = 0;
-		data_out[13] = 'F';
+		data_out_we2[0] = 'E';
+		data_out_we2[1] = 'N';
+		data_out_we2[2] = 'D';
+		data_out_we2[3] = 'P';
+		data_out_we2[4] = 'R';
+		data_out_we2[5] = 'E';
+		data_out_we2[6] = 'T';
+		data_out_we2[7] = 'W';
+		data_out_we2[8] = 'E';
+		data_out_we2[9] = '2';
+		data_out_we2[10] = 0;
+		data_out_we2[11] = 0;
+		data_out_we2[12] = 0;
+		data_out_we2[13] = 'F';
 			
 		// Montamos trama datos finalización exp
 		while(uartHandle.tx_state != HAL_UART_STATE_READY){};
-		hal_uart_tx(&uartHandle, data_out, sizeof(data_out));
+		hal_uart_tx(&uartHandle, data_out_we2, sizeof(data_out_we2));
 		
 		next_state_exp_WE2 = MEASURING_WE;
 		
@@ -1147,30 +1152,28 @@ void measuring_we1 (void){
 				if(contMedidasADC_we1 == NMEDIDASWE1){				// ¿Paramos de tomar medidas...?
 					// Hacemos medida y enviamos datos
 					// TODO
-					//uint8_t data_out[14] = {0};
 					//calculate media(dataADC);
-
-					
+				
 					// Montamos el paquete de datos
 					// Esto dependerá de cada tipo de técnica
-					data_out[0] = 'D';
-					data_out[1] = 'A';
-					data_out[2] = 'T';
-					data_out[3] = 0;
-					data_out[4] = 5; //rand();
-					data_out[5] = 5; //rand();
-					data_out[6] = 5; //rand();
-					data_out[7] = 5; //rand();
-					data_out[8] = 5; //rand();
-					data_out[9] = 5; //rand();
-					data_out[10] = 0;
-					data_out[11] = 0;
-					data_out[12] = 0;
-					data_out[13] = 'F';
+					data_out_we1[0] = 'D';
+					data_out_we1[1] = 'A';
+					data_out_we1[2] = 'T';
+					data_out_we1[3] = 0;
+					data_out_we1[4] = rand();
+					data_out_we1[5] = rand();
+					data_out_we1[6] = rand();
+					data_out_we1[7] = rand();
+					data_out_we1[8] = rand();
+					data_out_we1[9] = rand();
+					data_out_we1[10] = 0;
+					data_out_we1[11] = 0;
+					data_out_we1[12] = 0;
+					data_out_we1[13] = 'F';
 
 					// Enviamos los datos
 					while(uartHandle.tx_state != HAL_UART_STATE_READY){};
-					hal_uart_tx(&uartHandle, data_out, sizeof(data_out));
+					hal_uart_tx(&uartHandle, data_out_we1, sizeof(data_out_we1));
 					
 					//enviar = YES;
 					medidasADC_we1 = NO;
@@ -1247,12 +1250,6 @@ void measuring_we2 (void){
 
 					experimentWE2.contSamplesLUT++;
 					
-					// Habilitamos de nuevo el timer para el siguiente sample
-					//hal_tim67_int_enable(&tim7Handle);				// Habilitamos interrupción TIM6
-					//hal_tim67_enable(&tim7Handle);						// Habilitamos el timer					
-					
-
-					
 					// ¿Hay que cambiar de LUT...?
 					if(experimentWE2.contSamplesLUT == experimentWE2.nSamplesLUT){
 						leerLUTAWE2 = NO;								// Cambiamos a LUTB
@@ -1273,14 +1270,7 @@ void measuring_we2 (void){
 //					hal_gpio_write_to_pin(GPIOB, SPI_CS_PIN, 1);				// CS to HIGH		
 
 					experimentWE2.contSamplesLUT++;
-					
-					// Habilitamos de nuevo el timer para el siguiente sample
-					//hal_tim67_int_enable(&tim7Handle);				// Habilitamos interrupción TIM6
-					//hal_tim67_enable(&tim7Handle);						// Habilitamos el timer	
-					
-					
-
-					
+							
 					// ¿Hay que cambiar de LUT...?
 					if(experimentWE2.contSamplesLUT == experimentWE2.nSamplesLUT){
 						leerLUTBWE2 = NO;								// Cambiamos a LUTA
@@ -1303,31 +1293,29 @@ void measuring_we2 (void){
 
 				if(contMedidasADC_we2 == NMEDIDASWE2){				// ¿Paramos de tomar medidas...?
 					// Hacemos medida y enviamos datos
-					// TODO
-					//uint8_t data_out[14] = {0};
-					//calculate media(dataADC);
 
-					
+					//calculate media(dataADC);
+		
 					// Montamos el paquete de datos
 					// Esto dependerá de cada tipo de técnica
-					data_out[0] = 'D';
-					data_out[1] = 'A';
-					data_out[2] = 'T';
-					data_out[3] = 1;
-					data_out[4] = 8; //rand();
-					data_out[5] = 8; //rand();
-					data_out[6] = 8; //rand();
-					data_out[7] = 8; //rand();
-					data_out[8] = 8; //rand();
-					data_out[9] = 8; //rand();
-					data_out[10] = 0;
-					data_out[11] = 0;
-					data_out[12] = 0;
-					data_out[13] = 'F';
+					data_out_we2[0] = 'D';
+					data_out_we2[1] = 'A';
+					data_out_we2[2] = 'T';
+					data_out_we2[3] = 1;
+					data_out_we2[4] = rand();
+					data_out_we2[5] = rand();
+					data_out_we2[6] = rand();
+					data_out_we2[7] = rand();
+					data_out_we2[8] = rand();
+					data_out_we2[9] = rand();
+					data_out_we2[10] = 0;
+					data_out_we2[11] = 0;
+					data_out_we2[12] = 0;
+					data_out_we2[13] = 'F';
 
 					// Enviamos los datos
 					while(uartHandle.tx_state != HAL_UART_STATE_READY){};
-					hal_uart_tx(&uartHandle, data_out, sizeof(data_out));
+					hal_uart_tx(&uartHandle, data_out_we2, sizeof(data_out_we2));
 					
 					//enviar = YES;
 					medidasADC_we2 = NO;
@@ -1355,11 +1343,7 @@ void measuring_we2 (void){
 		/* Comprobamos si debemos cambiar el FS */
 		if (status_I_we2 != I_DEFAULT) {
 			next_state_exp_WE2 = FS_CH_WE;
-		}
-		
-		hal_tim67_int_enable(&tim7Handle);				// Habilitamos interrupción TIM6
-		hal_tim67_enable(&tim7Handle);						// Habilitamos el timer		
-		
+		}	
 	}
 	
 	else if (eWE2 == E_FINISHED | eWE2 == E_CANCELLED){
@@ -1773,10 +1757,11 @@ void TIM6_DAC_IRQHandler(void){
 			
 			
 			/* ¿Hemos finalizado el experimento? */
-			if(experimentWE1.contSamplesExp > experimentWE1.nSamplesExp){			// Hemos leído el último sample del experimento...
-				eWE1 = E_FINISHED;
+			if(experimentWE1.contSamplesExp == experimentWE1.nSamplesExp){			// Hemos leído el último sample del experimento...
 				
-				hal_tim67_clear_flag(&tim6Handle);				// Borramos la flag de int pendiente
+				eWE1 = E_FINISHED;
+
+				hal_tim67_clear_flag(&tim6Handle);						// Borramos la flag de int pendiente
 			}
 			else{
 
@@ -1837,6 +1822,7 @@ void TIM7_IRQHandler(){
 				}
 				
 				hal_tim67_clear_flag(&tim7Handle);				// Borramos la flag de int pendiente
+				
 			}
 			else{
 
@@ -1870,10 +1856,11 @@ void TIM7_IRQHandler(){
 			}
 			
 			/* ¿Hemos finalizado el experimento? */
-			if(experimentWE2.contSamplesExp > experimentWE2.nSamplesExp){			// Hemos leído el último sample del experimento...
-				eWE2 = E_FINISHED;
+			if(experimentWE2.contSamplesExp == experimentWE2.nSamplesExp){			// Hemos leído el último sample del experimento...
 				
-				hal_tim67_clear_flag(&tim7Handle);				// Borramos la flag de int pendiente
+				eWE2 = E_FINISHED;
+
+				hal_tim67_clear_flag(&tim7Handle);						// Borramos la flag de int pendiente
 			}
 			else{
 
