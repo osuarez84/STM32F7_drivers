@@ -139,8 +139,6 @@ void 	parse_cmd(uint8_t* cmd){
 }
 
 
-
-
 /**
 	* @brief  Reads the W1 ADC value
 	* @param  None

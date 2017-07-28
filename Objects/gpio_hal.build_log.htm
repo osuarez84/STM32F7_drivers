@@ -27,11 +27,43 @@ Project File Date:  05/03/2017
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 1 (build 61)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'Target 1'
-assembling startup_stm32f769xx.s...
-compiling led.c...
+compiling hal_EQ_techniques.c...
+hal_EQ_techniques.c(956): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  	e->runTime.tInterval = e->Init.tInterval / 1000.0;																				// Valor de tiempo de cada medición ADC
+hal_EQ_techniques.c(24): warning:  #177-D: function "generateRamp" was declared but never referenced
+  static uint32_t generateRamp(float eStart, float eStop, float eStep, float* lut) {
+hal_EQ_techniques.c(503): warning:  #177-D: function "load_CV_data" was declared but never referenced
+  static void load_CV_data(exp_param_values_t* e, uint8_t* cmd){
+hal_EQ_techniques.c(517): warning:  #177-D: function "load_LSV_data" was declared but never referenced
+  static void load_LSV_data(exp_param_values_t* e, uint8_t* cmd){
+hal_EQ_techniques.c(897): warning:  #177-D: function "generateDSCA" was declared but never referenced
+  static void generateDSCA(){
+hal_EQ_techniques.c(901): warning:  #177-D: function "generateAD" was declared but never referenced
+  static void generateAD(){
+hal_EQ_techniques.c(907): warning:  #177-D: function "generateFA" was declared but never referenced
+  static void generateFA(){
+hal_EQ_techniques.c(913): warning:  #177-D: function "generatePAD" was declared but never referenced
+  static void generatePAD(){
+hal_EQ_techniques.c(918): warning:  #177-D: function "generateDPA" was declared but never referenced
+  static void generateDPA(){
+hal_EQ_techniques.c(923): warning:  #177-D: function "generateMSA" was declared but never referenced
+  static void generateMSA(){
+hal_EQ_techniques.c(933): warning:  #177-D: function "load_DSCA_data" was declared but never referenced
+  static void load_DSCA_data(exp_param_values_t* e, uint8_t* cmd){
+hal_EQ_techniques.c(976): warning:  #177-D: function "load_AD_data" was declared but never referenced
+  static void load_AD_data(){
+hal_EQ_techniques.c(982): warning:  #177-D: function "load_FA_data" was declared but never referenced
+  static void load_FA_data(){
+hal_EQ_techniques.c(989): warning:  #177-D: function "load_PAD_data" was declared but never referenced
+  static void load_PAD_data(){
+hal_EQ_techniques.c(1036): warning:  #177-D: function "load_DPA_data" was declared but never referenced
+  static void load_DPA_data(){
+hal_EQ_techniques.c(1040): warning:  #177-D: function "load_MSA_data" was declared but never referenced
+  static void load_MSA_data(){
+hal_EQ_techniques.c: 16 warnings, 0 errors
 linking...
-Program Size: Code=16954 RO-data=854 RW-data=164 ZI-data=14676  
-".\Objects\gpio_hal.axf" - 0 Error(s), 0 Warning(s).
+Program Size: Code=16866 RO-data=854 RW-data=164 ZI-data=14492  
+".\Objects\gpio_hal.axf" - 0 Error(s), 16 Warning(s).
 
 <h2>Software Packages used:</h2>
 

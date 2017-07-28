@@ -71,6 +71,7 @@ typedef struct{
 
 typedef struct{
 	uint16_t start;
+	uint16_t eDC;
 	uint16_t stop;
 	uint16_t step;
 	uint16_t sr;
@@ -80,6 +81,8 @@ typedef struct{
 	
 	uint16_t tHold;
 	uint16_t ePulse1;
+	uint16_t ePulse2;			// DSCA
+	float tInterval;		// DSCA
 	uint16_t tPulse1;
 	uint16_t tPulse2;
 	uint16_t amplitude;

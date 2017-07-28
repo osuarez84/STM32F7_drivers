@@ -146,7 +146,9 @@ static uint32_t generateRamp(float eStart, float eStop, float eStep, float* lut)
 //}
 
 
-
+/* #######################################################
+   #	VOLTAMMETRIES
+   ####################################################### */
 
 /**
 * @brief	Each iteration prepare values to fill the 1024 LUT with the SCV
@@ -559,7 +561,7 @@ static void load_SCV_data(exp_param_values_t* e, uint8_t* cmd){
 	stop = ((int16_t)(e->Init.stop)) / 1000.0;
 	start = ((int16_t)(e->Init.start)) / 1000.0;
 		
-	tSampling = 1 / (e->fSampling);
+	tSampling = 1 / (float)(e->fSampling);
 	tInt = step / sr;
 	
 	if(stop > start){
@@ -862,6 +864,7 @@ static void load_ACV_data(exp_param_values_t* e, uint8_t* cmd){
 	step = e->Init.step / 1000.0;
 	stop = ((int16_t)(e->Init.stop)) / 1000.0;
 	start = ((int16_t)(e->Init.start)) / 1000.0;
+	sr = e->Init.sr / 1000.0;
 	
 	tInt = step / sr;
 	tSampling = 1 / (float)e->fSampling;
@@ -874,7 +877,7 @@ static void load_ACV_data(exp_param_values_t* e, uint8_t* cmd){
 	samples totales del exp	en la ISR */
 	e->nSamplesAC = ceil((1 / e->Init.freq) / (1 / (float)e->fSampling));
 	e->nSamples1 = ceil(tInt / tSampling);
-	e->nSamplesExp = e->nSamples1;
+	e->nSamplesPer = e->nSamples1;
 	e->nSamplesExp = e->nSteps * e->nSamplesPer;
 	e->nSamplesLUT = NSAMPLESLUT;
 	
@@ -887,7 +890,157 @@ static void load_ACV_data(exp_param_values_t* e, uint8_t* cmd){
 	
 }
 
+/* #######################################################
+   #	AMPEROMETRIES
+   ####################################################### */
 
+static void generateDSCA(){
+
+}
+
+static void generateAD(){
+
+
+}
+
+
+static void generateFA(){
+
+
+}
+
+
+static void generatePAD(){
+
+}
+
+
+static void generateDPA(){
+
+
+}
+
+static void generateMSA(){
+
+
+}
+
+
+/* ************************************************** */
+/* 	FUNCIONES PARA PRECARGA DE DATOS  DEL EXPERIMENTO */
+/* ************************************************** */
+
+static void load_DSCA_data(exp_param_values_t* e, uint8_t* cmd){
+
+	// Parámetros
+	// + ePulse1
+	// + tPulse1
+	// + ePulse2
+	// + tPulse2
+	
+	float tPulse1, tPulse2, tSampling;
+
+	// BORRAR
+	e->fSampling = 10000;		// Va a depender del filtro seleccionado
+
+	/* Experiment values */
+	e->Init.ePulse1 = ((cmd[24] << 8) | (cmd[25] & 0xFF));
+	e->Init.tPulse1 = ((cmd[26] << 8) | (cmd[27] & 0xFF));
+	e->Init.ePulse2 = ((cmd[28] << 8) | (cmd[29] & 0xFF));
+	e->Init.tPulse2 = ((cmd[30] << 8) | (cmd[31] & 0xFF));
+	e->Init.tInterval = ((cmd[32] << 8) | (cmd[33] & 0xFF));
+	
+	// Pasamos los parámetros a valores DAC
+	e->runTime.ePulse1 = ceil((((e->Init.ePulse1 / 1000.0) * 32768.0) / VREF) + 32768.0);
+	e->runTime.ePulse2 = ceil((((e->Init.ePulse2 / 1000.0) * 32768.0) / VREF) + 32768.0);
+	e->runTime.tInterval = e->Init.tInterval / 1000.0;																				// Valor de tiempo de cada medición ADC
+	
+	tSampling = 1 / (float)e->fSampling;
+
+	/* Inicializamos las variables para llevar la cuenta
+	de los samples que vamos leyendo de la LUT y de los 
+	samples totales del exp	en la ISR */
+	e->nSamples1 = ceil(tPulse1 / tSampling);
+	e->nSamples2 = ceil(tPulse2 / tSampling);
+	e->nSamplesExp = e->nSamples1 + e->nSamples2; 
+	e->nSamplesPer = e->nSamplesExp;									// En este caso los samples del "período" son los mismos que los del experimento (ver forma de onda)
+	e->nSamplesLUT = NSAMPLESLUT;
+		
+	// Inicializamos contadores
+	e->contSamplesExp = 0;
+	e->contSamplesLUT = 0;
+	e->contSamplesPer = 0;
+	
+}
+
+static void load_AD_data(){
+
+	// TODO
+}
+
+
+static void load_FA_data(){
+	
+	// TODO
+	
+}
+
+
+static void load_PAD_data(){
+
+	// Parámetros
+	// + eDC
+	// + ePulse1
+	// + ePulse2
+	// + tPulse1
+	// + tPulse2
+	
+//		float tPulse1, tPulse2, tSampling;
+
+//	// BORRAR
+//	e->fSampling = 10000;		// Va a depender del filtro seleccionado
+
+//	/* Experiment values */
+//	e->Init.ePulse1 = ((cmd[24] << 8) | (cmd[25] & 0xFF));
+//	e->Init.tPulse1 = ((cmd[26] << 8) | (cmd[27] & 0xFF));
+//	e->Init.ePulse2 = ((cmd[28] << 8) | (cmd[29] & 0xFF));
+//	e->Init.tPulse2 = ((cmd[30] << 8) | (cmd[31] & 0xFF));
+//	e->Init.tInterval = ((cmd[32] << 8) | (cmd[33] & 0xFF));
+//	
+//	// Pasamos los parámetros a valores DAC
+//	e->runTime.ePulse1 = ceil((((e->Init.ePulse1 / 1000.0) * 32768.0) / VREF) + 32768.0);
+//	e->runTime.ePulse2 = ceil((((e->Init.ePulse2 / 1000.0) * 32768.0) / VREF) + 32768.0);
+//	e->runTime.tInterval = e->Init.tInterval / 1000.0;																				// Valor de tiempo de cada medición ADC
+//	
+//	tSampling = 1 / (float)e->fSampling;
+
+//	/* Inicializamos las variables para llevar la cuenta
+//	de los samples que vamos leyendo de la LUT y de los 
+//	samples totales del exp	en la ISR */
+//	e->nSamples1 = ceil(tPulse1 / tSampling);
+//	e->nSamples2 = ceil(tPulse2 / tSampling);
+//	e->nSamplesExp = e->nSamples1 + e->nSamples2; 
+//	e->nSamplesPer = e->nSamplesExp;									// En este caso los samples del "período" son los mismos que los del experimento (ver forma de onda)
+//	e->nSamplesLUT = NSAMPLESLUT;
+//		
+//	// Inicializamos contadores
+//	e->contSamplesExp = 0;
+//	e->contSamplesLUT = 0;
+//	e->contSamplesPer = 0;
+	
+	
+	
+}
+
+
+static void load_DPA_data(){
+
+}
+
+static void load_MSA_data(){
+
+
+}
 
 
 /************************************************/
