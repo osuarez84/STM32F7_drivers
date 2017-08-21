@@ -3,50 +3,43 @@
 #include "hal_EQ_techniques.h"
 #include "led.h"
 
-
-
-
-
-
-
-
 /************************************************/
 /*				Helper functions				*/
 /************************************************/
-/**
-* @brief	Generate the data points between start and stop points
-* @param	Start point
-* @param	End point
-* @param	Step between two consecutive points
-* @param	Pointer to an array to save the data
-* @retval	No. samples 
-*/
-static uint32_t generateRamp(float eStart, float eStop, float eStep, float* lut) {
+///**
+//* @brief	Generate the data points between start and stop points
+//* @param	Start point
+//* @param	End point
+//* @param	Step between two consecutive points
+//* @param	Pointer to an array to save the data
+//* @retval	No. samples 
+//*/
+//static uint32_t generateRamp(float eStart, float eStop, float eStep, float* lut) {
 
-	// TODO : si trabajamos con valores uint16_t directamente
-	// es necesario cambiar la función fabsf que devuelve un float
-	// a abs, que devuelve un int
+//	// TODO : si trabajamos con valores uint16_t directamente
+//	// es necesario cambiar la función fabsf que devuelve un float
+//	// a abs, que devuelve un int
 
-	uint32_t i;
-	
-	uint32_t nSamples = ceil(fabsf(eStart - eStop) / eStep) + 1;				// Calculamos número de puntos...
-	lut[0] = eStart;															// Cargamos primer valor en LUT...
+//	uint32_t i;
+//	
+//	uint32_t nSamples = ceil(fabsf(eStart - eStop) / eStep) + 1;				// Calculamos número de puntos...
+//	lut[0] = eStart;															// Cargamos primer valor en LUT...
 
-	for (i = 1; i < nSamples; i++) {
+//	for (i = 1; i < nSamples; i++) {
 
-		if (eStart < eStop) {													// Rampa aumenta...
-			lut[i] = eStart + (i * eStep);
-		}
-		else {																	// Rampa disminuye...
-			lut[i] = eStart - (i * eStep);
-		}
+//		if (eStart < eStop) {													// Rampa aumenta...
+//			lut[i] = eStart + (i * eStep);
+//		}
+//		else {																	// Rampa disminuye...
+//			lut[i] = eStart - (i * eStep);
+//		}
 
-	}
+//	}
 
-	return nSamples;
+//	return nSamples;
 
 
-}
+//}
 
 
 /**
@@ -82,31 +75,6 @@ static uint32_t generateRamp(float eStart, float eStop, float eStep, float* lut)
 //	return (n1 + n2 + n3);
 
 //}
-
-
-/**
-* @brief	Computes the DAC value from the voltage value 
-* @param	Pointer to LUT with output voltage data
-* @param	Pointer to an array to save the DAC LUT
-* @param	No. samples of LUT with the output voltage data
-* @retval	None
-*/
-//void generateDACValues(float* lut, uint16_t* data, uint32_t n) {
-
-//	uint32_t i;
-//	
-//	/* Rutina para calcular la potencia de 2^NBITSDAC (para evitar el uso de pow())*/
-//	uint32_t DACp = 2;		// base
-//	for (i = 0; i < (NBITSDAC - 1); i++) {
-//		DACp *= 2;
-//	}
-
-//	for (i = 0; i <= n; i++) {
-//		data[i] = (( (DACp + 1) * lut[i]) / VREF);
-//	}
-
-//}
-
 
 
 ///**
@@ -150,9 +118,42 @@ static uint32_t generateRamp(float eStart, float eStop, float eStep, float* lut)
    #	VOLTAMMETRIES
    ####################################################### */
 
+// ++++++++++++++++++++++++++++++++++++++++++++++++++
+// Formulas para el cálculo de los valores DAC:
+// 	+ DAC bipotentiostat
+//		DatoDAC = ((Vanalog + 5) * (2^20 - 1)) / 10;
+//
+//
+// 	+ DAC galvanostat
+//		1. FS +/- 500nA
+//			DatoDAC = (((Ianalog * 10^7) + 5) * (2^20 - 1)) / 10
+//
+//		2. FS +/- 500uA
+//			DatoDAC = (((Ianalog * 10^4) + 5) * (2^20 - 1)) / 10
+//
+//		3. FS +/- 100mA 
+//			DatoDAC = (((Ianalog * 10) + 5) * (2^20 - 1)) / 10
+//
+// +++++++++++++++++++++++++++++++++++++++++++++++++++
+
+static void generateCV(exp_param_values_t* e, uint16_t* LUT){
+	// TODO
+
+}
+
+
+static void generateLSV(exp_param_values_t* e, uint16_t* LUT){
+	// TODO
+
+}
+
+
+
+
 /**
 * @brief	Each iteration prepare values to fill the 1024 LUT with the SCV
-* @param	None
+* @param	e : parameters for configuring the waveform
+* @param	LUT : array to save the values
 * @retval	None
 */
 // ANOTACIONES
@@ -228,8 +229,8 @@ static void generateSCV(exp_param_values_t* e, uint16_t* LUT){
 
 /**
 * @brief	Each iteration prepare values to fill the 1024 LUT with the DPV
-* @param	None
-* @retval	None
+* @param	e : parameters for configuring the waveform
+* @param	LUT : array to save the values
 */
 static void generateDPV(exp_param_values_t* e, uint16_t* LUT){
 	
@@ -285,8 +286,8 @@ static void generateDPV(exp_param_values_t* e, uint16_t* LUT){
 
 /**
 * @brief	Each iteration prepare values to fill the 1024 LUT with the NPV
-* @param	None
-* @retval	None
+* @param	e : parameters for configuring the waveform
+* @param	LUT : array to save the values
 */
 static void generateNPV(exp_param_values_t* e, uint16_t* LUT){
 
@@ -341,8 +342,8 @@ static void generateNPV(exp_param_values_t* e, uint16_t* LUT){
 
 /**
 * @brief	Each iteration prepare values to fill the 1024 LUT with the DNPV
-* @param	None
-* @retval	None
+* @param	e : parameters for configuring the waveform
+* @param	LUT : array to save the values
 */
 static void generateDNPV(exp_param_values_t* e, uint16_t* LUT){
 
@@ -403,8 +404,8 @@ static void generateDNPV(exp_param_values_t* e, uint16_t* LUT){
 
 /**
 * @brief	Each iteration prepare values to fill the 1024 LUT with the SWV
-* @param	None
-* @retval	None
+* @param	e : parameters for configuring the waveform
+* @param	LUT : array to save the values
 */
 static void generateSWV(exp_param_values_t* e, uint16_t* LUT){
 	
@@ -456,6 +457,11 @@ static void generateSWV(exp_param_values_t* e, uint16_t* LUT){
 	}
 }
 
+/**
+* @brief	Each iteration prepare values to fill the 1024 LUT with the ACV
+* @param	e : parameters for configuring the waveform
+* @param	LUT : array to save the values
+*/
 static void generateACV(exp_param_values_t* e, uint16_t* LUT){
 	
 	uint32_t i;
@@ -500,6 +506,11 @@ static void generateACV(exp_param_values_t* e, uint16_t* LUT){
 /* 	FUNCIONES PARA PRECARGA DE DATOS  DEL EXPERIMENTO */
 /* ************************************************** */
 
+/**
+* @brief	loads the data for CV technique
+* @param	e : parameters for configuring the waveform
+* @param	cmd : buffer with data from PC
+*/
 static void load_CV_data(exp_param_values_t* e, uint8_t* cmd){
 
 	// Parámetros
@@ -514,6 +525,12 @@ static void load_CV_data(exp_param_values_t* e, uint8_t* cmd){
 
 }
 
+
+/**
+* @brief	loads the data for LSV technique
+* @param	e : parameters for configuring the waveform
+* @param	cmd : buffer with data from PC
+*/
 static void load_LSV_data(exp_param_values_t* e, uint8_t* cmd){
 	
 	// Parámetros
@@ -526,6 +543,12 @@ static void load_LSV_data(exp_param_values_t* e, uint8_t* cmd){
 	
 }
 
+
+/**
+* @brief	loads the data for SCV technique
+* @param	e : parameters for configuring the waveform
+* @param	cmd : buffer with data from PC
+*/
 static void load_SCV_data(exp_param_values_t* e, uint8_t* cmd){
 
 	// Parámetros
@@ -550,9 +573,12 @@ static void load_SCV_data(exp_param_values_t* e, uint8_t* cmd){
 	e->Init.scans = ((cmd[32] << 8) | (cmd[33] & 0xFF));
 	
 	// Guardamos los parámetros convertidos a valores DAC
-	e->runTime.start = ceil((((e->Init.start / 1000.0) * 32768.0) / VREF) + 32768.0);
-	e->runTime.stop = ceil((((e->Init.stop / 1000.0) * 32768.0) / VREF) + 32768.0);
-	e->runTime.step = ceil((((e->Init.step / 1000.0) * 32768.0) / VREF));
+	//e->runTime.start = ceil((((e->Init.start / 1000.0) * 32768.0) / VREF) + 32768.0);
+	//e->runTime.stop = ceil((((e->Init.stop / 1000.0) * 32768.0) / VREF) + 32768.0);
+	//e->runTime.step = ceil((((e->Init.step / 1000.0) * 32768.0) / VREF));
+	e->runTime.start = ceil((((e->Init.start / 1000.0) + 5) * (pow(2,20) - 1)) / 10);
+	e->runTime.stop = ceil((((e->Init.stop / 1000.0) + 5) * (pow(2,20) - 1)) / 10);
+	e->runTime.step = ceil((((e->Init.step / 1000.0) + 5) * (pow(2,20) - 1)) / 10);
 	
 	// Recupero todos los decimales para los cálculos...
 	step = e->Init.step / 1000.0;
@@ -595,6 +621,11 @@ static void load_SCV_data(exp_param_values_t* e, uint8_t* cmd){
 }
 
 
+/**
+* @brief	loads the data for DPV technique
+* @param	e : parameters for configuring the waveform
+* @param	cmd : buffer with data from PC
+*/
 static void load_DPV_data(exp_param_values_t* e, uint8_t* cmd){
 				
 	
@@ -612,10 +643,15 @@ static void load_DPV_data(exp_param_values_t* e, uint8_t* cmd){
 	e->Init.sr = ((cmd[32] << 8) | (cmd[33] & 0xFF));
 	
 	// Pasamos los parámetros a valores DAC
-	e->runTime.start = ceil((((e->Init.start / 1000.0) * 32768.0) / VREF) + 32768.0);
-	e->runTime.stop = ceil((((e->Init.stop / 1000.0) * 32768.0) / VREF) + 32768.0);
-	e->runTime.step = ceil(((e->Init.step / 1000.0) * 32768.0) / VREF);
-	e->runTime.ePulse1 = ceil((((e->Init.ePulse1 / 1000.0) * 32768.0) / VREF) + 32768.0);
+	//e->runTime.start = ceil((((e->Init.start / 1000.0) * 32768.0) / VREF) + 32768.0);
+	//e->runTime.stop = ceil((((e->Init.stop / 1000.0) * 32768.0) / VREF) + 32768.0);
+	//e->runTime.step = ceil(((e->Init.step / 1000.0) * 32768.0) / VREF);
+	//e->runTime.ePulse1 = ceil((((e->Init.ePulse1 / 1000.0) * 32768.0) / VREF) + 32768.0);
+	e->runTime.start = ceil((((e->Init.start / 1000.0) + 5) * (pow(2,20) - 1)) / 10);
+	e->runTime.stop = ceil((((e->Init.stop / 1000.0) + 5) * (pow(2,20) - 1)) / 10);
+	e->runTime.step = ceil((((e->Init.step / 1000.0) + 5) * (pow(2,20) - 1)) / 10);
+	e->runTime.ePulse1 = ceil((((e->Init.ePulse1 / 1000.0) + 5) * (pow(2,20) - 1)) / 10);
+	
 	
 	// Recupero todos los decimales para los cálculos...
 	step = e->Init.step / 1000.0;
@@ -659,6 +695,11 @@ static void load_DPV_data(exp_param_values_t* e, uint8_t* cmd){
 }
 
 
+/**
+* @brief	loads the data for NPV technique
+* @param	e : parameters for configuring the waveform
+* @param	cmd : buffer with data from PC
+*/
 static void load_NPV_data(exp_param_values_t* e, uint8_t* cmd){
 	
 	float step, sr, tPulse, stop, start, tSampling, tInt;
@@ -675,9 +716,12 @@ static void load_NPV_data(exp_param_values_t* e, uint8_t* cmd){
 	
 	
 	// Pasamos los parámetros a valores DAC
-	e->runTime.start = ceil((((e->Init.start / 1000.0) * 32768.0) / VREF) + 32768.0);
-	e->runTime.stop = ceil((((e->Init.stop / 1000.0) * 32768.0) / VREF) + 32768.0);
-	e->runTime.step = ceil(((e->Init.step / 1000.0) * 32768.0) / VREF);
+	//e->runTime.start = ceil((((e->Init.start / 1000.0) * 32768.0) / VREF) + 32768.0);
+	//e->runTime.stop = ceil((((e->Init.stop / 1000.0) * 32768.0) / VREF) + 32768.0);
+	//e->runTime.step = ceil(((e->Init.step / 1000.0) * 32768.0) / VREF);
+	e->runTime.start = ceil((((e->Init.start / 1000.0) + 5) * (pow(2,20) - 1)) / 10);
+	e->runTime.stop = ceil((((e->Init.stop / 1000.0) + 5) * (pow(2,20) - 1)) / 10);
+	e->runTime.step = ceil((((e->Init.step / 1000.0) + 5) * (pow(2,20) - 1)) / 10);
 	
 	// Recupero todos los decimales para los cálculos...
 	step = e->Init.step / 1000.0;
@@ -714,6 +758,11 @@ static void load_NPV_data(exp_param_values_t* e, uint8_t* cmd){
 }
 
 
+/**
+* @brief	loads the data for DNPV technique
+* @param	e : parameters for configuring the waveform
+* @param	cmd : buffer with data from PC
+*/
 static void load_DNPV_data(exp_param_values_t* e, uint8_t* cmd){
 	
 	float step, sr, tPulse1, tPulse2, stop, start, tSampling, tInt;
@@ -731,10 +780,14 @@ static void load_DNPV_data(exp_param_values_t* e, uint8_t* cmd){
 	e->Init.sr = ((cmd[34] << 8) | (cmd[35] & 0xFF));
 	
 	// Pasamos los parámetros a valores DAC
-	e->runTime.start = ceil((((e->Init.start / 1000.0) * 32768.0) / VREF) + 32768.0);
-	e->runTime.stop = ceil((((e->Init.stop / 1000.0) * 32768.0) / VREF) + 32768.0);
-	e->runTime.step = ceil(((e->Init.step / 1000.0) * 32768.0) / VREF);
-	e->runTime.ePulse1 = ceil((((e->Init.ePulse1 / 1000.0) * 32768.0) / VREF) + 32768.0);
+	//e->runTime.start = ceil((((e->Init.start / 1000.0) * 32768.0) / VREF) + 32768.0);
+	//e->runTime.stop = ceil((((e->Init.stop / 1000.0) * 32768.0) / VREF) + 32768.0);
+	//e->runTime.step = ceil(((e->Init.step / 1000.0) * 32768.0) / VREF);
+	//e->runTime.ePulse1 = ceil((((e->Init.ePulse1 / 1000.0) * 32768.0) / VREF) + 32768.0);
+	e->runTime.start = ceil((((e->Init.start / 1000.0) + 5) * (pow(2,20) - 1)) / 10);
+	e->runTime.stop = ceil((((e->Init.stop / 1000.0) + 5) * (pow(2,20) - 1)) / 10);
+	e->runTime.step = ceil((((e->Init.step / 1000.0) + 5) * (pow(2,20) - 1)) / 10);
+	e->runTime.ePulse1 = ceil((((e->Init.ePulse1 / 1000.0) + 5) * (pow(2,20) - 1)) / 10);
 	
 	
 	// Recupero los decimales
@@ -774,6 +827,12 @@ static void load_DNPV_data(exp_param_values_t* e, uint8_t* cmd){
 
 }
 
+
+/**
+* @brief	loads the data for SWV technique
+* @param	e : parameters for configuring the waveform
+* @param	cmd : buffer with data from PC
+*/
 static void load_SWV_data(exp_param_values_t* e, uint8_t* cmd){
 	
 		float step, period, stop, start, tSampling;
@@ -789,10 +848,14 @@ static void load_SWV_data(exp_param_values_t* e, uint8_t* cmd){
 	e->Init.freq = ((cmd[30] << 8) | (cmd[31] & 0xFF));
 	
 	// Pasamos los parámetros a valores DAC
-	e->runTime.start = ceil((((e->Init.start / 1000.0) * 32768.0) / VREF) + 32768.0);
-	e->runTime.stop = ceil((((e->Init.stop / 1000.0) * 32768.0) / VREF) + 32768.0);
-	e->runTime.step = ceil(((e->Init.step / 1000.0) * 32768.0) / VREF);
-	e->runTime.amplitude = ceil(((e->Init.amplitude / 1000.0) * 32768.0) / VREF);
+	//e->runTime.start = ceil((((e->Init.start / 1000.0) * 32768.0) / VREF) + 32768.0);
+	//e->runTime.stop = ceil((((e->Init.stop / 1000.0) * 32768.0) / VREF) + 32768.0);
+	//e->runTime.step = ceil(((e->Init.step / 1000.0) * 32768.0) / VREF);
+	//e->runTime.amplitude = ceil(((e->Init.amplitude / 1000.0) * 32768.0) / VREF);
+	e->runTime.start = ceil((((e->Init.start / 1000.0) + 5) * (pow(2,20) - 1)) / 10);
+  e->runTime.stop = ceil((((e->Init.stop / 1000.0) + 5) * (pow(2,20) - 1)) / 10);
+	e->runTime.step = ceil((((e->Init.step / 1000.0) + 5) * (pow(2,20) - 1)) / 10);
+	e->runTime.amplitude = ceil((((e->Init.amplitude / 1000.0) + 5) * (pow(2,20) - 1)) / 10);
 	
 	// Recupero los decimales
 	step = e->Init.step / 1000.0;
@@ -830,6 +893,11 @@ static void load_SWV_data(exp_param_values_t* e, uint8_t* cmd){
 }
 
 
+/**
+* @brief	loads the data for ACV technique
+* @param	e : parameters for configuring the waveform
+* @param	cmd : buffer with data from PC
+*/
 static void load_ACV_data(exp_param_values_t* e, uint8_t* cmd){
 	
 	// Parámetros
@@ -854,10 +922,14 @@ static void load_ACV_data(exp_param_values_t* e, uint8_t* cmd){
 	e->Init.sr = ((cmd[32] << 8) | (cmd[33] & 0xFF));
 	
 	// Pasamos los parámetros a valores DAC
-	e->runTime.start = ceil((((e->Init.start / 1000.0) * 32768.0) / VREF) + 32768.0);
-	e->runTime.stop = ceil((((e->Init.stop / 1000.0) * 32768.0) / VREF) + 32768.0);
-	e->runTime.step = ceil(((e->Init.step / 1000.0) * 32768.0) / VREF);
-	e->runTime.ACamplitude = ceil(((e->Init.ACamplitude / 1000.0) * 32768.0) / VREF);
+	//e->runTime.start = ceil((((e->Init.start / 1000.0) * 32768.0) / VREF) + 32768.0);
+	//e->runTime.stop = ceil((((e->Init.stop / 1000.0) * 32768.0) / VREF) + 32768.0);
+	//e->runTime.step = ceil(((e->Init.step / 1000.0) * 32768.0) / VREF);
+	//e->runTime.ACamplitude = ceil(((e->Init.ACamplitude / 1000.0) * 32768.0) / VREF);
+	e->runTime.start = ceil((((e->Init.start / 1000.0) + 5) * (pow(2,20) - 1)) / 10);
+	e->runTime.stop = ceil((((e->Init.stop / 1000.0) + 5) * (pow(2,20) - 1)) / 10);
+	e->runTime.step = ceil((((e->Init.step / 1000.0) + 5) * (pow(2,20) - 1)) / 10);
+	e->runTime.ACamplitude = ceil((((e->Init.ACamplitude / 1000.0) + 5) * (pow(2,20) - 1)) / 10);
 	
 	
 	// Recupero los decimales
@@ -894,35 +966,172 @@ static void load_ACV_data(exp_param_values_t* e, uint8_t* cmd){
    #	AMPEROMETRIES
    ####################################################### */
 
-static void generateDSCA(){
+
+/**
+* @brief	Each iteration prepare values to fill the 1024 LUT with the DSCA
+* @param	e : parameters for configuring the waveform
+* @param	LUT : array to save the values
+*/
+static void generateDSCA(exp_param_values_t* e, uint16_t* LUT){
+
+	uint32_t i;
+	
+	for(i = 0; i < NSAMPLESLUT; i++){
+		
+		if(e->contSamplesPer < e->nSamplesPer){													// Primer pulso de la onda
+			LUT[i] = e->runTime.ePulse1;
+		}
+		
+		else if((e->contSamplesPer - e->nSamples1) < e->nSamples2){			// Segundo pulso de la onda
+			LUT[i] = e->runTime.ePulse2;
+		}
+		
+		e->contSamplesPer++;
+		
+		if(e->contSamplesPer == (e->nSamplesPer)){											// Hemos finalizado un período...?
+			e->contSamplesPer = 0;
+		}
+	}
+}
+
+
+/**
+* @brief	Each iteration prepare values to fill the 1024 LUT with the ACV
+* @param	e : parameters for configuring the waveform
+* @param	LUT : array to save the values
+*/
+static void generateAD(exp_param_values_t* e, uint16_t* LUT){
+
+	// TODO
+}
+
+
+/**
+* @brief	Each iteration prepare values to fill the 1024 LUT with the ACV
+* @param	e : parameters for configuring the waveform
+* @param	LUT : array to save the values
+*/
+static void generateFA(exp_param_values_t* e, uint16_t* LUT){
+
+	// TODO
+}
+
+/**
+* @brief	Each iteration prepare values to fill the 1024 LUT with the PAD
+* @param	e : parameters for configuring the waveform
+* @param	LUT : array to save the values
+*/
+static void generatePAD(exp_param_values_t* e, uint16_t* LUT){
+
+	uint16_t i;
+	
+	for(i = 0; i < NSAMPLESLUT; i++){
+		
+		if(e->contSamplesPer < e->nSamples1){																						// Primera parte de la onda
+			LUT[i] = e->runTime.eDC;
+		}
+		
+		else if((e->contSamplesPer - e->nSamples1) < e->nSamples2){											// Segunda parte de la onda
+			LUT[i] = e->runTime.ePulse1;
+		}
+		
+		else if((e->contSamplesPer - (e->nSamples1 + e->nSamples2)) < e->nSamples3){		// Tercera parte de la onda
+			LUT[i] = e->runTime.ePulse2;
+		}
+		
+		e->contSamplesPer++;
+		
+		if(e->contSamplesPer == e->nSamplesPer){																				// Hemos finalizado un período...?
+			e->contSamplesPer = 0;
+		}
+	}
+}
+
+
+/**
+* @brief	Each iteration prepare values to fill the 1024 LUT with the ACV
+* @param	e : parameters for configuring the waveform
+* @param	LUT : array to save the values
+*/
+static void generateDPA(exp_param_values_t* e, uint16_t* LUT){
+
+	uint16_t i;
+	
+	for(i = 0; i < NSAMPLESLUT; i++){
+	
+		if(e->contSamplesPer < e->nSamples1){																			// Primera parte de la onda
+			LUT[i] = e->runTime.eDC;
+		}
+		
+		else if((e->contSamplesPer -  e->nSamples1) < e->nSamples2){							// Segunda parte de la onda
+			LUT[i] = e->runTime.ePulse1;
+		}
+		
+		e->contSamplesPer++;
+		
+		if(e->contSamplesPer == e->nSamplesPer){																	// Hemos finalizado un período...?
+			e->contSamplesPer = 0;
+		}
+	}
+}
+
+
+/**
+* @brief	Each iteration prepare values to fill the 1024 LUT with the MSA
+* @param	e : parameters for configuring the waveform
+* @param	LUT : array to save the values
+*/
+// Para generar esta señal mejor enviar un primer mensaje con el nº de steps que 
+// se van a lanzar y posteriormente preparar la recepción en el MCU para poder
+// coger todos los parámetros de los steps en un segundo mensaje.
+// potential : variable para ir guardando el valor de potencial de cada step
+// nSamplesx : variable para ir guardando el n de samples de cada step
+// potentials[] : array para guardar todos los potenciales de cada step
+// samples[] : array para guardar el n de samples de cada step
+static void generateMSA(exp_param_values_t* e, uint16_t* LUT){
+
+	uint16_t i;
+	
+	for(i = 0; i < NSAMPLESLUT; i++){
+	
+		if(e->contStep < sizeof(e->runTime.potentials)){						// Si no es el último step de la lista...
+			LUT[i] = e->runTime.potentials[e->contStep];
+			
+			e->contSamplesPer++;
+			
+			if(e->contSamplesPer == e->runTime.samples[e->contStep]){				// Hemos acabado de leer el step actual...?
+				e->contStep++;																								// Cargamos el siguiente step
+				e->contSamplesPer = 0;																				// Reseteamos el contador de samples de cada step
+				
+				if(e->contStep == sizeof(e->runTime.potentials)){						// Hemos llegado al último step de la lista?
+					e->contStep = 0;																					// Volvemos a repetir el ciclo
+				}
+			}
+		}
+	}
+}
+
+
+/**
+* @brief	Each iteration prepare values to fill the 1024 LUT with the ZRA
+* @param	e : parameters for configuring the waveform
+* @param	LUT : array to save the values
+*/
+static void generateZRA(exp_param_values_t* e, uint16_t* LUT){
+
 
 }
 
-static void generateAD(){
 
+/**
+* @brief	Each iteration prepare values to fill the 1024 LUT with the HFP
+* @param	e : parameters for configuring the waveform
+* @param	LUT : array to save the values
+*/
+static void generateHFP(exp_param_values_t* e, uint16_t* LUT){
 
-}
-
-
-static void generateFA(){
-
-
-}
-
-
-static void generatePAD(){
-
-}
-
-
-static void generateDPA(){
-
-
-}
-
-static void generateMSA(){
-
-
+	
+	
 }
 
 
@@ -930,6 +1139,11 @@ static void generateMSA(){
 /* 	FUNCIONES PARA PRECARGA DE DATOS  DEL EXPERIMENTO */
 /* ************************************************** */
 
+/**
+* @brief	loads the data for DSCA technique
+* @param	e : parameters for configuring the waveform
+* @param	cmd : buffer with data from PC
+*/
 static void load_DSCA_data(exp_param_values_t* e, uint8_t* cmd){
 
 	// Parámetros
@@ -951,19 +1165,25 @@ static void load_DSCA_data(exp_param_values_t* e, uint8_t* cmd){
 	e->Init.tInterval = ((cmd[32] << 8) | (cmd[33] & 0xFF));
 	
 	// Pasamos los parámetros a valores DAC
-	e->runTime.ePulse1 = ceil((((e->Init.ePulse1 / 1000.0) * 32768.0) / VREF) + 32768.0);
-	e->runTime.ePulse2 = ceil((((e->Init.ePulse2 / 1000.0) * 32768.0) / VREF) + 32768.0);
+	//e->runTime.ePulse1 = ceil((((e->Init.ePulse1 / 1000.0) * 32768.0) / VREF) + 32768.0);
+	//e->runTime.ePulse2 = ceil((((e->Init.ePulse2 / 1000.0) * 32768.0) / VREF) + 32768.0);
+	e->runTime.ePulse1 = ceil((((e->Init.ePulse1 / 1000.0) + 5) * (pow(2,20) - 1)) / 10);
+	e->runTime.ePulse2 = ceil((((e->Init.ePulse2 / 1000.0) + 5) * (pow(2,20) - 1)) / 10);
+	
 	e->runTime.tInterval = e->Init.tInterval / 1000.0;																				// Valor de tiempo de cada medición ADC
 	
 	tSampling = 1 / (float)e->fSampling;
+	
+	tPulse1 = e->Init.tPulse1 / 1000.0;
+	tPulse2 = e->Init.tPulse2 / 1000.0;
 
 	/* Inicializamos las variables para llevar la cuenta
 	de los samples que vamos leyendo de la LUT y de los 
 	samples totales del exp	en la ISR */
 	e->nSamples1 = ceil(tPulse1 / tSampling);
 	e->nSamples2 = ceil(tPulse2 / tSampling);
-	e->nSamplesExp = e->nSamples1 + e->nSamples2; 
-	e->nSamplesPer = e->nSamplesExp;									// En este caso los samples del "período" son los mismos que los del experimento (ver forma de onda)
+	e->nSamplesPer = e->nSamples1 + e->nSamples2; 
+	e->nSamplesExp = e->nSamplesPer;									// En este caso los samples del "período" son los mismos que los del experimento (ver forma de onda)
 	e->nSamplesLUT = NSAMPLESLUT;
 		
 	// Inicializamos contadores
@@ -973,20 +1193,107 @@ static void load_DSCA_data(exp_param_values_t* e, uint8_t* cmd){
 	
 }
 
-static void load_AD_data(){
+/**
+* @brief	loads the data for AD technique
+* @param	e : parameters for configuring the waveform
+* @param	cmd : buffer with data from PC
+*/
+static void load_AD_data(exp_param_values_t* e, uint8_t* cmd){
 
-	// TODO
+	// Parámetros
+	// + eDC
+	// + tInterval
+	// + tRun
+	
+	// TODO 
+	// OJO tRun puede ser hasta 1 segundo, por lo que al venir multiplicado por 1000 desde el PC puede salirse del rango de un uint8_t!!!
+	// Hay que revisar esto más adelante para darle solución: aumentar a 32 bits? 
+	
+	float tSampling;
+	
+	tSampling = 1 / (float)e->fSampling;
+	
+	// BORRAR
+	e->fSampling = 10000;
+	
+	/* Experiment values */
+	e->Init.eDC = ((cmd[22] << 8) | (cmd[23] & 0xFF));
+	e->Init.tInterval = ((cmd[24] << 8) | (cmd[25] & 0xFF));
+	e->Init.tRun = ((cmd[26] << 8) | (cmd[27] & 0xFF));
+	
+	// Pasamos los parámetros a valores DAC
+	//e->runTime.eDC = ceil((((e->Init.eDC / 1000.0) * 32768.0) / VREF) + 32768.0);
+	e->runTime.eDC = ceil((((e->Init.eDC / 1000.0) + 5) * (pow(2,20) - 1)) / 10);
+	
+	e->runTime.tInterval = e->Init.tInterval / 1000.0;
+	e->runTime.tRun = e->Init.tRun / 1000.0;
+	
+	/* Inicializamos las variables para llevar la cuenta
+	de los samples que vamos leyendo de la LUT y de los 
+	samples totales del exp	en la ISR */
+	e->nSamplesExp = ceil(e->runTime.tRun / tSampling);									// En este caso los samples del "período" son los mismos que los del experimento (ver forma de onda)
+	e->nSamplesLUT = NSAMPLESLUT;
+		
+	// Inicializamos contadores
+	e->contSamplesExp = 0;
+	e->contSamplesLUT = 0;
 }
 
 
-static void load_FA_data(){
+/**
+* @brief	loads the data for FA technique
+* @param	e : parameters for configuring the waveform
+* @param	cmd : buffer with data from PC
+*/
+static void load_FA_data(exp_param_values_t* e, uint8_t* cmd){
 	
-	// TODO
+	// Parámetros
+	// + eDC
+	// + tInterval
+	// + tRun
+	
+	// TODO 
+	// OJO tRun puede ser hasta 1 segundo, por lo que al venir multiplicado por 1000 desde el PC puede salirse del rango de un uint8_t!!!
+	// Hay que revisar esto más adelante para darle solución: aumentar a 32 bits? 
+	
+	float tSampling;
+	
+	tSampling = 1 / (float)e->fSampling;
+	
+	// BORRAR
+	e->fSampling = 10000;
+	
+	/* Experiment values */
+	e->Init.eDC = ((cmd[22] << 8) | (cmd[23] & 0xFF));
+	e->Init.tInterval = ((cmd[24] << 8) | (cmd[25] & 0xFF));
+	e->Init.tRun = ((cmd[26] << 8) | (cmd[27] & 0xFF));
+	
+	// Pasamos los parámetros a valores DAC
+	//e->runTime.eDC = ceil((((e->Init.eDC / 1000.0) * 32768.0) / VREF) + 32768.0);
+	e->runTime.eDC = ceil((((e->Init.eDC / 1000.0) + 5) * (pow(2,20) - 1)) / 10);
+	
+	e->runTime.tInterval = e->Init.tInterval / 1000.0;
+	e->runTime.tRun = e->Init.tRun / 1000.0;
+	
+	/* Inicializamos las variables para llevar la cuenta
+	de los samples que vamos leyendo de la LUT y de los 
+	samples totales del exp	en la ISR */
+	e->nSamplesExp = ceil(e->runTime.tRun / tSampling);									// En este caso los samples del "período" son los mismos que los del experimento (ver forma de onda)
+	e->nSamplesLUT = NSAMPLESLUT;
+		
+	// Inicializamos contadores
+	e->contSamplesExp = 0;
+	e->contSamplesLUT = 0;
 	
 }
 
 
-static void load_PAD_data(){
+/**
+* @brief	loads the data for PAD technique
+* @param	e : parameters for configuring the waveform
+* @param	cmd : buffer with data from PC
+*/
+static void load_PAD_data(exp_param_values_t* e, uint8_t* cmd){
 
 	// Parámetros
 	// + eDC
@@ -994,60 +1301,731 @@ static void load_PAD_data(){
 	// + ePulse2
 	// + tPulse1
 	// + tPulse2
+	// + tInterval
+	// + tRun
 	
-//		float tPulse1, tPulse2, tSampling;
+	float tPulse1, tPulse2, tSampling;
 
-//	// BORRAR
-//	e->fSampling = 10000;		// Va a depender del filtro seleccionado
+	// BORRAR
+	e->fSampling = 10000;		// Va a depender del filtro seleccionado
 
-//	/* Experiment values */
-//	e->Init.ePulse1 = ((cmd[24] << 8) | (cmd[25] & 0xFF));
-//	e->Init.tPulse1 = ((cmd[26] << 8) | (cmd[27] & 0xFF));
-//	e->Init.ePulse2 = ((cmd[28] << 8) | (cmd[29] & 0xFF));
-//	e->Init.tPulse2 = ((cmd[30] << 8) | (cmd[31] & 0xFF));
-//	e->Init.tInterval = ((cmd[32] << 8) | (cmd[33] & 0xFF));
-//	
-//	// Pasamos los parámetros a valores DAC
-//	e->runTime.ePulse1 = ceil((((e->Init.ePulse1 / 1000.0) * 32768.0) / VREF) + 32768.0);
-//	e->runTime.ePulse2 = ceil((((e->Init.ePulse2 / 1000.0) * 32768.0) / VREF) + 32768.0);
-//	e->runTime.tInterval = e->Init.tInterval / 1000.0;																				// Valor de tiempo de cada medición ADC
-//	
-//	tSampling = 1 / (float)e->fSampling;
+	/* Experiment values */
+	e->Init.eDC = ((cmd[22] << 8) | (cmd[23] & 0xFF));
+	e->Init.ePulse1 = ((cmd[24] << 8) | (cmd[25] & 0xFF));
+	e->Init.tPulse1 = ((cmd[26] << 8) | (cmd[27] & 0xFF));
+	e->Init.ePulse2 = ((cmd[28] << 8) | (cmd[29] & 0xFF));
+	e->Init.tPulse2 = ((cmd[30] << 8) | (cmd[31] & 0xFF));
+	e->Init.tInterval = ((cmd[32] << 8) | (cmd[33] & 0xFF));
+	e->Init.tRun = ((cmd[34] << 8) | (cmd[35] & 0xFF));
+	
+	// Pasamos los parámetros a valores DAC
+	//e->runTime.eDC = ceil((((e->Init.eDC / 1000) * 32768.0) / VREF) + 32768.0);
+	//e->runTime.ePulse1 = ceil((((e->Init.ePulse1 / 1000.0) * 32768.0) / VREF) + 32768.0);
+	//e->runTime.ePulse2 = ceil((((e->Init.ePulse2 / 1000.0) * 32768.0) / VREF) + 32768.0);
+	e->runTime.eDC = ceil((((e->Init.eDC / 1000.0) + 5) * (pow(2,20) - 1)) / 10);
+	e->runTime.ePulse1 = ceil((((e->Init.ePulse1 / 1000.0) + 5) * (pow(2,20) - 1)) / 10);
+	e->runTime.ePulse2 = ceil((((e->Init.ePulse2 / 1000.0) + 5) * (pow(2,20) - 1)) / 10);
+	
+	
+	e->runTime.tInterval = e->Init.tInterval / 1000.0;																				// Valor de tiempo de cada medición ADC
+	e->runTime.tRun = e->Init.tRun / 1000.0;
 
-//	/* Inicializamos las variables para llevar la cuenta
-//	de los samples que vamos leyendo de la LUT y de los 
-//	samples totales del exp	en la ISR */
-//	e->nSamples1 = ceil(tPulse1 / tSampling);
-//	e->nSamples2 = ceil(tPulse2 / tSampling);
-//	e->nSamplesExp = e->nSamples1 + e->nSamples2; 
-//	e->nSamplesPer = e->nSamplesExp;									// En este caso los samples del "período" son los mismos que los del experimento (ver forma de onda)
-//	e->nSamplesLUT = NSAMPLESLUT;
-//		
-//	// Inicializamos contadores
-//	e->contSamplesExp = 0;
-//	e->contSamplesLUT = 0;
-//	e->contSamplesPer = 0;
+	tPulse1 = e->Init.tPulse1 / 1000.0;
+	tPulse2 = e->Init.tPulse2 / 1000.0;
+
+	tSampling = 1 / (float)e->fSampling;
+	
+	/* Inicializamos las variables para llevar la cuenta
+	de los samples que vamos leyendo de la LUT y de los 
+	samples totales del exp	en la ISR */
+	e->nSamples1 = ceil((e->runTime.tInterval - (e->Init.tPulse1 + e->Init.tPulse2)) / tSampling);
+	e->nSamples2 = ceil(tPulse1 / tSampling);
+	e->nSamples3 = ceil(tPulse2 / tSampling);
+	e->nSamplesPer = e->nSamples1 + e->nSamples2 + e->nSamples3; 
+	e->nSamplesExp = ceil(e->runTime.tRun / tSampling);									// En este caso los samples del "período" son los mismos que los del experimento (ver forma de onda)
+	e->nSamplesLUT = NSAMPLESLUT;
+		
+	// Inicializamos contadores
+	e->contSamplesExp = 0;
+	e->contSamplesLUT = 0;
+	e->contSamplesPer = 0;
 	
 	
 	
 }
 
 
-static void load_DPA_data(){
+
+/**
+* @brief	loads the data for DPA technique
+* @param	e : parameters for configuring the waveform
+* @param	cmd : buffer with data from PC
+*/
+static void load_DPA_data(exp_param_values_t* e, uint8_t* cmd){
+
+	// PARAMETROS
+	// + eDC
+	// + ePulse
+	// + tPulse
+	// + tInterval
+	// + tRun
+	
+	float tPulse1, tSampling;
+	
+	// BORRAR
+	e->fSampling = 10000;
+	
+	/* Experiment values */
+	e->Init.eDC = ((cmd[22] << 8) | (cmd[23] & 0xFF));
+	e->Init.ePulse1 = ((cmd[24] << 8) | (cmd[25] & 0xFF));
+	e->Init.tPulse1 = ((cmd[26] << 8) | (cmd[27] & 0xFF));
+	e->Init.tInterval = ((cmd[28] << 8) | (cmd[29] & 0xFF));
+	e->Init.tRun = ((cmd[30] << 8) | (cmd[31] & 0xFF));
+	
+	// Pasamos parámetros a valores DAC
+	//e->runTime.eDC = ceil((((e->Init.eDC / 1000.0) * 32768.0) / VREF) + 32768.0);
+	//e->runTime.ePulse1 = ceil((((e->Init.ePulse1 / 1000.0) * 32768.0) / VREF) + 32768.0);
+	e->runTime.eDC = ceil((((e->Init.eDC / 1000.0) + 5) * (pow(2,20) - 1)) / 10);
+	e->runTime.ePulse1 = ceil((((e->Init.ePulse1 / 1000.0) + 5) * (pow(2,20) - 1)) / 10);
+	
+	
+	e->runTime.tInterval = e->Init.tInterval / 1000.0;
+	e->runTime.tRun = e->Init.tRun / 1000.0;
+	
+	tPulse1 = e->Init.tPulse1 / 1000.0;
+	
+	tSampling = 1 / (float)e->fSampling;
+	
+		/* Inicializamos las variables para llevar la cuenta
+	de los samples que vamos leyendo de la LUT y de los 
+	samples totales del exp	en la ISR */
+	e->nSamples1 = ceil((e->runTime.tInterval - tPulse1) / tSampling);
+	e->nSamples2 = ceil(tPulse1 / tSampling);
+	e->nSamplesPer = e->nSamples1 + e->nSamples2;
+	e->nSamplesExp = ceil(e->runTime.tRun / tSampling);
+	e->nSamplesLUT = NSAMPLESLUT;
+	
+	// Inicializamos contadores
+	e->contSamplesExp = 0;
+	e->contSamplesLUT = 0;
+	e->contSamplesPer = 0;
+	
+}
+
+
+/**
+* @brief	loads the data for MSA technique
+* @param	e : parameters for configuring the waveform
+* @param	cmd : buffer with data from PC
+*/
+static void load_MSA_data(exp_param_values_t* e, uint8_t* cmd){
+
+	// Parámetros
+	// + frSize : frame size => tamaño de la trama que se va a recibir posteiormente con todos los datos de tensiones y tiempos para cada level
+	// + Cycles
+	// + Levels/steps
+	// + tInterval
+	// + potentials[]
+	// + samples[]
+	
+	// Hay que definir este flag en el main y ponerlo a 1 donde corresponda.
+	if(e->msa_second_frame == 0){					// ¿es el segundo data frame para el MSA con los valores de todos los levels?
+		float tInterval, tSampling;
+		
+		// BORRAR
+		e->fSampling = 10000;
+		
+		/* Experiment values */
+		e->Init.frSize = ((cmd[22] << 8) | (cmd[23] & 0xFF));
+		e->Init.levels = ((cmd[24] << 8) | (cmd[25] & 0xFF));
+		e->Init.cycles = ((cmd[26] << 8) | (cmd[27] & 0xFF));
+		e->Init.tInterval = ((cmd[28] << 8) | (cmd[29] & 0xFF));
+	}
+	
+	else{																// SI, aquí vienen todos los valores para rellenar los arrays
+		
+		float tSampling;
+		uint16_t i;
+		
+		tSampling = 1 / (float)e->fSampling;
+		
+		e->runTime.tInterval = e->Init.tInterval / 1000.0;
+		
+		e->nSamplesExp = 0;
+		
+		// Loop para generar el los arrays de valores para todos los levels
+		for (i = 3; i < e->Init.levels; i++){
+			e->Init.potentials[i] = ((cmd[i] << 8) | (cmd[i+1] & 0xFF));
+			e->Init.time[i] = ((cmd[i+2] << 8) | (cmd[i+3] & 0xFF));
+			
+			// Vamos convirtendo a la vez los potenciales a valores DAC
+			//e->runTime.potentials[i-3] = ceil((((e->Init.potentials[i-3] / 1000.0) * 32768.0) / VREF) + 32768.0);
+			e->runTime.potentials[i-3] = ceil((((e->Init.potentials[i-3] / 1000.0) + 5) * (pow(2,20) - 1)) / 10);
+			
+			// ... y calculando el nº de samples de cada level
+			e->runTime.samples[i-3] = ceil((e->Init.time[i-3] / 1000.0) / tSampling);
+			
+			// ... y además vamos a inicializar el nº de samples del experimento
+			e->nSamplesExp = e->nSamplesExp + e->runTime.samples[i];
+		}
+		
+		/* Inicializamos las variables para llevar la cuenta
+		de los samples que vamos leyendo de la LUT y de los 
+		samples totales del exp	en la ISR */
+		e->nSamplesLUT = NSAMPLESLUT;
+		
+		// Inicializamos contadores
+		e->contSamplesExp = 0;
+		e->contSamplesLUT = 0;
+		e->contStep = 0;
+		
+	}
+}
+
+
+/**
+* @brief	loads the data for ZRA technique
+* @param	e : parameters for configuring the waveform
+* @param	cmd : buffer with data from PC
+*/
+static void load_ZRA_data(exp_param_values_t* e, uint8_t* cmd){
+
+	// Parámetros
+	// + OCV => los parámetros de la OCV se van a determinar empíricamente por lo que no se van a introducir desde la interface
+	// tRun
+	// tInterval
+	
+	float tSampling;
+	
+	tSampling = 1 / (float)e->fSampling;
+	
+	// BORRAR
+	e->fSampling = 10000;
+	
+	/* Experiment values */
+	e->Init.tInterval = ((cmd[22] << 8) | (cmd[23] & 0xFF));
+	e->Init.tRun = ((cmd[24] << 8) | (cmd[25] & 0xFF));
+	
+	e->runTime.tInterval = e->Init.tInterval / 1000.0;
+	e->runTime.tRun = e->Init.tRun / 1000.0;
+	
+	e->nSamplesExp = ceil(e->runTime.tRun / tSampling);
+	e->nSamplesLUT = NSAMPLESLUT;
+	
+	
+	// Inicializamos contadores
+	e->contSamplesExp = 0;
+	e->contSamplesLUT = 0;
+	
+}
+
+
+/**
+* @brief	loads the data for HCP technique
+* @param	e : parameters for configuring the waveform
+* @param	cmd : buffer with data from PC
+*/
+static void load_HFP_data(exp_param_values_t* e, uint8_t* cmd){
+	// Parámetros
+	// + eDC
+	
+	e->Init.eDC = ((cmd[22] << 8) | (cmd[23] & 0xFF));
+	
+	//e->runTime.eDC = ceil((((e->Init.eDC / 1000.0) * 32768.0) / VREF) + 32768.0);
+	e->runTime.eDC = ceil((((e->Init.eDC / 1000.0) + 5) * (pow(2,20) - 1)) / 10);
 
 }
 
-static void load_MSA_data(){
 
+/* #######################################################
+   #	POTENTIOMETRIES
+   ####################################################### */
+
+
+static void generateDSCP(exp_param_values_t* e, uint16_t* LUT){
+
+	// TODO
 
 }
+
+static void generatePD(exp_param_values_t* e, uint16_t* LUT){
+	// TODO
+
+}
+
+static void generateFP(exp_param_values_t* e, uint16_t* LUT){
+
+	// TODO
+
+}
+
+static void generateCRCP(exp_param_values_t* e, uint16_t* LUT){
+
+	// TODO
+
+}
+
+static void generateMSP(exp_param_values_t* e, uint16_t* LUT){
+
+	// TODO
+	
+}
+
+static void generatePSA(exp_param_values_t* e, uint16_t* LUT){
+
+	// TODO
+
+}
+
+static void generateZCP(exp_param_values_t* e, uint16_t* LUT){
+
+	// TODO
+
+}
+
+
+
+/* ************************************************** */
+/* 	FUNCIONES PARA PRECARGA DE DATOS  DEL EXPERIMENTO */
+/* ************************************************** */	
+
+/**
+* @brief	loads the data for PD technique
+* @param	e : parameters for configuring the waveform
+* @param	e_config : configuration parameters for the experiment
+* @param	cmd : buffer with data from PC
+*/
+static void load_PD_data(exp_param_values_t* e, uint8_t* cmd, exp_config_t* e_config){
+
+	// Parámetros
+	// + iDC
+	// + tInterval
+	// + tRun
+	
+	// OJO tRun puede ser hasta 1 segundo, por lo que al venir multiplicado por 1000 desde el PC puede salirse del rango de un uint8_t!!!
+	// Hay que revisar esto más adelante para darle solución: aumentar a 32 bits? 
+	float tSampling;
+	e->fSampling = 10000;
+	
+	tSampling = 1 / (float)e->fSampling;
+	
+	// BORRAR
+	e->fSampling = 10000;
+	
+	/* Experiment values */
+	e->Init.iDC = ((cmd[22] << 8) | (cmd[23] & 0xFF));
+	e->Init.tInterval = ((cmd[24] << 8) | (cmd[25] & 0xFF));
+	e->Init.tRun = ((cmd[26] << 8) | (cmd[27] & 0xFF));
+	
+	// Pasamos los parámetros a valores DAC según el FS seleccionado
+	switch(e_config->rango){
+	
+		case FS_G_500nA:	
+			e->runTime.iDC = ceil(((((e->Init.iDC * pow(10,7)) + 5)) * (pow(2,20) - 1)) / 10);
+			break;
+		
+		case FS_G_500uA:
+			e->runTime.iDC = ceil(((((e->Init.iDC * pow(10,4)) + 5)) * (pow(2,20) - 1)) / 10);
+			break;
+		
+		case FS_G_100mA:
+			e->runTime.iDC = ceil(((((e->Init.iDC * 10) + 5)) * (pow(2,20) - 1)) / 10);
+			break;
+		
+		default:
+			break;
+	}
+	
+	
+	e->runTime.tInterval = e->Init.tInterval / 1000.0;
+	e->runTime.tRun = e->Init.tRun / 1000.0;
+	
+	/* Inicializamos las variables para llevar la cuenta
+	de los samples que vamos leyendo de la LUT y de los 
+	samples totales del exp	en la ISR */
+	e->nSamplesExp = ceil(e->runTime.tRun / tSampling);									// En este caso los samples del "período" son los mismos que los del experimento (ver forma de onda)
+	e->nSamplesLUT = NSAMPLESLUT;
+		
+	// Inicializamos contadores
+	e->contSamplesExp = 0;
+	e->contSamplesLUT = 0;
+
+}
+	
+
+/**
+* @brief	loads the data for FP technique
+* @param	e : parameters for configuring the waveform
+* @param	e_config : configuration parameters for the experiment
+* @param	cmd : buffer with data from PC
+*/
+static void load_FP_data(exp_param_values_t* e, uint8_t* cmd, exp_config_t* e_config){
+
+	// Parámetros
+	// + iDC
+	// + tInterval
+	// + tRun
+	
+	// TODO 
+	// OJO tRun puede ser hasta 1 segundo, por lo que al venir multiplicado por 1000 desde el PC puede salirse del rango de un uint8_t!!!
+	// Hay que revisar esto más adelante para darle solución: aumentar a 32 bits? 
+	
+	float tSampling;
+	
+	tSampling = 1 / (float)e->fSampling;
+	
+	// BORRAR
+	e->fSampling = 10000;
+	
+	/* Experiment values */
+	e->Init.iDC = ((cmd[22] << 8) | (cmd[23] & 0xFF));
+	e->Init.tInterval = ((cmd[24] << 8) | (cmd[25] & 0xFF));
+	e->Init.tRun = ((cmd[26] << 8) | (cmd[27] & 0xFF));
+	
+	// Pasamos los parámetros a valores DAC según el FS seleccionado
+		switch(e_config->rango){
+	
+		case FS_G_500nA:	
+			e->runTime.iDC = ceil(((((e->Init.iDC * pow(10,7)) + 5)) * (pow(2,20) - 1)) / 10);
+			break;
+		
+		case FS_G_500uA:
+			e->runTime.iDC = ceil(((((e->Init.iDC * pow(10,4)) + 5)) * (pow(2,20) - 1)) / 10);
+			break;
+		
+		case FS_G_100mA:
+			e->runTime.iDC = ceil(((((e->Init.iDC * 10) + 5)) * (pow(2,20) - 1)) / 10);
+			break;
+		
+		default:
+			break;
+	}
+	
+	
+	e->runTime.tInterval = e->Init.tInterval / 1000.0;
+	e->runTime.tRun = e->Init.tRun / 1000.0;
+	
+	/* Inicializamos las variables para llevar la cuenta
+	de los samples que vamos leyendo de la LUT y de los 
+	samples totales del exp	en la ISR */
+	e->nSamplesExp = ceil(e->runTime.tRun / tSampling);									// En este caso los samples del "período" son los mismos que los del experimento (ver forma de onda)
+	e->nSamplesLUT = NSAMPLESLUT;
+		
+	// Inicializamos contadores
+	e->contSamplesExp = 0;
+	e->contSamplesLUT = 0;
+	
+}
+
+
+/**
+* @brief	loads the data for DSCP technique
+* @param	e : parameters for configuring the waveform
+* @param	e_config : configuration parameters for the experiment
+* @param	cmd : buffer with data from PC
+*/
+static void load_DSCP_data(exp_param_values_t* e, uint8_t* cmd, exp_config_t* e_config){
+
+	// Parámetros
+	// + iPulse1
+	// + tPulse1
+	// + iPulse2
+	// + tPulse2
+	
+	float tPulse1, tPulse2, tSampling;
+
+	// BORRAR
+	e->fSampling = 10000;		// Va a depender del filtro seleccionado
+
+	/* Experiment values */
+	e->Init.iPulse1 = ((cmd[24] << 8) | (cmd[25] & 0xFF));
+	e->Init.tPulse1 = ((cmd[26] << 8) | (cmd[27] & 0xFF));
+	e->Init.iPulse2 = ((cmd[28] << 8) | (cmd[29] & 0xFF));
+	e->Init.tPulse2 = ((cmd[30] << 8) | (cmd[31] & 0xFF));
+	e->Init.tInterval = ((cmd[32] << 8) | (cmd[33] & 0xFF));
+	
+	// Pasamos los parámetros a valores DAC según el FS seleccionado
+	switch(e_config->rango){
+	
+		case FS_G_500nA:	
+			e->runTime.iPulse1 = ceil(((((e->Init.iPulse1 * pow(10,7)) + 5)) * (pow(2,20) - 1)) / 10);
+			e->runTime.iPulse2 = ceil(((((e->Init.iPulse2 * pow(10,7)) + 5)) * (pow(2,20) - 1)) / 10);
+			break;
+		
+		case FS_G_500uA:
+			e->runTime.iPulse1 = ceil(((((e->Init.iPulse1 * pow(10,4)) + 5)) * (pow(2,20) - 1)) / 10);
+			e->runTime.iPulse2 = ceil(((((e->Init.iPulse2 * pow(10,4)) + 5)) * (pow(2,20) - 1)) / 10);
+			break;
+		
+		case FS_G_100mA:
+			e->runTime.iPulse1 = ceil(((((e->Init.iPulse1 * 10) + 5)) * (pow(2,20) - 1)) / 10);
+			e->runTime.iPulse2 = ceil(((((e->Init.iPulse2 * 10) + 5)) * (pow(2,20) - 1)) / 10);
+			break;
+		
+		default:
+			break;
+	}
+	
+	
+	e->runTime.tInterval = e->Init.tInterval / 1000.0;																				// Valor de tiempo de cada medición ADC
+	
+	tSampling = 1 / (float)e->fSampling;
+	
+	tPulse1 = e->Init.tPulse1 / 1000.0;
+	tPulse2 = e->Init.tPulse2 / 1000.0;
+
+	/* Inicializamos las variables para llevar la cuenta
+	de los samples que vamos leyendo de la LUT y de los 
+	samples totales del exp	en la ISR */
+	e->nSamples1 = ceil(tPulse1 / tSampling);
+	e->nSamples2 = ceil(tPulse2 / tSampling);
+	e->nSamplesPer = e->nSamples1 + e->nSamples2; 
+	e->nSamplesExp = e->nSamplesPer;									// En este caso los samples del "período" son los mismos que los del experimento (ver forma de onda)
+	e->nSamplesLUT = NSAMPLESLUT;
+		
+	// Inicializamos contadores
+	e->contSamplesExp = 0;
+	e->contSamplesLUT = 0;
+	e->contSamplesPer = 0;
+
+	
+
+}
+
+
+/**
+* @brief	loads the data for CRCP technique
+* @param	e : parameters for configuring the waveform
+* @param	e_config : configuration parameters for the experiment
+* @param	cmd : buffer with data from PC
+*/
+static void load_CRCP_data(exp_param_values_t* e, uint8_t* cmd, exp_config_t* e_config){
+
+	// TODO
+
+}
+	
+
+/**
+* @brief	loads the data for MSP technique
+* @param	e : parameters for configuring the waveform
+* @param	e_config : configuration parameters for the experiment
+* @param	cmd : buffer with data from PC
+*/
+static void load_MSP_data(exp_param_values_t* e, uint8_t* cmd, exp_config_t* e_config){
+
+	// TODO
+	// Parámetros
+	// + frSize : frame size => tamaño de la trama que se va a recibir posteiormente con todos los datos de tensiones y tiempos para cada level
+	// + Cycles
+	// + Levels/steps
+	// + tInterval
+	// + currents[]
+	// + samples[]
+	
+	// TODO: Hay que definir este flag en el main y ponerlo a 1 donde corresponda.
+	if(e->msa_second_frame == 0){					// ¿es el segundo data frame para el MSA con los valores de todos los levels?
+		float tInterval, tSampling;
+		
+		// BORRAR
+		e->fSampling = 10000;
+		
+		/* Experiment values */
+		e->Init.frSize = ((cmd[22] << 8) | (cmd[23] & 0xFF));
+		e->Init.levels = ((cmd[24] << 8) | (cmd[25] & 0xFF));
+		e->Init.cycles = ((cmd[26] << 8) | (cmd[27] & 0xFF));
+		e->Init.tInterval = ((cmd[28] << 8) | (cmd[29] & 0xFF));
+	}
+	
+	else{																// SI, aquí vienen todos los valores para rellenar los arrays
+		
+		float tSampling;
+		uint16_t i;
+		
+		tSampling = 1 / (float)e->fSampling;
+		
+		e->runTime.tInterval = e->Init.tInterval / 1000.0;
+		
+		e->nSamplesExp = 0;
+		
+		// Loop para generar el los arrays de valores para todos los levels
+		for (i = 3; i < e->Init.levels; i++){
+			e->Init.currents[i] = ((cmd[i] << 8) | (cmd[i+1] & 0xFF));
+			e->Init.time[i] = ((cmd[i+2] << 8) | (cmd[i+3] & 0xFF));
+			
+			// Vamos convirtendo a la vez los potenciales a valores DAC según el FS seleccionado
+			switch(e_config->rango){
+	
+				case FS_G_500nA:	
+					e->runTime.currents[i-3] = ceil(((((e->Init.currents[i-3] * pow(10,7)) + 5)) * (pow(2,20) - 1)) / 10);
+					break;
+				
+				case FS_G_500uA:
+					e->runTime.currents[i-3] = ceil(((((e->Init.currents[i-3] * pow(10,4)) + 5)) * (pow(2,20) - 1)) / 10);
+					break;
+				
+				case FS_G_100mA:
+					e->runTime.currents[i-3] = ceil(((((e->Init.currents[i-3] * 10) + 5)) * (pow(2,20) - 1)) / 10);
+					break;
+				
+				default:
+					break;
+			}
+			
+			// ... y calculando el nº de samples de cada level
+			e->runTime.samples[i-3] = ceil((e->Init.time[i-3] / 1000.0) / tSampling);
+			
+			
+			// ... y además vamos a inicializar el nº de samples del experimento
+			e->nSamplesExp = e->nSamplesExp + e->runTime.samples[i];
+		}
+		
+		/* Inicializamos las variables para llevar la cuenta
+		de los samples que vamos leyendo de la LUT y de los 
+		samples totales del exp	en la ISR */
+		e->nSamplesLUT = NSAMPLESLUT;
+		
+		// Inicializamos contadores
+		e->contSamplesExp = 0;
+		e->contSamplesLUT = 0;
+		e->contStep = 0;
+		
+	}
+	
+}
+	
+/**
+* @brief	loads the data for PSA technique
+* @param	e : parameters for configuring the waveform
+* @param	e_config : configuration parameters for the experiment
+* @param	cmd : buffer with data from PC
+*/	
+static void load_PSA_data(exp_param_values_t* e, uint8_t* cmd, exp_config_t* e_config){
+
+	
+	// TODO: todavía hay que revisar la manera en que se va a realizar la finalización 
+	// de la técnica ya que esta acaba cuando se llegue a eEnd o cuando tRun finalice,
+	// lo que primero ocurra.
+	
+	// Parámetros
+	// + iStrip
+	// + eEnd
+	// + tInterval
+	// + tRun
+	
+	// TODO 
+	// OJO tRun puede ser hasta 1 segundo, por lo que al venir multiplicado por 1000 desde el PC puede salirse del rango de un uint8_t!!!
+	// Hay que revisar esto más adelante para darle solución: aumentar a 32 bits? 
+	
+	float tSampling;
+	
+	tSampling = 1 / (float)e->fSampling;
+	
+	// BORRAR
+	e->fSampling = 10000;
+	
+	/* Experiment values */
+	e->Init.iStrip = ((cmd[22] << 8) | (cmd[23] & 0xFF));
+	e->Init.eEnd = ((cmd[24] << 8) | (cmd[25] & 0xFF));
+	e->Init.tInterval = ((cmd[28] << 8) | (cmd[29] & 0xFF));
+	e->Init.tRun = ((cmd[26] << 8) | (cmd[27] & 0xFF));
+	
+	// Pasamos los parámetros a valores DAC según el FS seleccionado 
+	switch(e_config->rango){
+	
+		case FS_G_500nA:	
+			e->runTime.iStrip = ceil(((((e->Init.iStrip * pow(10,7)) + 5)) * (pow(2,20) - 1)) / 10);
+			break;
+		
+		case FS_G_500uA:
+			e->runTime.iStrip = ceil(((((e->Init.iStrip * pow(10,4)) + 5)) * (pow(2,20) - 1)) / 10);
+			break;
+		
+		case FS_G_100mA:
+			e->runTime.iStrip = ceil(((((e->Init.iStrip * 10) + 5)) * (pow(2,20) - 1)) / 10);
+			break;
+		
+		default:
+			break;
+	}
+	
+	e->runTime.tInterval = e->Init.tInterval / 1000.0;
+	e->runTime.tRun = e->Init.tRun / 1000.0;
+	
+	/* Inicializamos las variables para llevar la cuenta
+	de los samples que vamos leyendo de la LUT y de los 
+	samples totales del exp	en la ISR */
+	e->nSamplesExp = ceil(e->runTime.tRun / tSampling);									// En este caso los samples del "período" son los mismos que los del experimento (ver forma de onda)
+	e->nSamplesLUT = NSAMPLESLUT;
+		
+	// Inicializamos contadores
+	e->contSamplesExp = 0;
+	e->contSamplesLUT = 0;
+	
+}
+	
+
+/**
+* @brief	loads the data for ZCP technique
+* @param	e : parameters for configuring the waveform
+* @param	e_config : configuration parameters for the experiment
+* @param	cmd : buffer with data from PC
+*/
+static void load_ZCP_data(exp_param_values_t* e, uint8_t* cmd){
+
+	// Parámetros
+	// + OCV => los parámetros de la OCV se van a determinar empíricamente por lo que no se van a introducir desde la interface
+	// + tRun
+	// + tInterval
+	
+	float tSampling;
+	
+	tSampling = 1 / (float)e->fSampling;
+	
+	// BORRAR
+	e->fSampling = 10000;
+	
+	/* Experiment values */
+	e->Init.tInterval = ((cmd[22] << 8) | (cmd[23] & 0xFF));
+	e->Init.tRun = ((cmd[24] << 8) | (cmd[25] & 0xFF));
+	
+	e->runTime.tInterval = e->Init.tInterval / 1000.0;
+	e->runTime.tRun = e->Init.tRun / 1000.0;
+	
+	e->nSamplesExp = ceil(e->runTime.tRun / tSampling);
+	e->nSamplesLUT = NSAMPLESLUT;
+	
+	
+	// Inicializamos contadores
+	e->contSamplesExp = 0;
+	e->contSamplesLUT = 0;
+}
+	
+	
+
+/* #######################################################
+   #	EIS
+   ####################################################### */
+	
+	
+// TODO
+
+
+
+
+
 
 
 /************************************************/
 /*										APIs											*/
 /************************************************/
-
-// Función para cargar datos recibidos desde el PC en la estructura del experimento correspondiente
+/**
+* @brief	function for load the data from PC inside the needed structure
+* @param	e : parameters for configuring the waveform
+* @param	p : parameters for configuring the pretreatment
+* @param	e_config : configuration parameters for the experiment
+* @param	cmd : buffer with data from PC
+*/
 void load_data(uint8_t* buff, exp_param_values_t* e, pretreat_param_t* p, exp_config_t* eConfig){
 	
 	/* Recogemos datos pretratamiento */
@@ -1063,9 +2041,65 @@ void load_data(uint8_t* buff, exp_param_values_t* e, pretreat_param_t* p, exp_co
 	eConfig->cell_on = buff[9];
 	eConfig->exp = buff[5];
 	
+	// Configuramos el FS según vayamos a utilizar potenciostato o galvanostato
+	switch(eConfig->exp){																
+		case 0:												// Si vamos a utilizar potenciostato (voltametrías, amperometrías y PEIS)...
+		case 1:
+		case 2:
+		case 3:
+		case 4:
+		case 5:
+		case 6:
+		case 7:
+		case 8:
+		case 9:
+		case 10:
+		case 11:
+		case 12:
+		case 13:
+		case 14:
+		case 15:
+			if(eConfig->rango == 0){
+				eConfig->rango = FS_B_5mA;
+			}
+			else if(eConfig->rango == 1){
+				eConfig->rango = FS_B_50uA;
+			}
+			else if(eConfig->rango == 2){
+				eConfig->rango = FS_B_500nA;
+			}
+			else if(eConfig->rango == 3){
+				eConfig->rango = FS_B_5_100_mA;
+			}
+			break;
+			
+		case 16:										// Si vamos a utilizar galvanostato (potenciometrías y GEIS)...
+		case 17:
+		case 18:
+		case 19:
+		case 20:
+		case 21:
+		case 22:
+			if(eConfig->rango == 0){
+				eConfig->rango = FS_G_500nA;
+			}
+			else if(eConfig->rango == 1){
+				eConfig->rango = FS_G_500uA;
+			}
+			else if(eConfig->rango == 2){
+				eConfig->rango = FS_G_100mA;
+			}
+			
+			// TODO: falta añadir las técnicas de EIS a estos cases
+			
+	}
+	
 	
 	/* en función de la técnica guardamos los datos del experimento en la estructura correspondiente */
 	switch(eConfig->exp){
+		/* **********************************
+		* VOLTAMMETRIES
+		************************************ */
 		case 0:													// CV
 			//load_CV_data(e, buff);
 			break;
@@ -1097,18 +2131,97 @@ void load_data(uint8_t* buff, exp_param_values_t* e, pretreat_param_t* p, exp_co
 		case 7:													// ACV
 			load_ACV_data(e, buff);
 			break;
+		
+		/* **********************************
+		* AMPEROMETRIES
+		************************************ */
+		case 8:													// AD
+			load_AD_data(e, buff);
+			break;
+		
+		case 9:													// FA
+			load_FA_data(e, buff);
+			break;
+		
+		case 10:												// DSCA
+			load_DSCA_data(e, buff);
+			break;
+		
+		case 11:												// PAD
+			load_PAD_data(e, buff);
+			break;
+		
+		case 12:												// DPA
+			load_DPA_data(e, buff);
+			break;
+		
+		case 13:												// MSA
+			load_MSA_data(e, buff);
+			break;
+		
+		case 14:												// ZRA
+			load_ZRA_data(e, buff);
+			break;
+		
+		case 15:												// HFP
+			load_HFP_data(e, buff);
+			break;
+		
+		/* **********************************
+		* POTENTIOMETRIES
+		************************************ */
+		case 16:												// PD
+			load_PD_data(e, buff, eConfig);
+			break;
+		
+		case 17:												// FP
+			load_FP_data(e, buff, eConfig);
+			break;
+		
+		case 18:												// DSCP
+			load_DSCP_data(e, buff, eConfig);
+			break;
+		
+		case 19: 												// CRCP
+			// TODO
+			break;
+		
+		case 20:												// MSP
+			load_MSP_data(e, buff, eConfig);
+			break;
+		
+		case 21:												// PSA
+			load_PSA_data(e, buff, eConfig);
+			break;
+		
+		case 22:												// ZCP
+			load_ZCP_data(e, buff);
+			break;
 	
-	
-	
+		/* **********************************
+		* EIS
+		************************************ */
+		// TODO
+		
 	}
 
 }
 	
 
+/**
+* @brief	function for generate the data from loaded parameters
+* @param	e : parameters for configuring the waveform
+* @param	e_config : configuration parameters for the experiment
+* @param	lut : pointer to an array where wave is loaded
+*/
 void generate_data(exp_param_values_t* e,	exp_config_t* eConfig, uint16_t* lut){
 
 	/* En función de la técnica guardamos los datos del experimento en la estructura correspondiente */
 	switch(eConfig->exp){
+		
+		/* **********************************
+		* VOLTAMMETRIES
+		************************************ */
 		case 0:													// CV
 			// TODO
 			break;
@@ -1140,12 +2253,80 @@ void generate_data(exp_param_values_t* e,	exp_config_t* eConfig, uint16_t* lut){
 		case 7:													// ACV
 			generateACV(e, lut);
 			break;
-
-
+		
+		/* **********************************
+		* AMPEROMETRIES
+		************************************ */
+		case 8:													// AD
+			generateAD(e, lut);
+			break;
+		
+		case 9:													// FA
+			generateFA(e, lut);
+			break;
+		
+		case 10:												// DSCA
+			generateDSCA(e, lut);
+			break;
+		
+		case 11:												// PAD
+			generatePAD(e, lut);
+			break;
+		
+		case 12:												// DPA
+			generateDPA(e, lut);
+			break;
+		
+		case 13:												// MSA
+			generateMSA(e, lut);
+			break;
+		
+		case 14:												// ZRA
+			generateZRA(e, lut);
+			break;
+		
+		case 15:												// HFP
+			generateHFP(e, lut);
+			break;
+		
+		/* **********************************
+		* POTENTIOMETRIES
+		************************************ */
+		case 16:												// PD
+			generatePD(e, lut);
+			break;
+		
+		case 17:												// FP
+			generateFP(e, lut);
+			break;
+		
+		case 18:												// DSCP
+			generateDSCP(e, lut);
+			break;
+		
+		case 19: 												// CRCP
+			// TODO
+			break;
+		
+		case 20:												// MSP
+			generateMSP(e, lut);
+			break;
+		
+		case 21:												// PSA
+			generatePSA(e, lut);
+			break;
+		
+		case 22:												// ZCP
+			generateZCP(e, lut);
+			break;
+		
+		
+		/* **********************************
+		* EIS
+		************************************ */
+		// TODO
 
 	}
 }
-
-
 
 

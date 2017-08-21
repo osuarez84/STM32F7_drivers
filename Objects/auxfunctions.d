@@ -13,4 +13,5 @@
 .\objects\auxfunctions.o: hal_EQ_techniques.h
 .\objects\auxfunctions.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
 .\objects\auxfunctions.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+.\objects\auxfunctions.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
 .\objects\auxfunctions.o: auxFunctions.h

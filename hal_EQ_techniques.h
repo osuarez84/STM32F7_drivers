@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include <math.h>
 #include <stdlib.h>
+#include <stdbool.h> 		// OJO : esto es de C99
 #include "led.h"
 
 
@@ -45,6 +46,22 @@
 //}DF_OUTPUT;
 
 
+typedef enum {
+	/* GALVANOSTAT */
+	FS_G_500nA,
+	FS_G_500uA,
+	FS_G_100mA,
+	
+	/* BIPOTENTIOSTAT */
+	FS_B_5mA,
+	FS_B_50uA,
+	FS_B_500nA,
+	FS_B_5_100_mA
+}FS_GALV_BIPOT;
+
+
+	
+	
 /************************************************/
 /*		Structures for handling input Data				*/
 /************************************************/
@@ -63,7 +80,7 @@ typedef struct{
 typedef struct{
 	uint8_t bipot;
 	uint8_t exp;
-	uint16_t rango;
+	FS_GALV_BIPOT rango;
 	uint8_t high_gain;
 	uint8_t cell_on;
 	uint16_t cell;
@@ -83,11 +100,31 @@ typedef struct{
 	uint16_t ePulse1;
 	uint16_t ePulse2;			// DSCA
 	float tInterval;		// DSCA
+	uint16_t tRun;			// DAP, DPA
 	uint16_t tPulse1;
 	uint16_t tPulse2;
 	uint16_t amplitude;
 	uint16_t freq;
 	uint16_t ACamplitude;	
+	
+	// MSA
+	uint16_t frSize;
+	uint16_t cycles;
+	uint16_t levels;
+	uint16_t samples[100];		// OJO si se cambia esto hay que revisar el tamaño del buffer para poder recibir en un solo frame todos los valores.
+	uint16_t potentials[100];
+	uint16_t time[100];
+
+	// Potentiometries
+	uint16_t iDC;
+	uint16_t currents[100];		// MSP
+	uint16_t iPulse1;
+	uint16_t iPulse2;
+	uint16_t iStrip;					// PSA
+	uint16_t eEnd;
+
+
+
 }param_t;
 
 typedef struct{
@@ -116,6 +153,9 @@ typedef struct{
 	uint16_t nSamplesAC;
 	uint16_t contSin;
 	
+	// MSA
+	bool msa_second_frame; // Flag para saber si se va a recibir segundo frame con datos de los levels del MSA
+
 	
 }exp_param_values_t;
 

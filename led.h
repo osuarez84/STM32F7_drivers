@@ -132,7 +132,7 @@ typedef enum {
 typedef enum {
 	PRETREATMENT_WE,
 	MEASURING_WE,
-	FS_CH_WE,
+	FS_CH_WE
 }state_exp_t;
 
 

@@ -27,43 +27,59 @@ Project File Date:  05/03/2017
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 1 (build 61)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'Target 1'
+compiling auxFunctions.c...
+compiling led.c...
 compiling hal_EQ_techniques.c...
-hal_EQ_techniques.c(956): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+hal_EQ_techniques.c(1173): warning:  #1035-D: single-precision operand implicitly converted to double-precision
   	e->runTime.tInterval = e->Init.tInterval / 1000.0;																				// Valor de tiempo de cada medición ADC
-hal_EQ_techniques.c(24): warning:  #177-D: function "generateRamp" was declared but never referenced
-  static uint32_t generateRamp(float eStart, float eStop, float eStep, float* lut) {
-hal_EQ_techniques.c(503): warning:  #177-D: function "load_CV_data" was declared but never referenced
+hal_EQ_techniques.c(1228): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  	e->runTime.tInterval = e->Init.tInterval / 1000.0;
+hal_EQ_techniques.c(1275): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  	e->runTime.tInterval = e->Init.tInterval / 1000.0;
+hal_EQ_techniques.c(1330): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  	e->runTime.tInterval = e->Init.tInterval / 1000.0;																				// Valor de tiempo de cada medición ADC
+hal_EQ_techniques.c(1392): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  	e->runTime.tInterval = e->Init.tInterval / 1000.0;
+hal_EQ_techniques.c(1433): warning:  #177-D: variable "tInterval" was declared but never referenced
+  		float tInterval, tSampling;
+hal_EQ_techniques.c(1433): warning:  #177-D: variable "tSampling" was declared but never referenced
+  		float tInterval, tSampling;
+hal_EQ_techniques.c(1452): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  		e->runTime.tInterval = e->Init.tInterval / 1000.0;
+hal_EQ_techniques.c(1509): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  	e->runTime.tInterval = e->Init.tInterval / 1000.0;
+hal_EQ_techniques.c(1640): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  	e->runTime.tInterval = e->Init.tInterval / 1000.0;
+hal_EQ_techniques.c(1705): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  	e->runTime.tInterval = e->Init.tInterval / 1000.0;
+hal_EQ_techniques.c(1770): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  	e->runTime.tInterval = e->Init.tInterval / 1000.0;																				// Valor de tiempo de cada medición ADC
+hal_EQ_techniques.c(1828): warning:  #177-D: variable "tInterval" was declared but never referenced
+  		float tInterval, tSampling;
+hal_EQ_techniques.c(1828): warning:  #177-D: variable "tSampling" was declared but never referenced
+  		float tInterval, tSampling;
+hal_EQ_techniques.c(1847): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  		e->runTime.tInterval = e->Init.tInterval / 1000.0;
+hal_EQ_techniques.c(1952): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  	e->runTime.tInterval = e->Init.tInterval / 1000.0;
+hal_EQ_techniques.c(1992): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  	e->runTime.tInterval = e->Init.tInterval / 1000.0;
+hal_EQ_techniques.c(139): warning:  #177-D: function "generateCV" was declared but never referenced
+  static void generateCV(exp_param_values_t* e, uint16_t* LUT){
+hal_EQ_techniques.c(145): warning:  #177-D: function "generateLSV" was declared but never referenced
+  static void generateLSV(exp_param_values_t* e, uint16_t* LUT){
+hal_EQ_techniques.c(514): warning:  #177-D: function "load_CV_data" was declared but never referenced
   static void load_CV_data(exp_param_values_t* e, uint8_t* cmd){
-hal_EQ_techniques.c(517): warning:  #177-D: function "load_LSV_data" was declared but never referenced
+hal_EQ_techniques.c(534): warning:  #177-D: function "load_LSV_data" was declared but never referenced
   static void load_LSV_data(exp_param_values_t* e, uint8_t* cmd){
-hal_EQ_techniques.c(897): warning:  #177-D: function "generateDSCA" was declared but never referenced
-  static void generateDSCA(){
-hal_EQ_techniques.c(901): warning:  #177-D: function "generateAD" was declared but never referenced
-  static void generateAD(){
-hal_EQ_techniques.c(907): warning:  #177-D: function "generateFA" was declared but never referenced
-  static void generateFA(){
-hal_EQ_techniques.c(913): warning:  #177-D: function "generatePAD" was declared but never referenced
-  static void generatePAD(){
-hal_EQ_techniques.c(918): warning:  #177-D: function "generateDPA" was declared but never referenced
-  static void generateDPA(){
-hal_EQ_techniques.c(923): warning:  #177-D: function "generateMSA" was declared but never referenced
-  static void generateMSA(){
-hal_EQ_techniques.c(933): warning:  #177-D: function "load_DSCA_data" was declared but never referenced
-  static void load_DSCA_data(exp_param_values_t* e, uint8_t* cmd){
-hal_EQ_techniques.c(976): warning:  #177-D: function "load_AD_data" was declared but never referenced
-  static void load_AD_data(){
-hal_EQ_techniques.c(982): warning:  #177-D: function "load_FA_data" was declared but never referenced
-  static void load_FA_data(){
-hal_EQ_techniques.c(989): warning:  #177-D: function "load_PAD_data" was declared but never referenced
-  static void load_PAD_data(){
-hal_EQ_techniques.c(1036): warning:  #177-D: function "load_DPA_data" was declared but never referenced
-  static void load_DPA_data(){
-hal_EQ_techniques.c(1040): warning:  #177-D: function "load_MSA_data" was declared but never referenced
-  static void load_MSA_data(){
-hal_EQ_techniques.c: 16 warnings, 0 errors
+hal_EQ_techniques.c(1562): warning:  #177-D: function "generateCRCP" was declared but never referenced
+  static void generateCRCP(exp_param_values_t* e, uint16_t* LUT){
+hal_EQ_techniques.c(1802): warning:  #177-D: function "load_CRCP_data" was declared but never referenced
+  static void load_CRCP_data(exp_param_values_t* e, uint8_t* cmd, exp_config_t* e_config){
+hal_EQ_techniques.c: 23 warnings, 0 errors
 linking...
-Program Size: Code=16866 RO-data=854 RW-data=164 ZI-data=14492  
-".\Objects\gpio_hal.axf" - 0 Error(s), 16 Warning(s).
+Program Size: Code=27766 RO-data=994 RW-data=164 ZI-data=17764  
+".\Objects\gpio_hal.axf" - 0 Error(s), 23 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -89,12 +105,12 @@ Package Vendor: Keil
    * Component: ARM::CMSIS:CORE:5.0.1
 
    * Component: Keil::Device:Startup:1.2.0
+      Include file:  Drivers\CMSIS\Device\ST\STM32F7xx\Include\stm32f7xx.h
       Source file:   MDK\Device\Source\ARM\STM32F7xx_OPT.s
       Source file:   MDK\Device\Source\ARM\STM32F7xx_OTP.s
-      Include file:  Drivers\CMSIS\Device\ST\STM32F7xx\Include\stm32f7xx.h
       Source file:   Drivers\CMSIS\Device\ST\STM32F7xx\Source\Templates\arm\startup_stm32f769xx.s
       Source file:   Drivers\CMSIS\Device\ST\STM32F7xx\Source\Templates\system_stm32f7xx.c
-Build Time Elapsed:  00:00:07
+Build Time Elapsed:  00:00:23
 </pre>
 </body>
 </html>

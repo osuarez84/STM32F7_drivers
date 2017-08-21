@@ -15,7 +15,6 @@ uart_handle_t uartHandle;
 tim67_handle_t tim6Handle;
 tim67_handle_t tim7Handle;
 
-
 uint32_t contPretreatment_we1 = 0;
 uint32_t contPretreatment_we2 = 0;
 uint8_t DACvalue[2];
