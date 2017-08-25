@@ -1,122 +1,6 @@
-// TODO : WORK IN PROGRESS
-
 #include "hal_EQ_techniques.h"
 #include "led.h"
 
-/************************************************/
-/*				Helper functions				*/
-/************************************************/
-///**
-//* @brief	Generate the data points between start and stop points
-//* @param	Start point
-//* @param	End point
-//* @param	Step between two consecutive points
-//* @param	Pointer to an array to save the data
-//* @retval	No. samples 
-//*/
-//static uint32_t generateRamp(float eStart, float eStop, float eStep, float* lut) {
-
-//	// TODO : si trabajamos con valores uint16_t directamente
-//	// es necesario cambiar la función fabsf que devuelve un float
-//	// a abs, que devuelve un int
-
-//	uint32_t i;
-//	
-//	uint32_t nSamples = ceil(fabsf(eStart - eStop) / eStep) + 1;				// Calculamos número de puntos...
-//	lut[0] = eStart;															// Cargamos primer valor en LUT...
-
-//	for (i = 1; i < nSamples; i++) {
-
-//		if (eStart < eStop) {													// Rampa aumenta...
-//			lut[i] = eStart + (i * eStep);
-//		}
-//		else {																	// Rampa disminuye...
-//			lut[i] = eStart - (i * eStep);
-//		}
-
-//	}
-
-//	return nSamples;
-
-
-//}
-
-
-/**
-* @brief	Concatenates the arrays containing the LUTs
-* @param	Pointer to LUT1
-* @param	Pointer to LUT2
-* @param	Pointer to LUT3
-* @param	Pointer to LUT where to put the complete data
-* @param	No. samples of the LUT1
-* @param	No. samples of the LUT2
-* @param	No. samples of the LUT3
-* @retval	No. samples of the complete data (1 scan)
-*/
-//static uint32_t concatenateLUTs(float* lut1, float* lut2, float* lut3, float* lutC, uint32_t n1, uint32_t n2, uint32_t n3) {
-
-//	uint32_t i;
-//	
-//	n1--;																// El último pto de la LUT1 es igual al primero de la LUT2
-//	n2--;																// por lo que lo desechamos. Lo mismo para LUT2 y LUT3
-//	
-//	for (i = 0; i < n1; i++) {									
-//		lutC[i] = lut1[i];												
-//	}
-
-//	for (i = 0; i < n2; i++) {									
-//		lutC[i + n1] = lut2[i];
-//	}
-
-//	for (i = 0; i < n3; i++) {
-//		lutC[i + (n1 + n2)] = lut3[i];
-//	}
-
-//	return (n1 + n2 + n3);
-
-//}
-
-
-///**
-//* @brief	Generates CV waveform for 1 complete scan
-//* @param	Pointer to data structure
-//* @param	Pointer to an auxiliar array
-//* @param	Pointer to an auxiliar array
-//* @param	Pointer to an auxiliar array
-//* @param	Pointer to an array to sace complete LUT
-//* @retval	Lenght of the LUT
-//*/
-//uint32_t generateCVsignal(DF_CVTypeDef* df, float* LUT1, float* LUT2, float* LUT3, float* LUTcomplete) {
-
-//	uint32_t nSamples1 = generateRamp(df->start, df->vtx1, df->step, LUT1);
-//	uint32_t nSamples2 = generateRamp(df->vtx1, df->vtx2, df->step, LUT2);
-//	uint32_t nSamples3 = generateRamp(df->vtx2, df->vtx1, df->step, LUT3);
-
-//	uint32_t lengthLUT = concatenateLUTs(LUT1, LUT2, LUT3, LUTcomplete, nSamples1, nSamples2, nSamples3);
-
-//	return lengthLUT;
-//}
-
-///**
-//* @brief	Generates LSV waveform for 1 complete scan
-//* @param	Pointer to data structure
-//* @param	Pointer to an array to sace complete LUT
-//* @retval	Lenght of the LUT
-//*/
-//uint32_t generateLSVsignal(DF_LSVTypeDef* df, float* LUTcomplete) {
-//	
-//	uint32_t lengthLUT = generateRamp(df->start, df->stop, df->step, LUTcomplete);
-
-//	/* Escribimos el Estop en el último valor de la LUT */
-//	LUTcomplete[lengthLUT-1] = df->stop;
-
-//	return lengthLUT;
-//}
-
-
-/* #######################################################
-   #	VOLTAMMETRIES
-   ####################################################### */
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++
 // Formulas para el cálculo de los valores DAC:
@@ -136,15 +20,210 @@
 //
 // +++++++++++++++++++++++++++++++++++++++++++++++++++
 
-static void generateCV(exp_param_values_t* e, uint16_t* LUT){
-	// TODO
 
+/************************************************/
+/*				Helper functions				*/
+/************************************************/
+
+/* #######################################################
+   #	VOLTAMMETRIES
+   ####################################################### */
+
+
+/**
+* @brief	Each iteration prepare values to fill the 1024 LUT with the CV
+* @param	e : parameters for configuring the waveform
+* @param	LUT : array to save the values
+* @retval	None
+*/
+static void generateCV(exp_param_values_t* e, uint16_t* LUT){
+
+	// TODO :  se tiene que llevar cuenta de los scans ya que debe de enviarsele
+	// al PC el número de scan al que pertenece cada dato.
+	
+	// =================================================================================
+	// Este algorítmo divide la generación de la CV en 2 partes y a su vez
+	// la segunda parte se divide en A y B.
+	// PRIMERA PARTE
+	//
+	// Va desde eStart hasta eVtx1. Se comprueba si esta es de subida o de bajada y 
+	// se calculan los steps que hay entre eStart y eVtx1.
+	//
+	//
+	// SEGUNDA PARTE
+	//
+	// A) Va desde eVtx1 a eVtx2. Se comprueba si ésta es de subida o de bajada y se
+	// calculan los steps de nuevo. 
+	// B) Va desde eVtx2 a eVtx1. Similar a la parte A.
+	// ==================================================================================
+	
+	uint16_t i;
+
+	
+	for(i = 0; i < NSAMPLESLUT; i++){
+			
+		if(!e->flagPrimeraParte){														// La primera parte solo se genera al principio... (start => vtx1)
+		// Generamos la primeraparte de la onda
+		
+			if(e->runTime.vtx1 > e->runTime.start){																														// Primera parte sube...
+				if(e->contStep > e->nSteps1){										// Hemos llegado al vertex 1...?
+					
+					e->flagPrimeraParte = 1;											// Hemos terminado de sacar la primera parte de la señal
+					e->contStep = 1;															// Inicializamos contStep para comenzar la segunda parte
+					if(e->runTime.vtx1 < e->runTime.vtx2){				// activamos el flag para saber si comienza subiendo o no la segunda parte
+						e->flagSube = 1;
+					}
+					else{
+						e->flagSube = 0;
+					}
+					e->parteA = 1;
+				}
+				
+				else{
+					LUT[i] = e->runTime.start + (e->contStep * e->runTime.step);
+					if(LUT[i] > e->runTime.vtx1){																		// Hemos sobrepasado el valor de vtx1?
+						LUT[i] = e->runTime.vtx1;																			// Lo ajustamos
+					}
+				}	
+			}
+			
+			else{																																															// Primera parte baja...
+				if(e->contStep > e->nSteps1){										// Hemos llegado al vertex 1...?
+					e->flagPrimeraParte = 1;											// Hemos terminado de sacar la primera parte de la señal
+					e->contStep = 1;															// Inicializamos contStep para segunda parte señal
+					if(e->runTime.vtx1 < e->runTime.vtx2){				// activamos el flag para saber si comienza subiendo o no la segunda parte
+						e->flagSube = 1;
+					}
+					else{
+						e->flagSube = 0;
+					}
+					e->parteA = 1;
+				}
+
+				else{
+					LUT[i] = e->runTime.start - (e->contStep * e->runTime.step);
+					if(LUT[i] < e->runTime.vtx1){									// Hemos sobrepasado valor de vtx2?
+						LUT[i] = e->runTime.vtx1;										// Lo ajustamos
+					}
+				}
+			}
+			
+			e->contSamplesPer++;
+			
+			if(e->contSamplesPer == e->nSamplesPer){					// Hemos llegado al final del período (step)
+				e->contStep++;
+				e->contSamplesPer = 0;
+			}			
+		}
+			
+		else{						// vtx1 => vtx2 => vtx1 => vtx2...
+			// Generamos escaneos completos y aumentamos contador cada vez que completemos uno
+			if(e->parteA){																																				// PARTE A : vtx1 => vtx2
+				if(e->flagSube){																												// Steps suben...
+					
+					if(e->contStep > e->nSteps2){													// Llegamos a vtx2, tenemos que empezar a bajar
+						e->flagSube = 0;
+						e->contStep = 1;
+						e->parteA = 0;
+					}
+					else{
+						LUT[i] = e->runTime.vtx1 + (e->contStep * e->runTime.step);			
+						if(LUT[i] > e->runTime.vtx2){							// Hemos sobrepasado valor de vtx2?
+							LUT[i] = e->runTime.vtx2;								// Lo ajustamos
+						}
+					}
+				}
+				else{																																		// Steps bajan...
+					if(e->contStep > e->nSteps2){													// Llegamos a vtx2, tenemos que empezar a subir...
+						e->flagSube = 1;
+						e->contStep = 1;
+						e->parteA = 0;
+					}
+					else{
+						LUT[i] = e->runTime.vtx1 - (e->contStep * e->runTime.step);
+						if(LUT[i] < e->runTime.vtx2){							// Hemos sobrepasado valor de vtx2?
+							LUT[i] = e->runTime.vtx2;   						// Lo ajustamos
+						}
+					}
+				}
+			}
+			
+			else{																																								// PARTE B : vtx2 => vtx1
+				if(e->flagSube){														// Steps suben
+					if(e->contStep > e->nSteps2){							// Llegamos a vtx1, tenemos que empezar a bajar
+						e->flagSube = 0;
+						e->contStep = 1;
+						e->parteA = 1;
+					}
+					
+					else{
+						LUT[i] = e->runTime.vtx2 + (e->contStep * e->runTime.step);
+						if(LUT[i] > e->runTime.vtx1){						// Hemos sobreapsado el valor de vtx1
+							LUT[i] = e->runTime.vtx1;							// Lo ajustamos
+						}
+					}
+				}
+				
+				else{																				// Steps bajan...
+					
+					if(e->contStep > e->nSteps2){							// Llegamos a vtx2, ahora empezamos a subir 
+						e->flagSube = 1;
+						e->contStep = 1;
+						e->parteA = 1;
+					}
+					
+					else{
+						LUT[i] = e->runTime.vtx2 - (e->contStep * e->runTime.step);
+						if(LUT[i] < e->runTime.vtx1){						// Hemos sobrepasado valor vtx2?
+							LUT[i] = e->runTime.vtx1;							// Ajustamos
+						}
+					}
+				}
+			}
+	
+			
+			e->contSamplesPer++;
+			
+			if(e->contSamplesPer == e->nSamplesPer){				// Hemos llegado al final del período (step)
+				e->contStep++;
+				e->contSamplesPer = 0;
+			}
+		}
+	}
 }
 
 
+/**
+* @brief	Each iteration prepare values to fill the 1024 LUT with the LSV
+* @param	e : parameters for configuring the waveform
+* @param	LUT : array to save the values
+* @retval	None
+*/
 static void generateLSV(exp_param_values_t* e, uint16_t* LUT){
-	// TODO
 
+	uint16_t i;
+	
+	for(i = 0; i < NSAMPLESLUT; i++){
+	
+		if(e->contStep <= e->nSteps){																					// Si no hemos llegado al último step...
+			
+			if(e->upwardsStep){																									// Steps suben...?
+				LUT[i] = e->runTime.start + (e->runTime.step * e->contStep);
+			}
+			else {																															// Steps bajan...?
+				LUT[i] = e->runTime.start + (e->runTime.step * e->contStep);
+			}
+		
+			e->contSamplesPer++;																								// Aumentamos contador del período
+			
+			if(e->contSamplesPer == e->nSamplesPer){														// Hemos terminado el step?
+				e->contStep++;																										// Subimos o bajamos otro step
+				e->contSamplesPer = 0;																						// Reseteamos contador 
+			}
+		}
+		
+	}
+	
 }
 
 
@@ -156,72 +235,91 @@ static void generateLSV(exp_param_values_t* e, uint16_t* LUT){
 * @param	LUT : array to save the values
 * @retval	None
 */
-// ANOTACIONES
-// El algorítmo de generación de esta señal cambia un poco dependiendo de si la onda comienza
-// subiendo o si la onda comiena bajando. Como hay que controlar posteriormente las subidas y 
-// bajadas para ver si hemos llegado a los límites, se utiliza el flagSube. De esta manera
-// si la señal comienza subiendo va a oscilar entre start - stop - start - stop - ...
-// Si la señal comienza bajando : stop - start - stop - start - ...
-// Este flag controla esas subidas y bajadas ya que el contador de steps aumenta y disminuye según 
-// hay que subir o bajar al llegar al límite.
-// OJO : acordarse de poner a 1 o 0 el flagSube antes de llamar a esta función!!
+
+// El algorítmo de generación de la señal SCV está basado en el mismo
+// utilizado para generar la CV.
 
 static void generateSCV(exp_param_values_t* e, uint16_t* LUT){
 	
 	uint16_t i;
 	
 	for(i = 0; i < NSAMPLESLUT; i++){
+		
+		if(e->parteA){																	// PARTE 1: start => stop
+			if(e->upwardsStep){												// Steps suben...
+				
+				if(e->contStep > e->nSteps){						// Hemos llegado a stop, empezamos a bajar...
+					e->upwardsStep = 0;
+					e->contStep = 1;
+					e->parteA = 0;
+				}
+				
+				else{
+					LUT[i] = e->runTime.start + (e->contStep * e->runTime.step);
+					if(LUT[i] > e->runTime.stop){																		// Hemos sobrepasado valor de stop?
+						LUT[i] = e->runTime.stop;																			// Ajustamos
+					}
+				}
+			}
+			
+			else{																			// Steps bajan...
+				
+				if(e->contStep > e->nSteps){						// Hemos llegado a stop, empezamos a subir...
+					e->upwardsStep = 1;
+					e->contStep = 1;
+					e->parteA = 0;
+				}
+				
+				else{
+					LUT[i] = e->runTime.start - (e->contStep * e->runTime.step);
+					if(LUT[i] < e->runTime.stop){																		// Hemos sobrepasado valor de top?
+						LUT[i] = e->runTime.stop;																			// Ajustamos
+					}
+				}
+			}
+		}
 	
-		if(e->upwardsStep){										// Steps comienzan subiendo...
-			
-			LUT[i] = e->runTime.start + (e->runTime.step * e->contStep);
-			
-			e->contSamplesPer++;
-			
-			if(e->contSamplesPer == e->nSamplesPer){			// Hemos terminado el período..??
-				if(e->flagSube){
-					e->contStep++;													// SI: si estamos subiendo aumentamos un step
-				}
-				else{																			// SI: si estamos bajando disminuimos un step
-					e->contStep--;
+		else{																									// PARTE 2 : stop => start
+			if(e->upwardsStep){												// Steps suben...
+				
+				if(e->contStep > e->nSteps){						// Hemos llegado a start, empezamos a bajar...
+					e->upwardsStep = 0;
+					e->contStep = 1;
+					e->parteA = 1;
+				
 				}
 				
-				e->contSamplesPer = 0;										// Reseteamos el contador para el nuevo período
+				else{
+					LUT[i] = e->runTime.stop + (e->contStep * e->runTime.step);
+					if(LUT[i] > e->runTime.start){																	// Hemos sobrepasado el valor de start?
+						LUT[i] = e->runTime.start;																		// Ajustamos
+					}
+				}	
+			}
+			
+			else{																			// Steps bajan...
 				
-				if(e->contStep > e->nSteps){							// Hemos llegado al límite??
-					e->flagSube = 0;												// Cambiamos la dirección 
-					e->contStep -= 2;
+				if(e->contStep > e->nSteps){					// Hemos llegado a start, empezamos a subir...
+					e->upwardsStep = 1;
+					e->contStep = 1;
+					e->parteA = 1;
+				
 				}
-				else if(e->contStep == 0){								// Hemos llegado al otro límite??
-					e->flagSube = 1;												// Cambiamos la dirección
-				}		
+				
+				else{
+					LUT[i] = e->runTime.stop - (e->contStep * e->runTime.step);
+					if(LUT[i] < e->runTime.start){																	// Hemos sobrepasado valor de start?
+						LUT[i] = e->runTime.start;																		// Ajustamos
+					}
+				}	
 			}
 		}
 		
-		else{																	// Steps comienzan bajando....(estructura similar a la parte de subida)
-			LUT[i] = e->runTime.start - (e->runTime.step * e->contStep);
-			
-			e->contSamplesPer++;
-			
-			if(e->contSamplesPer == e->nSamplesPer){
-			
-				if(e->flagSube){
-					e->contStep--;
-				}
-				else{
-					e->contStep++;
-				}
-				
-				e->contSamplesPer = 0;
-				
-				if(e->contStep == 0){
-					e->flagSube = 0;
-				}
-				else if(e->contStep > e->nSteps){
-					e->flagSube = 1;
-					e->contStep -= 2;
-				}
-			}
+		e->contSamplesPer++;
+		
+		if(e->contSamplesPer == e->nSamplesPer){												// Hemos finalizado un período (step) ?
+			e->contStep++;																								// Subimos al siguiente step 
+			e->contSamplesPer = 0;																				// Reseteamos contador de samples periodo
 		}
 	}
 }
@@ -513,16 +611,77 @@ static void generateACV(exp_param_values_t* e, uint16_t* LUT){
 */
 static void load_CV_data(exp_param_values_t* e, uint8_t* cmd){
 
+	
 	// Parámetros
 	// + start
 	// + vtx1
 	// + vtx2
 	// + step
-	// sr
-	// scans
+	// + sr
+	// + scans
 	
 	// TODO
+	float start, step, vtx1, vtx2, sr, tSampling, tInt;
+	
+	// BORRAR :  va a depender del filtro seleccionado
+	e->fSampling = 10000;
+	
 
+	/* Experiment values */
+	e->Init.start = ((cmd[22] << 8) | (cmd[23] & 0xFF));
+	e->Init.vtx1 = ((cmd[24] << 8) | (cmd[25] & 0xFF));
+	e->Init.vtx2 = ((cmd[26] << 8) | (cmd[27] & 0xFF));
+	e->Init.step = ((cmd[28] << 8) | (cmd[29] & 0xFF));
+	e->Init.sr = ((cmd[30] << 8) | (cmd[31] & 0xFF));
+	e->Init.scans = ((cmd[32] << 8) | (cmd[33] & 0xFF));
+	
+	
+	// Guardamos los parámetros convertidos a valores DAC
+	//e->runTime.start = ceil((((e->Init.start / 1000.0) * 32768.0) / VREF) + 32768.0);
+	//e->runTime.stop = ceil((((e->Init.stop / 1000.0) * 32768.0) / VREF) + 32768.0);
+	//e->runTime.step = ceil((((e->Init.step / 1000.0) * 32768.0) / VREF));
+	e->runTime.start = ceil((((e->Init.start / 1000.0) + 5) * (pow(2,20) - 1)) / 10);
+	e->runTime.vtx1 = ceil((((e->Init.vtx1 / 1000.0) + 5) * (pow(2,20) - 1)) / 10);
+	e->runTime.vtx2 = ceil((((e->Init.vtx2 / 1000.0) + 5) * (pow(2,20) - 1)) / 10);
+	e->runTime.step = ceil((((e->Init.step / 1000.0) + 5) * (pow(2,20) - 1)) / 10);
+	
+	
+		// Recupero todos los decimales para los cálculos...
+	step = e->Init.step / 1000.0;
+	sr = e->Init.sr / 1000.0;
+	
+	vtx1 = ((int16_t)(e->Init.vtx1)) / 1000.0;
+	vtx2 = ((int16_t)(e->Init.vtx2)) / 1000.0;
+	start = ((int16_t)(e->Init.start)) / 1000.0;
+		
+	tSampling = 1 / (float)(e->fSampling);
+	tInt = step / sr;
+	
+	// Nº de samples
+	e->nSamples1 = ceil(tInt / tSampling);
+	
+	// Nº de steps
+	e->nSteps1 = ceil(fabs(start - vtx2) / step);		// nSteps1 : no. steps in start - vtx1 part
+	e->nSteps2 = ceil(fabs(vtx1 - vtx2) / step);		// nSteps2 : no. steps in vtx1 - vtx2 part
+	
+	/* Inicializamos las variables para llevar la cuenta
+	de los samples que vamos leyendo de la LUT y de los 
+	samples totales del exp	en la ISR */
+	e->nSamplesPer = e->nSamples1;																												// Samples de cada período de LUT (suma samples cada tramo)
+	e->nSamplesExp = e->Init.scans * (e->nSamplesPer * (e->nSteps1 + (2*e->nSteps2)));		// Samples totales del experimento
+	e->nSamplesLUT = NSAMPLESLUT;
+		
+	// Inicializamos contadores
+	e->contSamplesPer = 0;
+	e->contStep = 0;
+	e->contSamplesExp = 0;
+	e->contSamplesLUT = 0;
+	e->contScansCV = 0;
+	
+
+	// Inicializamos flags auxiliares
+	e->parteA = 0;
+	e->flagPrimeraParte = 0;
 }
 
 
@@ -539,8 +698,56 @@ static void load_LSV_data(exp_param_values_t* e, uint8_t* cmd){
 	// + step
 	// + sr
 	
-	// TODO
+	float start, stop, step, sr, tSampling, tInt;
 	
+	// BORRAR :  va a depender del filtro seleccionado
+	e->fSampling = 10000;
+		
+	/* Experiment values */
+	e->Init.start = ((cmd[22] << 8) | (cmd[23] & 0xFF));
+	e->Init.stop = ((cmd[24] << 8) | (cmd[25] & 0xFF));
+	e->Init.step = ((cmd[26] << 8) | (cmd[27] & 0xFF));
+	e->Init.sr = ((cmd[28] << 8) | (cmd[29] & 0xFF));
+
+	
+	// Guardamos los parámetros convertidos a valores DAC
+	//e->runTime.start = ceil((((e->Init.start / 1000.0) * 32768.0) / VREF) + 32768.0);
+	//e->runTime.stop = ceil((((e->Init.stop / 1000.0) * 32768.0) / VREF) + 32768.0);
+	//e->runTime.step = ceil((((e->Init.step / 1000.0) * 32768.0) / VREF));
+	e->runTime.start = ceil((((e->Init.start / 1000.0) + 5) * (pow(2,20) - 1)) / 10);
+	e->runTime.stop = ceil((((e->Init.stop / 1000.0) + 5) * (pow(2,20) - 1)) / 10);
+	e->runTime.step = ceil((((e->Init.step / 1000.0) + 5) * (pow(2,20) - 1)) / 10);
+	
+	
+		// Recupero todos los decimales para los cálculos...
+	step = e->Init.step / 1000.0;
+	sr = e->Init.sr / 1000.0;
+	
+	stop = ((int16_t)(e->Init.stop)) / 1000.0;
+	start = ((int16_t)(e->Init.start)) / 1000.0;
+		
+	tSampling = 1 / (float)(e->fSampling);
+	tInt = step / sr;
+	
+	// Nº de samples
+	e->nSamples1 = ceil(tInt / tSampling);
+	
+	// Nº de steps
+	e->nSteps = ceil(fabs(start - stop) / step);	
+
+	
+	/* Inicializamos las variables para llevar la cuenta
+	de los samples que vamos leyendo de la LUT y de los 
+	samples totales del exp	en la ISR */
+	e->nSamplesPer = e->nSamples1;																												// Samples de cada período de LUT (suma samples cada tramo)
+	e->nSamplesExp = e->nSamplesPer * e->nSteps ;		// Samples totales del experimento
+	e->nSamplesLUT = NSAMPLESLUT;
+		
+	// Inicializamos contadores
+	e->contSamplesPer = 0;
+	e->contStep = 0;
+	e->contSamplesExp = 0;
+	e->contSamplesLUT = 0;
 }
 
 
@@ -555,7 +762,7 @@ static void load_SCV_data(exp_param_values_t* e, uint8_t* cmd){
 	// + start
 	// + stop
 	// + step
-	// + tHold
+	// + tHold		TODO :  tener en cuenta la gestión de este tHold 
 	// + sr
 	// + scans
 	
@@ -609,7 +816,7 @@ static void load_SCV_data(exp_param_values_t* e, uint8_t* cmd){
 	de los samples que vamos leyendo de la LUT y de los 
 	samples totales del exp	en la ISR */
 	e->nSamplesPer = e->nSamples1;															// Samples de cada período de LUT (suma samples cada tramo)
-	e->nSamplesExp = e->nSteps * e->nSamplesPer;								// Samples totales del experimento
+	e->nSamplesExp = 2 * e->nSteps * e->nSamplesPer;						// Samples totales del experimento
 	e->nSamplesLUT = NSAMPLESLUT;
 		
 	// Inicializamos contadores
@@ -617,6 +824,9 @@ static void load_SCV_data(exp_param_values_t* e, uint8_t* cmd){
 	e->contStep = 0;
 	e->contSamplesExp = 0;
 	e->contSamplesLUT = 0;
+	
+	// Inicializamos flags
+	e->parteA = 1;
 	
 }
 
@@ -1430,7 +1640,7 @@ static void load_MSA_data(exp_param_values_t* e, uint8_t* cmd){
 	
 	// Hay que definir este flag en el main y ponerlo a 1 donde corresponda.
 	if(e->msa_second_frame == 0){					// ¿es el segundo data frame para el MSA con los valores de todos los levels?
-		float tInterval, tSampling;
+		float tInterval;
 		
 		// BORRAR
 		e->fSampling = 10000;
@@ -2010,12 +2220,153 @@ static void load_ZCP_data(exp_param_values_t* e, uint8_t* cmd){
 	
 // TODO
 
+// Carga en un array los 4096 valores de la señal a generar
+// Este array se pasa luego en forma de puntero a las APIs de CEMITEC
+// para que el DDS genere la frecuencia deseada
+static void generatePEIS_FP(exp_param_values_t* e, exp_config_t* e_config, uint16_t* LUT){
+
+	
+	uint16_t i = 0;
+		
+	if(e_config->eis.waveType == MULTISINE){
+		// TODO
+		
+	}
+		
+	else{
+		for(i = 0; i < 4096; i++){							// Rellenamos el array con los valores correspondientes
+			//e->Init.eis.amplitude * sin((2 * PI / e->nSamplesAC) * e->contSin)
+		}
+		
+	}
+}
+	
+
+
+
+static void generatePEIS_SP(exp_param_values_t* e, exp_config_t* e_config, uint16_t* LUT){
+
+
+}
+
+
+static void generatePEIS_TS(exp_param_values_t* e, exp_config_t* e_config, uint16_t* LUT){
+
+}
+
+
+static void generateGEIS_FC(exp_param_values_t* e, exp_config_t* e_config, uint16_t* LUT){
+
+
+
+}
+
+
+static void generateGEIS_SC(exp_param_values_t* e, exp_config_t* e_config, uint16_t* LUT){
+
+
+
+}
+
+static void generateGEIS_TS(exp_param_values_t* e, exp_config_t* e_config, uint16_t* LUT){
+
+
+
+}
+
+
+/* ************************************************** */
+/* 	FUNCIONES PARA PRECARGA DE DATOS  DEL EXPERIMENTO */
+/* ************************************************** */	
+
+static void load_PEIS_FP_data(exp_param_values_t* e, uint8_t* cmd, exp_config_t* e_config){
+
+	// Parámetros
+	//		+ DC potential
+	//		+ Amplitude
+	// 1) Escaneo en frecuencia
+	//		+ First applied frequency
+	//		+ Last applied frequency
+	//		+ Number of frequencies
+	//		+ Amplitude
+	//		+ Sine/Multisine
+	//		+ noSines
+	//		+ freq step (linear, log, decade)
+
+
+	e->Init.eis.DCpotential = ((cmd[26] << 8) | (cmd[27] & 0xFF));
+	e->Init.eis.amplitude = ((cmd[34] << 8) | (cmd[35] & 0xFF));					// Amplitud máxima (tiene que llegar ya convertida desde el PC a este valor)
+	
+	if(e_config->eis.isScan == 1){			// Si es un escaneo en frecuencias recogeme estos parámetros también
+		e->Init.eis.firstFreq = ((cmd[28] << 8) | (cmd[29] & 0xFF));
+		e->Init.eis.lastFreq = ((cmd[30] << 8) | (cmd[31] & 0xFF));
+		e->Init.eis.nFreq = ((cmd[32] << 8) | (cmd[33] & 0xFF));
+	}
+	
+	
+	
+	
+}
+
+
+static void load_PEIS_SP_data(exp_param_values_t* e, uint8_t* cmd, exp_config_t* e_config){
+
+	// Parámetros
+	//	+ eStart
+	//	+ eStop
+	//	+ eStep
+	// 1) Escaneo en frecuencia
+	//		+ First applied frequency
+	//		+ Last applied frequency
+	//		+ Number of frequencies
+	//		+ Amplitude
+	//		+ Sine/Multisine
+	//		+ noSines
+	//		+ freq step (linear, log, decade)
+	
+	e->Init.eis.DCstart = ((cmd[26] << 8) | (cmd[27] & 0xFF));
+	e->Init.eis.DCstop = ((cmd[28] << 8) | (cmd[29] & 0xFF));
+	e->Init.eis.DCstep = ((cmd[30] << 8) | (cmd[31] & 0xFF));
+	e->Init.eis.amplitude = ((cmd[38] << 8) | (cmd[39] & 0xFF));
+	
+	if(e_config->eis.isScan == 1){																					// Es un escaneo de frecuencias?
+		e->Init.eis.firstFreq = ((cmd[32] << 8) | (cmd[33] & 0xFF));					// Recogemos además estos otros parametros
+		e->Init.eis.lastFreq = ((cmd[34] << 8) | (cmd[35] & 0xFF));
+		e->Init.eis.nFreq = ((cmd[36] << 8) | (cmd[37] & 0xFF));
+	}
+
+}
+
+static void load_PEIS_TS_data(exp_param_values_t* e, uint8_t* cmd, exp_config_t* e_config){
+
+
+}
+
+
+static void load_GEIS_FC_data(exp_param_values_t* e, uint8_t* cmd, exp_config_t* e_config){
+
+
+}
+
+static void load_GEIS_SC_data(exp_param_values_t* e, uint8_t* cmd, exp_config_t* e_config){
+
+
+}
+
+
+static void load_GEIS_TS_data(exp_param_values_t* e, uint8_t* cmd, exp_config_t* e_config){
+
+
+}
 
 
 
 
 
 
+
+
+/* ============================================== */
 /************************************************/
 /*										APIs											*/
 /************************************************/
@@ -2040,6 +2391,36 @@ void load_data(uint8_t* buff, exp_param_values_t* e, pretreat_param_t* p, exp_co
 	eConfig->bipot = buff[3];
 	eConfig->cell_on = buff[9];
 	eConfig->exp = buff[5];
+	
+	// Si nos llega técnica EIS cargamos además estos parámetros de configuración...
+	if(eConfig->exp == 23 | eConfig->exp == 24 | eConfig->exp == 25 | eConfig->exp == 26 | eConfig->exp == 27 | eConfig->exp == 28){
+		
+		if(buff[25] == 1){				// isScan == 1??; es un escaneo?
+			
+			eConfig->eis.isScan = 1;								// Se lo indicamos a la estructura 
+			
+			if(buff[22] == 1){											// Vemos si es multisine o no y ponemos la variable al valor...
+				eConfig->eis.waveType = MULTISINE;
+
+				eConfig->eis.noSines = buff[24];			// Guardamos el número de sines que se utilizan para formar la multisine
+			}
+			else{
+				eConfig->eis.waveType = SINE;
+			}
+			
+			if(buff[23] == 0){											// Vemos el tipo de step que se aplica a las frecuencias
+				eConfig->eis.freqStep = LINEAR;
+			}
+			else if(buff[23] == 1){
+				eConfig->eis.freqStep = LOG;
+			}
+			else if (buff[23] == 2){
+				eConfig->eis.freqStep = DECADE;
+			}
+		
+		}
+	}
+	
 	
 	// Configuramos el FS según vayamos a utilizar potenciostato o galvanostato
 	switch(eConfig->exp){																
@@ -2101,11 +2482,11 @@ void load_data(uint8_t* buff, exp_param_values_t* e, pretreat_param_t* p, exp_co
 		* VOLTAMMETRIES
 		************************************ */
 		case 0:													// CV
-			//load_CV_data(e, buff);
+			load_CV_data(e, buff);
 			break;
 		
 		case 1:													// LSV
-			//load_LSV_data(e, buff);
+			load_LSV_data(e, buff);
 			break;
 		
 		case 2:													// SCV
@@ -2201,10 +2582,30 @@ void load_data(uint8_t* buff, exp_param_values_t* e, pretreat_param_t* p, exp_co
 		/* **********************************
 		* EIS
 		************************************ */
-		// TODO
+		case 23:																	// PEIS-FixedPotential
+			load_PEIS_FP_data(e, buff, eConfig);
+			break;
 		
+		case 24:																	// PEIS-ScanPotential
+			load_PEIS_SP_data(e, buff, eConfig);
+			break;
+		
+		case 25:																	// PEIS-TimeScan
+			load_PEIS_TS_data(e, buff, eConfig);
+			break;
+		
+		case 26:																	// GEIS-FixedPotential
+			load_GEIS_FC_data(e, buff, eConfig);
+			break;
+		
+		case 27:																	// GEIS-ScanPotential
+			load_GEIS_SC_data(e, buff, eConfig);
+			break;
+		
+		case 28:																	// GEIS-TimeScan
+			load_GEIS_TS_data(e, buff, eConfig);
+			break;
 	}
-
 }
 	
 
@@ -2223,11 +2624,11 @@ void generate_data(exp_param_values_t* e,	exp_config_t* eConfig, uint16_t* lut){
 		* VOLTAMMETRIES
 		************************************ */
 		case 0:													// CV
-			// TODO
+			generateCV(e, lut);
 			break;
 
 		case 1:													// LSV
-			// TODO
+			generateLSV(e, lut);
 			break;
 		
 		case 2:													// SCV
@@ -2324,7 +2725,30 @@ void generate_data(exp_param_values_t* e,	exp_config_t* eConfig, uint16_t* lut){
 		/* **********************************
 		* EIS
 		************************************ */
-		// TODO
+		case 23:																	// PEIS-FixedPotential
+			generatePEIS_FP(e, eConfig, lut);
+			break;
+		
+		case 24:																	// PEIS-ScanPotential
+			generatePEIS_SP(e, eConfig, lut);
+			break;
+		
+		case 25:																	// PEIS-TimeScan
+			generatePEIS_TS(e, eConfig, lut);
+			break;
+		
+		case 26:																	// GEIS-FixedPotential
+			generateGEIS_FC(e, eConfig, lut);
+			break;
+		
+		case 27:																	// GEIS-ScanPotential
+			generateGEIS_SC(e, eConfig, lut);
+			break;
+		
+		case 28:																	// GEIS-TimeScan
+			generateGEIS_TS(e, eConfig, lut);
+			break;
+		
 
 	}
 }

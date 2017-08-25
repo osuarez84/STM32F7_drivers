@@ -45,7 +45,7 @@
 //	
 //}DF_OUTPUT;
 
-
+/* Enum para selección fondo de escala CEMITEC */
 typedef enum {
 	/* GALVANOSTAT */
 	FS_G_500nA,
@@ -59,12 +59,82 @@ typedef enum {
 	FS_B_5_100_mA
 }FS_GALV_BIPOT;
 
+/* Enum para selección filtros en modo POT CEMITEC */
+typedef enum{
+	BUTTER_250Hz,
+	BESSEL_1point2KHz,
+	BUTTER_200KHz
+}FILTER_POT_SELEC;
 
-	
+
 	
 /************************************************/
 /*		Structures for handling input Data				*/
 /************************************************/
+/* Estructuras para EIS */
+// TODO
+
+typedef enum{
+	LINEAR		= 0x00,
+	LOG				= 0x01,
+	DECADE		= 0x02
+}freq_step_l;
+
+
+typedef enum{
+	TWO_W		= 0x00,
+	THREE_W	= 0x01,
+	FOUR_W	= 0x02
+}number_wires_l;
+
+typedef enum{
+	SINE			= 0x00,
+	MULTISINE	= 0x01
+}waveType_l;
+
+
+typedef struct{
+
+	uint8_t OCP_on;
+	
+	// With frequency scans...
+	freq_step_l freqStep;					// Linear, Log or freqs/dec
+	// Multisine
+	uint8_t noSines;
+	uint8_t isScan;
+	
+	
+	number_wires_l noW;
+	waveType_l waveType;
+	
+}eis_exp_config_t;
+
+
+typedef struct{
+
+	uint16_t DCpotential;
+	uint16_t DCstart;
+	uint16_t DCstop;
+	uint16_t DCstep;
+	uint16_t nofSamples;			// nº de muestras a recoger por el equipo
+	
+	uint16_t amplitude;
+	
+	//uint16_t maxIntTime;
+	//uint16_t minIntCyc;
+	
+	// Frequency scans
+	uint16_t firstFreq;
+	uint16_t lastFreq;
+	uint16_t nFreq;
+	
+
+	
+	
+}eis_param_values_t;
+
+
+
 /* Definición estructuras datos recibidas por el USB */
 
 typedef struct{
@@ -84,6 +154,8 @@ typedef struct{
 	uint8_t high_gain;
 	uint8_t cell_on;
 	uint16_t cell;
+	
+	eis_exp_config_t eis;
 }exp_config_t;
 
 typedef struct{
@@ -123,7 +195,7 @@ typedef struct{
 	uint16_t iStrip;					// PSA
 	uint16_t eEnd;
 
-
+	eis_param_values_t eis;
 
 }param_t;
 
@@ -139,15 +211,21 @@ typedef struct{
 	uint32_t contSamplesPer;
 	uint32_t contSamplesExp;
 	uint16_t contSamplesLUT;
+	uint16_t contScansCV;				// CV
 	
 	uint16_t nSamplesLUT;
 	uint32_t nSamplesExp;
 	uint32_t nSamplesPer;
 	uint32_t nSteps;
+	uint32_t nSteps1;
+	uint32_t nSteps2;
 	uint16_t nSamples1;
 	uint16_t nSamples2;
 	uint16_t nSamples3;
 	uint16_t fSampling;		// fSampling dependerá del filtro seleccionado
+	
+	uint16_t nScan;				// Para la CV. Aquí guardamos el scan en que nos encontramos. Esto se lo pasamos
+												// al PC para que este pueda controlar a qué scan pertenecen los ptos que le están llegando.
 	
 	// ACV
 	uint16_t nSamplesAC;
@@ -155,7 +233,13 @@ typedef struct{
 	
 	// MSA
 	bool msa_second_frame; // Flag para saber si se va a recibir segundo frame con datos de los levels del MSA
-
+	
+	// CV
+	bool flagPrimeraParte;		// Flag para controlar la parte de la señal que estamos generando
+	bool parteA;
+	
+	// Variable para selección de filtro en modo POT
+	FILTER_POT_SELEC filter;
 	
 }exp_param_values_t;
 
@@ -167,8 +251,7 @@ typedef struct{
 /* Estructuras para POTENCIOMETRIAS */
 // TODO
 
-/* Estructuras para EIS */
-// TODO
+
 
 
 /************************************************/
